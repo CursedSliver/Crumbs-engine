@@ -31,7 +31,9 @@ var Crumbs_Init_On_Load = function() {
 		this.parent = parent?parent:null;
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
-		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
+		if (Crumbs.particleImgs.hasOwnProperty(obj.imgs)) { this.imgs = Crumbs.particleImgs[obj.imgs]; } else { this.imgs = obj.imgs?obj.imgs:Crumbs.particleDefaults.imgs; }
+		this.imgs = [].concat(this.imgs);
+		this.imgUsing = obj.imgUsing?obj.imgUsing:Crumbs.particleDefaults.imgUsing;
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
 		this.order = obj.order?obj.order:Crumbs.particleDefaults.order;
 		let initRe = null;
@@ -76,7 +78,7 @@ var Crumbs_Init_On_Load = function() {
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.nonQuickSettable = ['filters'];
-	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'img', 'behaviorParams']
+	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'imgs', 'imgUsing', 'behaviorParams']
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && Crumbs.validProperties.includes(i)) { this[i] = o; } 
@@ -266,6 +268,8 @@ var Crumbs_Init_On_Load = function() {
  	what it can return:
   	x, y, scaleX, scaleY, rotation: self explanatory
    	filter: an object containing all the CSS filters
+	imgs: a new array of the images
+ 	imgUsing: the img frame selected
 	newChild: an object or an array containing objects for spawning children
  	behaviorParams: an object to replace the original params for this behavior
   	*/
@@ -279,7 +283,8 @@ var Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.particleDefaults = {
-		img: Crumbs.particleImgs.empty,
+		imgs: Crumbs.particleImgs.empty,
+		imgUsing: 0,
 		scope: 'foreground',
 		init: Crumbs.particleInits.default,
 		behaviors: Crumbs.particleBehaviors.idle,
