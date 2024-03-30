@@ -20,9 +20,9 @@ var Crumbs_Init_On_Load = function() {
 		id: '',
 		behaviorParams: {}
 	};
-	Crumbs.particle = function(img, scope, init, behaviors, id, behaviorParams, obj) {
+	Crumbs.particle = function(obj) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
-		if (typeof obj === 'undefined') { obj = {}; }
+		if (typeof obj !== 'object') { obj = {}; }
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!(this.scope == 'left' || this.scope == 'middle' || this.scope == 'right' || this.scope == 'all')) { throw 'Crumbs particle type not matching or is undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
@@ -33,8 +33,8 @@ var Crumbs_Init_On_Load = function() {
 		} else if (typeof init === 'object') {
 			initRe = init;
 		} else if (typeof init === 'undefined') {
-			throw 'Crumbs particle init cannot be undefined; Use \'null\' to specify the default init location';
-		} else { this.initRe = Crumbs.particleDefaults.init; }
+			this.initRe = Crumbs.particleDefaults.init;
+		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
 		this.x = initRe.x;
 		this.y = initRe.y;
 		this.scaleX = initRe.scaleX;
@@ -44,10 +44,10 @@ var Crumbs_Init_On_Load = function() {
 		this.filters = {};
 		this.behaviors = [];
 		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = this.behaviorParams.concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
-		if (typeof behaviors == 'function' || Array.isArray(behaviors)) { 
-			this.behaviors = this.behaviors.concat(behaviors);
+		if (typeof obj.behaviors == 'function' || Array.isArray(obj.behaviors)) { 
+			this.behaviors = this.behaviors.concat(obj.behaviors);
 		} else {
-			if (typeof behaviors === 'undefined') { throw 'Crumbs particle behavior cannot be undefined'; } else { throw 'Crumbs particle behavior type '+(typeof type)+' not applicable'; } 
+			if (typeof behaviors === 'undefined') { this.behaviors = Crumbs.particleDefaults.behaviors; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
 		this.t = 0; //amount of draw ticks since its creation
 		let pushed = false;
@@ -98,7 +98,7 @@ var Crumbs_Init_On_Load = function() {
 					counter++;
 				}
 			}
-			Crumbs.particles.splice(counter, Crumbs.particles[i].length); //ensures a complete removal
+			Crumbs.particles.splice(counter, Crumbs.particles[i].length); 
 		}
 	};
 	Crumbs.killAllParticles = function() {
@@ -146,6 +146,7 @@ var Crumbs_Init_On_Load = function() {
 				}
 			}
 		}
+		return toReturn;
 	};
 	
 	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation
