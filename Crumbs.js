@@ -11,7 +11,8 @@ var Crumbs_Init_On_Load = function() {
 		}
 	}
 	Crumbs.particleImgs = {
-		glint: 'glint.png'
+		empty: 'img/empty.png',
+		glint: 'img/glint.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		let targetL = '';
@@ -75,7 +76,7 @@ var Crumbs_Init_On_Load = function() {
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.nonQuickSettable = ['filters'];
-	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'behaviorParams']
+	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'img', 'behaviorParams']
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && Crumbs.validProperties.includes(i)) { this[i] = o; } 
@@ -278,7 +279,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.particleDefaults = {
-		img: '',
+		img: Crumbs.particleImgs.empty,
 		scope: 'foreground',
 		init: Crumbs.particleInits.default,
 		behaviors: Crumbs.particleBehaviors.idle,
