@@ -1,4 +1,4 @@
-var Crumbs = {};
+if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var Crumbs_Init_On_Load = function() {
 	Crumbs.prefs = {
@@ -6,18 +6,20 @@ var Crumbs_Init_On_Load = function() {
 			left: 1,
 			middle: 1,
 			right: 1,
-			all: 1
+			all: 1,
+			background: 1
 		}
 	}
 	Crumbs.particleImgs = {
 		
 	};
+	Crumbs.validScopes = ['left', 'middle', 'right', 'all', 'background'];
 	Crumbs.particle = function(obj) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.particle constructor parameter must be an object or undefined.'; }
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
-		if (!(this.scope == 'left' || this.scope == 'middle' || this.scope == 'right' || this.scope == 'all')) { throw 'Crumbs particle type not matching or is undefined';  } 
+		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
 		let initRe = null;
@@ -55,6 +57,9 @@ var Crumbs_Init_On_Load = function() {
 		if (this.filters.hasOwnProperty('alpha')) { delete this.filters.alpha; return [this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.filters.alpha, this.filters]; }
 		else { return [this.x, this.y, this.scaleX, this.scaleY, this.rotation, 1, this.filters]; }
 	};
+	Crumbs.particle.prototype.getInfo = function() {
+		return this; 
+	};
 	Crumbs.particle.prototype.hasSubs = function() {
 		return (this.subParticles.length > 0);
 	};
@@ -68,20 +73,21 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.particle.prototype.triggerBehavior = function() {
 		for (let b in this.behaviors) {
-			let e = this.behaviors[b](this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.t, this.behaviorParams[b]);
+			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
-			this.x = e[0]; this.y = e[1]; this.scaleX = e[2]; this.scaleY = e[3]; this.rotation = e[4];
-			if (e[5]) {
-				var o = e[5];
-				if (o.filters) {
-					for (let i in o.filters) {
-						this.filters[i] = o.filters[i];
-					}
+			this.x = e.x?e.x:this.x; 
+			this.y = e.y?e.y:this.y; 
+			this.scaleX = e.scaleX?e.scaleX:this.scaleX; 
+			this.scaleY = e.scaleY?e.scaleY:this.scaleY; 
+			this.rotation = e.rotation?e.rotation:this.rotation;
+			if (e.filters) {
+				for (let i in e.filters) {
+					this.filters[i] = e.filters[i];
 				}
 			}
 		}
-	}
+	};
 	Crumbs.reorderAllParticles = function() {
 		for (let i in Crumbs.particles) {
 			let counter = 0;
@@ -150,14 +156,14 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleInits.bottomRandom = function() {
 		return {x: Math.random() * l('backgroundLeftCanvas').offsetWidth, y: l('backgroundLeftCanvas').offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
 	};
-	Crumbs.particleBehaviors = {}; //behaviors return array containing x, y, scaleX, scaleY, rotation, then an object for any optional attributes. Return 't' to terminate the particle
-	Crumbs.particleBehaviors.idle = function(x, y, sx, sy, r, t, p) {
-		return [x, y, sx, sy, r];
+	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
+	Crumbs.particleBehaviors.idle = function(o, p) {
+		return {};
 	};
-	Crumbs.particleBehaviors.rise = function(x, y, sx, sy, r, t, p) {
-		if (t > 64) { return 't'; }
-		let l = Math.log2(Math.max(t, 2));
-		return [x, y - l, sx * (1 / l), sy * (1 / l), r]; 
+	Crumbs.particleBehaviors.rise = function(o, p) {
+		if (o.t > 64) { return 't'; }
+		let l = Math.log2(Math.max(o.t, 2));
+		return {y: o.y - l, scaleX: o.scaleX * (1 / l), scaleY: o.scaleY * (1 / l)}; 
 	};
 
 	Crumbs.particleDefaults = {
@@ -183,7 +189,8 @@ var Crumbs_Init_On_Load = function() {
 		left: [],
 		middle: [],
 		right: [],
-		all: []
+		all: [],
+		background: []
 	};
 }
 
