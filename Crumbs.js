@@ -56,7 +56,7 @@ var Crumbs_Init_On_Load = function() {
 		if (typeof obj.behaviors == 'function' || Array.isArray(obj.behaviors)) { 
 			this.behaviors = this.behaviors.concat(obj.behaviors);
 		} else {
-			if (typeof behaviors === 'undefined') { this.behaviors = Crumbs.particleDefaults.behaviors; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
+			if (typeof obj.behaviors === 'undefined') { this.behaviors = [Crumbs.particleDefaults.behaviors]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
 		this.t = 0; //amount of draw ticks since its creation
 		if (this.parent === null) {
