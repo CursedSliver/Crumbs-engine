@@ -91,7 +91,7 @@ var Crumbs_Init_On_Load = function() {
 					counter++;
 				}
 			}
-			Crumbs.particles.splice(counter, Crumbs.particles[i].length); 
+			Crumbs.particles[i].splice(counter, Crumbs.particles[i].length); 
 		}
 	};
 	Crumbs.killAllParticles = function() {
