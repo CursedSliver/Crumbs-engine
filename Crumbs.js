@@ -1,6 +1,14 @@
 var Crumbs = {};
 
 var Crumbs_Init_On_Load = function() {
+	Crumbs.prefs = {
+		particles: {
+			left: 1,
+			middle: 1,
+			right: 1,
+			all: 1
+		}
+	}
 	Crumbs.particleImgs = {
 		
 	};
@@ -81,8 +89,8 @@ var Crumbs_Init_On_Load = function() {
 			for (let ii in Crumbs.particles[i]) { Crumbs.particles[i][ii].die(); }
 		}
 	}
-	Crumbs.particlesEnabled = function() {
-		return Game.prefs.particles && Crumbs.prefs.particles;
+	Crumbs.particlesEnabled = function(scope) {
+		return Crumbs.prefs.particles[scope];
 	};
 	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation
 	Crumbs.particleInits.default = function() {
