@@ -6,7 +6,7 @@ var Crumbs_Init_On_Load = function() {
 			left: 1,
 			middle: 1,
 			right: 1,
-			all: 1,
+			foreground: 1,
 			background: 1
 		}
 	}
@@ -77,7 +77,7 @@ var Crumbs_Init_On_Load = function() {
 		left: [],
 		middle: [],
 		right: [],
-		all: [],
+		foreground: [],
 		background: []
 	};
 	Crumbs.particle.prototype.getInfo = function() {
