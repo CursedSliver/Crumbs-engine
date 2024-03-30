@@ -12,14 +12,6 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleImgs = {
 		
 	};
-	Crumbs.particleDefaults = {
-		img: '',
-		scope: 'all',
-		init: Crumbs.particleInits.default,
-		behaviors: Crumbs.particleBehaviors.idle,
-		id: '',
-		behaviorParams: {}
-	};
 	Crumbs.particle = function(obj) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
@@ -166,6 +158,15 @@ var Crumbs_Init_On_Load = function() {
 		let l = Math.log2(Math.max(t, 2));
 		return [x, y - l, sx * (1 / l), sy * (1 / l), r]; 
 	};
+
+	Crumbs.particleDefaults = {
+		img: '',
+		scope: 'all',
+		init: Crumbs.particleInits.default,
+		behaviors: Crumbs.particleBehaviors.idle,
+		id: '',
+		behaviorParams: {}
+	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', function() { if (Crumbs.particlesEnabled()) { 
 		for (let i in Crumbs.particles) { 
