@@ -22,7 +22,8 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.particle = function(obj) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
-		if (typeof obj !== 'object') { obj = {}; }
+		if (typeof obj === 'undefined') { obj = {}; }
+		if (typeof obj !== 'object') { throw 'Crumbs.particle constructor parameter must be an object or undefined.'; }
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!(this.scope == 'left' || this.scope == 'middle' || this.scope == 'right' || this.scope == 'all')) { throw 'Crumbs particle type not matching or is undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
@@ -154,7 +155,7 @@ var Crumbs_Init_On_Load = function() {
 		return {x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0};
 	};
 	Crumbs.particleInits.bottomRandom = function() {
-		return [Math.random() * l('backgroundLeftCanvas').offsetWidth, l('backgroundLeftCanvas').offsetHeight, 1, 1, 0];
+		return {x: Math.random() * l('backgroundLeftCanvas').offsetWidth, y: l('backgroundLeftCanvas').offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return array containing x, y, scaleX, scaleY, rotation, then an object for any optional attributes. Return 't' to terminate the particle
 	Crumbs.particleBehaviors.idle = function(x, y, sx, sy, r, t, p) {
