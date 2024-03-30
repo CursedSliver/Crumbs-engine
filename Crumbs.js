@@ -13,7 +13,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleImgs = {
 		glint: 'glint.png'
 	};
-	Crumbs.getCanvasByScope = function(scope) {
+	Crumbs.getCanvasByScope = function(s) {
 		let targetL = '';
 		if (s == 'left') { targetL = 'backgroundLeftCanvas'; } 
 		else if (s == 'background') { targetL = 'backgroundCanvas'; }
