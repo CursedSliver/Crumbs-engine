@@ -116,6 +116,13 @@ var Crumbs_Init_On_Load = function() {
 			}
 		}
 	};
+	Crumbs.particle.prototype.updateChildren = function() {
+		for (let i in this.children) {
+			this.children[i].t++;
+			this.children[i].triggerBehavior();
+			this.children[i].updateChildren();
+		}
+	};
 	Crumbs.reorderAllParticles = function() {
 		for (let i in Crumbs.particles) {
 			let counter = 0;
@@ -136,6 +143,17 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particlesEnabled = function(scope) {
 		return Crumbs.prefs.particles[scope];
 	};
+	Crumbs.updateParticles = function() { //called every draw frame
+		for (let i in Crumbs.particles) { 
+			if (Crumbs.particlesEnabled(i)) {
+				for (let ii in Crumbs.particles[i]) {
+					if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); Crumbs.particles[i][ii].updateChildren(); }
+				} 
+			}
+		} 
+		if (Game.drawT % 3600 == 0) { Crumbs.reorderAllParticles(); } 
+	};
+	
 	Crumbs.findParticle = function(id, scope) {
 		if (scope) {
 			for (let i in Crumbs.particles[scope]) {
@@ -210,16 +228,7 @@ var Crumbs_Init_On_Load = function() {
 		behaviorParams: {}
 	}; //needs to be down here for some reason
 	
-	Game.registerHook('draw', function() { 
-		for (let i in Crumbs.particles) { 
-			if (Crumbs.particlesEnabled(i)) {
-				for (let ii in Crumbs.particles[i]) {
-					if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); }
-				} 
-			}
-		} 
-		if (Game.drawT % 3600 == 0) { Crumbs.reorderAllParticles(); } 
-	});
+	Game.registerHook('draw', Crumbs.updateParticles);
 }
 
 Game.registerMod('Crumbs engine', {
