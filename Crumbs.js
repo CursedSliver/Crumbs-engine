@@ -269,6 +269,11 @@ var Crumbs_Init_On_Load = function() {
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
+
+	//below for the actual drawing
+	let div = document.createElement('canvas');
+	div.id = 'foregroundCanvas'; div.style = 'background: none;';
+	l('game').appendChild(div);
 }
 
 Game.registerMod('Crumbs engine', {
