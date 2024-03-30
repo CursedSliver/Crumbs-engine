@@ -23,10 +23,11 @@ var Crumbs_Init_On_Load = function() {
 		return l(targetL);
 	} 
 	Crumbs.validScopes = ['left', 'middle', 'right', 'all', 'background'];
-	Crumbs.particle = function(obj) {
+	Crumbs.particle = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.particle constructor parameter must be an object or undefined.'; }
+		this.parent = parent?parent:null;
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
@@ -44,7 +45,7 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleX = initRe.scaleX;
 		this.scaleY = initRe.scaleY;
 		this.rotation = initRe.rotation; //euler, clockwise
-		this.subParticles = [];
+		this.children = [];
 		this.filters = {};
 		this.behaviors = [];
 		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = this.behaviorParams.concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
@@ -54,11 +55,19 @@ var Crumbs_Init_On_Load = function() {
 			if (typeof behaviors === 'undefined') { this.behaviors = Crumbs.particleDefaults.behaviors; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
 		this.t = 0; //amount of draw ticks since its creation
-		let pushed = false;
-		for (let i in Crumbs.particles) {
-			if (Crumbs.particles[this.scope][i] === null) { this.index = i; Crumbs.particles[this.scope][i] = this; pushed = true; break; }
+		if (this.parent === null) {
+			let pushed = false;
+			for (let i in Crumbs.particles) {
+				if (Crumbs.particles[this.scope][i] === null) { this.index = i; Crumbs.particles[this.scope][i] = this; pushed = true; break; }
+			}
+			if (!pushed) { this.index = Crumbs.particles[this.scope].length; Crumbs.particles[this.scope].push(this); }
+		} else {
+			let pushed = false;
+			for (let i in this.parent.children) {
+				if (this.parent.children[i] === null) { this.index = i; this.parent.children[i] = this; pushed = true; break; }
+			}
+			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
 		}
-		if (!pushed) { this.index = Crumbs.particles[this.scope].length; Crumbs.particles[this.scope].push(this); }
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.particles = {
@@ -71,11 +80,18 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particle.prototype.getInfo = function() {
 		return this; 
 	};
-	Crumbs.particle.prototype.hasSubs = function() {
-		return (this.subParticles.length > 0);
-	};
 	Crumbs.particle.prototype.die = function() {
-		Crumbs.particles[this.scope][this.index] = null;
+		if (this.parent) { this.parent.removeChild(this.index) }
+		else { Crumbs.particles[this.scope][this.index] = null; }
+	};
+	Crumbs.particle.prototype.spawnChild = function(obj) {
+		this.children.push(new Crumbs.particle(obj, this));
+	};
+	Crumbs.particle.prototype.hasChildren = function() {
+		return (this.children.length > 0);
+	};
+	Crumbs.particle.prototype.removeChild = function(index) {
+		this.children[index] = null; //unlike with root level particles, children arrays are not cleaned every 3600 draw ticks, so please use them wisely.
 	};
 	Crumbs.particle.prototype.reorder = function(at) {
 		Crumbs.particles[this.scope][this.index] = null;
@@ -92,6 +108,7 @@ var Crumbs_Init_On_Load = function() {
 			this.scaleX = e.scaleX?e.scaleX:this.scaleX; 
 			this.scaleY = e.scaleY?e.scaleY:this.scaleY; 
 			this.rotation = e.rotation?e.rotation:this.rotation;
+			this.behaviorParams[b] = e.newParam?e.newParam:this.behaviorParams[b];
 			if (e.filters) {
 				for (let i in e.filters) {
 					this.filters[i] = e.filters[i];
@@ -168,6 +185,13 @@ var Crumbs_Init_On_Load = function() {
 		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
+	/*
+ 	what it can return:
+  	x, y, scaleX, scaleY, rotation: self explanatory
+   	filter: an object containing all the CSS filters
+	newChild: an object or an array containing objects for spawning children
+ 	newParam: an object to replace the original params for this behavior
+  	*/
 	Crumbs.particleBehaviors.idle = function(o, p) {
 		return {};
 	};
@@ -194,7 +218,7 @@ var Crumbs_Init_On_Load = function() {
 				} 
 			}
 		} 
-		if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } 
+		if (Game.drawT % 3600 == 0) { Crumbs.reorderAllParticles(); } 
 	});
 }
 
