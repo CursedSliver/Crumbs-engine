@@ -123,6 +123,32 @@ var Crumbs_Init_On_Load = function() {
 			this.children[i].updateChildren();
 		}
 	};
+	Crumbs.particle.prototype.findChild = function(id) {
+		for (let i in this.children) { 
+			if (this.children[i] !== null) {
+				if (this.children[i].id === id) {
+					return this.children[i];
+				} else {
+					let cd = this.children[i].findChild(id);
+					if (cd !== null) { return cd; }
+				}
+			}
+		}
+		return null;
+	};
+	Crumbs.particle.prototype.getChildren = function(id) {
+		let toReturn = [];
+		for (let i in this.children) {
+			if (this.children[i] !== null) {
+				if (this.children[i].id === id) {
+					toReturn.push(this.children[i]);
+				} else {
+					toReturn.concat(this.children[i].getChildren(id)); 
+				}
+			}
+		}
+		return toReturn;
+	};
 	Crumbs.reorderAllParticles = function() {
 		for (let i in Crumbs.particles) {
 			let counter = 0;
@@ -189,6 +215,20 @@ var Crumbs_Init_On_Load = function() {
 					if (Crumbs.particles[i][ii] !== null && Crumbs.particles[i][ii].id == id) {
 						toReturn.push(Crumbs.particles[i][ii]);
 					}
+				}
+			}
+		}
+		return toReturn;
+	};
+	Crumbs.globalSearch = function(id) { //searches through all fields for all particles of a given id; not recommended for regular use
+		let toReturn = [];
+		for (let i in Crumbs.particles) {
+			for (let ii in Crumbs.particles[i]) {
+				if (Crumbs.particles[i][ii] !== null) {
+					if (Crumbs.particles[i][ii].id == id) {
+						toReturn.push(Crumbs.particles[i][ii]);
+					}
+					toReturn.concat(Crumbs.particles[i][ii].getChildren(id));
 				}
 			}
 		}
