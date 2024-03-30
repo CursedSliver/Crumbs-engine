@@ -28,6 +28,7 @@ var Crumbs_Init_On_Load = function() {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.particle constructor parameter must be an object or undefined.'; }
+		for (let i in obj) { if (!Crumbs.allProperties.includes(i)) { throw i+' is not a valid property for a particle.'; } }
 		this.parent = parent?parent:null;
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
@@ -49,6 +50,7 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleX = initRe.scaleX;
 		this.scaleY = initRe.scaleY;
 		this.rotation = initRe.rotation; //euler, clockwise
+		this.alpha = initRe.alpha;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -78,11 +80,13 @@ var Crumbs_Init_On_Load = function() {
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.nonQuickSettable = ['filters'];
-	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'imgs', 'imgUsing', 'behaviorParams']
+	Crumbs.nonValidProperties = ['scope', 'behaviors'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
-			if (!Crumbs.nonQuickSettable.includes(i) && Crumbs.validProperties.includes(i)) { this[i] = o; } 
-			else if (!Crumbs.validProperties.includes(i)) { throw 'Cannot set particle property "'+i+'"!'; }
+			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o; } 
+			else if (Crumbs.nonValidProperties.includes(i)) { throw 'Cannot set particle property "'+i+'"!'; }
+			else { throw 'Unrecognized particle property: "'+i+'"!'; }
 		}
 		if (o.filters) {
 			for (let i in o.filters) {
@@ -258,15 +262,16 @@ var Crumbs_Init_On_Load = function() {
 	
 	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
 	Crumbs.particleInits.default = function(s) {
-		return {x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0};
+		return {x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1};
 	};
 	Crumbs.particleInits.bottomRandom = function(c) {
-		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
+		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
 	/*
  	what it can return:
   	x, y, scaleX, scaleY, rotation: self explanatory
+    alpha: opacity
    	filter: an object containing all the CSS filters
 	imgs: a new array of the images
  	imgUsing: the img frame selected
