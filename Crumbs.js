@@ -47,6 +47,8 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleY = initRe.scaleY;
 		this.rotation = initRe.rotation; //euler, clockwise
 		this.children = [];
+		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
+		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.filters = {};
 		this.behaviors = [];
 		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = this.behaviorParams.concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
@@ -118,6 +120,10 @@ var Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.particle.prototype.updateChildren = function() {
+		if (this.parent !== null) {
+			this.canvaCenter = [this.parent.x + this.parent.canvaCenter[0], this.parent.y + this.parent.canvaCenter[1]];
+			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
+		}
 		for (let i in this.children) {
 			this.children[i].t++;
 			this.children[i].triggerBehavior();
@@ -276,6 +282,48 @@ var Crumbs_Init_On_Load = function() {
 	let div = document.createElement('canvas');
 	div.id = 'foregroundCanvas'; div.style = 'background: none;';
 	l('game').appendChild(div);
+
+	Crumbs.compileParticles = function(s) {
+		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
+		for (let i in Crumbs.particles[s]) {
+			arr = Crumbs.merge(arr, Crumbs.particles[s][i].compile());
+		}
+		return arr;
+	};
+	Crumbs.particle.prototype.compile = function() {
+		let arr = [];
+		arr.push(this);
+		for (let i in this.children) {
+			arr = Crumbs.merge(arr, this.children[i].compile());
+		}
+		return arr;
+	};
+	Crumbs.merge = function(arr1, arr2) {
+		//merges two particles arrays together sorting based on order
+		let mergedArray = [];
+    	let i = 0;
+    	let j = 0;	
+	
+	    while (i < arr1.length && j < arr2.length) {
+	        if (arr1[i].order < arr2[j].order) {
+	            mergedArray.push(arr1[i]);
+	            i++;
+	        } else {
+	            mergedArray.push(arr2[j]);
+	            j++;
+	        }
+	    }
+	    while (i < arr1.length) {
+	        mergedArray.push(arr1[i]);
+	        i++;
+	    }
+	    while (j < arr2.length) {
+	        mergedArray.push(arr2[j]);
+	        j++;
+	    }
+	
+	    return mergedArray;
+	};
 }
 
 Game.registerMod('Crumbs engine', {
