@@ -51,6 +51,7 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleY = initRe.scaleY;
 		this.rotation = initRe.rotation; //euler, clockwise
 		this.alpha = initRe.alpha;
+		this.patternFill = obj.patternFill?obj.patternFill:Crumbs.particleDefaults.patternFill;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -81,7 +82,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -295,7 +296,8 @@ var Crumbs_Init_On_Load = function() {
 		behaviors: Crumbs.particleBehaviors.idle,
 		id: '',
 		order: 0,
-		behaviorParams: {}
+		behaviorParams: {},
+		patternFill: 0
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
