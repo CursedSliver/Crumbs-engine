@@ -2,13 +2,13 @@ var Crumbs = {};
 
 var Crumbs_Init_On_Load = function() {
 	Crumbs.particleImgs = {
-		light: App?this.dir+"/img.png":"https://raw.githack.com/omaruvu/Kaizo-Cookie/main/decay_light_glint.png"
+		
 	};
-	Crumbs.particle = function(type, init, behaviors, behaviorParams) {
+	Crumbs.particle = function(img, scope, init, behaviors, behaviorParams) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
-		this.type = type;
-		if (this.type == 'light') { this.img = Crumbs.particleImgs.light; } 
-		else { throw 'Crumbs particle type not matching or is undefined'; }
+		this.scope = scope;
+		if (!(this.scope == 'left' || this.scope == 'middle' || this.scope == 'right' || this.scope == 'all')) { throw 'Crumbs particle type not matching or is undefined';  } 
+		if (Crumbs.particleImgs.hasOwnProperty(img)) { this.img = Crumbs.particleImgs[img]; } else { this.img = img; }
 		let initRe = init();
 		this.x = initRe[0];
 		this.y = initRe[1];
@@ -27,9 +27,9 @@ var Crumbs_Init_On_Load = function() {
 		this.t = 0; //amount of draw ticks since its creation
 		let pushed = false;
 		for (let i in Crumbs.particles) {
-			if (Crumbs.particles[i] === null) { this.index = i; Crumbs.particles[i] = this; pushed = true; break; }
+			if (Crumbs.particles[this.scope][i] === null) { this.index = i; Crumbs.particles[this.scope][i] = this; pushed = true; break; }
 		}
-		if (!pushed) { this.index = Crumbs.particles.length; Crumbs.particles.push(this); }
+		if (!pushed) { this.index = Crumbs.particles[this.scope].length; Crumbs.particles[this.scope].push(this); }
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.particle.prototype.return = function() {
@@ -41,11 +41,11 @@ var Crumbs_Init_On_Load = function() {
 		return (this.subParticles.length > 0);
 	};
 	Crumbs.particle.prototype.die = function() {
-		Crumbs.particles[this.index] = null;
+		Crumbs.particles[this.scope][this.index] = null;
 	};
 	Crumbs.particle.prototype.reorder = function(at) {
-		Crumbs.particles[this.index] = null;
-		Crumbs.particles[at] = this;
+		Crumbs.particles[this.scope][this.index] = null;
+		Crumbs.particles[this.scope][at] = this;
 		Crumbs.index = at;
 	};
 	Crumbs.particle.prototype.triggerBehavior = function() {
@@ -67,16 +67,18 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.reorderAllParticles = function() {
 		let counter = 0;
 		for (let i in Crumbs.particles) {
-			if (Crumbs.particles[i] !== null) {
-				Crumbs.particles[i].reorder(counter);
-				counter++;
+			for (let ii in Crumbs.particles[i]) {
+				if (Crumbs.particles[i][ii] !== null) {
+					Crumbs.particles[i][ii].reorder(counter);
+					counter++;
+				}
 			}
 		}
 		Crumbs.particles.splice(counter, Crumbs.particles.length); //ensures a complete removal
 	};
 	Crumbs.killAllParticles = function() {
 		for (let i in Crumbs.particles) {
-			Crumbs.particles[i].die();
+			for (let ii in Crumbs.particles[i]) { Crumbs.particles[i][ii].die(); }
 		}
 	}
 	Crumbs.particlesEnabled = function() {
@@ -100,7 +102,12 @@ var Crumbs_Init_On_Load = function() {
 	};
 	
 	Game.registerHook('draw', function() { if (Crumbs.particlesEnabled()) { for (let i in Crumbs.particles) { if (Crumbs.particles[i] !== null) { Crumbs.particles[i].t++; Crumbs.particles[i].triggerBehavior(); } } if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } } });
-	Crumbs.particles = [];
+	Crumbs.particles = {
+		left: [],
+		middle: [],
+		right: [],
+		all: []
+	};
 }
 
 Game.registerMod('Crumbs engine', {
