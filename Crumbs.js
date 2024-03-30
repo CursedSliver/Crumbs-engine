@@ -109,7 +109,14 @@ var Crumbs_Init_On_Load = function() {
 		return [x, y - l, sx * (1 / l), sy * (1 / l), r]; 
 	};
 	
-	Game.registerHook('draw', function() { if (Crumbs.particlesEnabled()) { for (let i in Crumbs.particles) { if (Crumbs.particles[i] !== null) { Crumbs.particles[i].t++; Crumbs.particles[i].triggerBehavior(); } } if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } } });
+	Game.registerHook('draw', function() { if (Crumbs.particlesEnabled()) { 
+		for (let i in Crumbs.particles) { 
+			for (let ii in Crumbs.particles[i]) {
+				if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); }
+			} 
+		} 
+		if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } } 
+	});
 	Crumbs.particles = {
 		left: [],
 		middle: [],
