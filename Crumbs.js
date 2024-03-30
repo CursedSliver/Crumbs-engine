@@ -11,7 +11,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 	}
 	Crumbs.particleImgs = {
-		
+		glint: 'glint.png'
 	};
 	Crumbs.getCanvasByScope = function(scope) {
 		let targetL = '';
@@ -61,10 +61,12 @@ var Crumbs_Init_On_Load = function() {
 		if (!pushed) { this.index = Crumbs.particles[this.scope].length; Crumbs.particles[this.scope].push(this); }
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.particle.prototype.return = function() {
-		//every draw frame, it returns instructions on how to draw the particle
-		if (this.filters.hasOwnProperty('alpha')) { delete this.filters.alpha; return [this.x, this.y, this.scaleX, this.scaleY, this.rotation, this.filters.alpha, this.filters]; }
-		else { return [this.x, this.y, this.scaleX, this.scaleY, this.rotation, 1, this.filters]; }
+	Crumbs.particles = {
+		left: [],
+		middle: [],
+		right: [],
+		all: [],
+		background: []
 	};
 	Crumbs.particle.prototype.getInfo = function() {
 		return this; 
@@ -194,13 +196,6 @@ var Crumbs_Init_On_Load = function() {
 		} 
 		if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } 
 	});
-	Crumbs.particles = {
-		left: [],
-		middle: [],
-		right: [],
-		all: [],
-		background: []
-	};
 }
 
 Game.registerMod('Crumbs engine', {
