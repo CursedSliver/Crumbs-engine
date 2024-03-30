@@ -32,7 +32,7 @@ var Crumbs_Init_On_Load = function() {
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.img)) { this.img = Crumbs.particleImgs[obj.img]; } else { this.img = obj.img?obj.img:Crumbs.particleDefaults.img; }
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
-		this.order = obj.order?obj.order:Crumb.particleDefaults.order;
+		this.order = obj.order?obj.order:Crumbs.particleDefaults.order;
 		let initRe = null;
 		if (typeof init === 'function') {
 			initRe = init(Crumbs.getCanvasByScope(this.scope));  
