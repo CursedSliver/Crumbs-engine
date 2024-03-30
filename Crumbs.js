@@ -85,7 +85,7 @@ var Crumbs_Init_On_Load = function() {
 		else { Crumbs.particles[this.scope][this.index] = null; }
 	};
 	Crumbs.particle.prototype.spawnChild = function(obj) {
-		this.children.push(new Crumbs.particle(obj, this));
+		new Crumbs.particle(obj, this);
 	};
 	Crumbs.particle.prototype.hasChildren = function() {
 		return (this.children.length > 0);
