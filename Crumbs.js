@@ -105,19 +105,20 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.findParticle = function(id, scope) {
 		if (scope) {
 			for (let i in Crumbs.particles[scope]) {
-				if (Crumbs.particles[scope][i].id == id) {
+				if (Crumbs.particles[scope][i] !== null && Crumbs.particles[scope][i].id == id) {
 					return Crumbs.particles[scope][i];
 				}
 			}
 		} else {
 			for (let i in Crumbs.particles) {
 				for (let ii in Crumbs.particles[i]) {
-					if (Crumbs.particles[i][ii].id == id) {
+					if (Crumbs.particles[i][ii] !== null && Crumbs.particles[i][ii].id == id) {
 						return Crumbs.particles[i][ii];
 					}
 				}
 			}
 		}
+		return null;
 	};
 	Crumbs.getParticles = function(id, scopes) {
 		let toReturn = [];
@@ -125,7 +126,7 @@ var Crumbs_Init_On_Load = function() {
 			if (!Array.isArray(scopes)) { scopes = [scopes]; }
 			for (let i in scopes) {
 				for (let ii in Crumbs.particles[scopes[i]]) {
-					if (Crumbs.particles[scopes[i]][ii].id == id) {
+					if (Crumbs.particles[scopes[i]][ii] !== null && Crumbs.particles[scopes[i]][ii].id == id) {
 						toReturn.push(Crumbs.particles[scopes[i]][ii]);
 					}
 				}
@@ -133,7 +134,7 @@ var Crumbs_Init_On_Load = function() {
 		} else {
 			for (let i in Crumbs.particles) {
 				for (let ii in Crumbs.particles[i]) {
-					if (Crumbs.particles[i][ii].id == id) {
+					if (Crumbs.particles[i][ii] !== null && Crumbs.particles[i][ii].id == id) {
 						toReturn.push(Crumbs.particles[i][ii]);
 					}
 				}
@@ -168,13 +169,15 @@ var Crumbs_Init_On_Load = function() {
 		behaviorParams: {}
 	}; //needs to be down here for some reason
 	
-	Game.registerHook('draw', function() { if (Crumbs.particlesEnabled()) { 
+	Game.registerHook('draw', function() { 
 		for (let i in Crumbs.particles) { 
-			for (let ii in Crumbs.particles[i]) {
-				if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); }
-			} 
+			if (Crumbs.particlesEnabled(i)) {
+				for (let ii in Crumbs.particles[i]) {
+					if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); }
+				} 
+			}
 		} 
-		if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } } 
+		if (Game.drawT % 300 == 0) { Crumbs.reorderAllParticles(); } 
 	});
 	Crumbs.particles = {
 		left: [],
