@@ -73,6 +73,12 @@ var Crumbs_Init_On_Load = function() {
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
+	Crumbs.quickSettable = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'alpha']
+	Crumbs.particle.prototype.set = function(o) {
+		for (let i in o) {
+			if (Crumbs.quickSettable.includes(i)) { this[i] = o; }
+		}
+	};
 	Crumbs.particles = {
 		left: [],
 		middle: [],
