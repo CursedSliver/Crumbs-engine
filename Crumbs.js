@@ -75,9 +75,11 @@ var Crumbs_Init_On_Load = function() {
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
 	Crumbs.nonQuickSettable = ['filters'];
+	Crumbs.validProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'behaviorParams']
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
-			if (!Crumbs.nonQuickSettable.includes(i)) { this[i] = o; }
+			if (!Crumbs.nonQuickSettable.includes(i) && Crumbs.validProperties.includes(i)) { this[i] = o; } 
+			else if (!Crumbs.validProperties.includes(i)) { throw 'Cannot set particle property "'+i+'"!'; }
 		}
 		if (o.filters) {
 			for (let i in o.filters) {
@@ -118,6 +120,13 @@ var Crumbs_Init_On_Load = function() {
 			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
+			if (e.newChild) {
+				let childsToSpawn = [].concat(e.newChild); //light bulb moment
+				for (let i in childsToSpawn) {
+					this.spawnChild(childsToSpawn[i]);
+				}
+				delete e.newChild;
+			}
 			this.set(e);
 		}
 	};
@@ -257,7 +266,7 @@ var Crumbs_Init_On_Load = function() {
   	x, y, scaleX, scaleY, rotation: self explanatory
    	filter: an object containing all the CSS filters
 	newChild: an object or an array containing objects for spawning children
- 	newParam: an object to replace the original params for this behavior
+ 	behaviorParams: an object to replace the original params for this behavior
   	*/
 	Crumbs.particleBehaviors.idle = function(o, p) {
 		return {};
