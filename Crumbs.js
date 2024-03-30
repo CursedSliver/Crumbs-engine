@@ -70,13 +70,19 @@ var Crumbs_Init_On_Load = function() {
 				if (this.parent.children[i] === null) { this.index = i; this.parent.children[i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
+			this.updateChildren();
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.quickSettable = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'id', 'order', 'alpha']
+	Crumbs.nonQuickSettable = ['filters'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
-			if (Crumbs.quickSettable.includes(i)) { this[i] = o; }
+			if (!Crumbs.nonQuickSettable.includes(i)) { this[i] = o; }
+		}
+		if (o.filters) {
+			for (let i in o.filters) {
+				this.filters[i] = o.filters[i];
+			}
 		}
 	};
 	Crumbs.particles = {
@@ -112,17 +118,7 @@ var Crumbs_Init_On_Load = function() {
 			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
-			this.x = e.x?e.x:this.x; 
-			this.y = e.y?e.y:this.y; 
-			this.scaleX = e.scaleX?e.scaleX:this.scaleX; 
-			this.scaleY = e.scaleY?e.scaleY:this.scaleY; 
-			this.rotation = e.rotation?e.rotation:this.rotation;
-			this.behaviorParams[b] = e.newParam?e.newParam:this.behaviorParams[b];
-			if (e.filters) {
-				for (let i in e.filters) {
-					this.filters[i] = e.filters[i];
-				}
-			}
+			this.set(e);
 		}
 	};
 	Crumbs.particle.prototype.updateChildren = function() {
