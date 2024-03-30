@@ -60,7 +60,7 @@ var Crumbs_Init_On_Load = function() {
 		this.t = 0; //amount of draw ticks since its creation
 		if (this.parent === null) {
 			let pushed = false;
-			for (let i in Crumbs.particles) {
+			for (let i in Crumbs.particles[this.scope]) {
 				if (Crumbs.particles[this.scope][i] === null) { this.index = i; Crumbs.particles[this.scope][i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = Crumbs.particles[this.scope].length; Crumbs.particles[this.scope].push(this); }
