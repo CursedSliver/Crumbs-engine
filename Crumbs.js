@@ -84,7 +84,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
-			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o; } 
+			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
 			else if (Crumbs.nonValidProperties.includes(i)) { throw 'Cannot set particle property "'+i+'"!'; }
 			else { throw 'Unrecognized particle property: "'+i+'"!'; }
 		}
