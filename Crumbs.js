@@ -111,7 +111,7 @@ var Crumbs_Init_On_Load = function() {
 			}
 		} else {
 			for (let i in Crumbs.particles) {
-				for (let ii in Crumbs.particles[ii]) {
+				for (let ii in Crumbs.particles[i]) {
 					if (Crumbs.particles[i][ii].id == id) {
 						return Crumbs.particles[i][ii];
 					}
@@ -132,7 +132,7 @@ var Crumbs_Init_On_Load = function() {
 			}
 		} else {
 			for (let i in Crumbs.particles) {
-				for (let ii in Crumbs.particles[ii]) {
+				for (let ii in Crumbs.particles[i]) {
 					if (Crumbs.particles[i][ii].id == id) {
 						toReturn.push(Crumbs.particles[i][ii]);
 					}
