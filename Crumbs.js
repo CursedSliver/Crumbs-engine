@@ -73,16 +73,16 @@ var Crumbs_Init_On_Load = function() {
 		}
 	}
 	Crumbs.reorderAllParticles = function() {
-		let counter = 0;
 		for (let i in Crumbs.particles) {
+			let counter = 0;
 			for (let ii in Crumbs.particles[i]) {
 				if (Crumbs.particles[i][ii] !== null) {
 					Crumbs.particles[i][ii].reorder(counter);
 					counter++;
 				}
 			}
+			Crumbs.particles.splice(counter, Crumbs.particles[i].length); //ensures a complete removal
 		}
-		Crumbs.particles.splice(counter, Crumbs.particles.length); //ensures a complete removal
 	};
 	Crumbs.killAllParticles = function() {
 		for (let i in Crumbs.particles) {
