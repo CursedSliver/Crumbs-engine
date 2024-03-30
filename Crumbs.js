@@ -26,7 +26,7 @@ var Crumbs_Init_On_Load = function() {
 		} else if (typeof init === 'object') {
 			initRe = init;
 		} else if (typeof init === 'undefined') {
-			this.initRe = Crumbs.particleInits.default();
+			initRe = Crumbs.particleDefaults.init();
 		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
 		this.x = initRe.x;
 		this.y = initRe.y;
