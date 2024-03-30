@@ -17,12 +17,12 @@ var Crumbs_Init_On_Load = function() {
 		let targetL = '';
 		if (s == 'left') { targetL = 'backgroundLeftCanvas'; } 
 		else if (s == 'background') { targetL = 'backgroundCanvas'; }
-		else if (s == 'all') { }
+		else if (s == 'foreground') { }
 		else if (s == 'middle') { }
 		else if (s == 'right') { }
 		return l(targetL);
 	} 
-	Crumbs.validScopes = ['left', 'middle', 'right', 'all', 'background'];
+	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
 	Crumbs.particle = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
@@ -261,7 +261,7 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.particleDefaults = {
 		img: '',
-		scope: 'all',
+		scope: 'foreground',
 		init: Crumbs.particleInits.default,
 		behaviors: Crumbs.particleBehaviors.idle,
 		id: '',
