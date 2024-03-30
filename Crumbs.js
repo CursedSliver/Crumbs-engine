@@ -13,6 +13,15 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleImgs = {
 		
 	};
+	Crumbs.getCanvasByScope = function(scope) {
+		let targetL = '';
+		if (s == 'left') { targetL = 'backgroundLeftCanvas'; } 
+		else if (s == 'background') { targetL = 'backgroundCanvas'; }
+		else if (s == 'all') { }
+		else if (s == 'middle') { }
+		else if (s == 'right') { }
+		return l(targetL);
+	} 
 	Crumbs.validScopes = ['left', 'middle', 'right', 'all', 'background'];
 	Crumbs.particle = function(obj) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
@@ -24,11 +33,11 @@ var Crumbs_Init_On_Load = function() {
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
 		let initRe = null;
 		if (typeof init === 'function') {
-			initRe = init();  
+			initRe = init(Crumbs.getCanvasByScope(this.scope));  
 		} else if (typeof init === 'object') {
 			initRe = init;
 		} else if (typeof init === 'undefined') {
-			initRe = Crumbs.particleDefaults.init();
+			initRe = Crumbs.particleDefaults.init(Crumbs.getCanvasByScope(this.scope));
 		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
 		this.x = initRe.x;
 		this.y = initRe.y;
@@ -149,12 +158,12 @@ var Crumbs_Init_On_Load = function() {
 		return toReturn;
 	};
 	
-	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation
-	Crumbs.particleInits.default = function() {
+	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
+	Crumbs.particleInits.default = function(s) {
 		return {x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0};
 	};
-	Crumbs.particleInits.bottomRandom = function() {
-		return {x: Math.random() * l('backgroundLeftCanvas').offsetWidth, y: l('backgroundLeftCanvas').offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
+	Crumbs.particleInits.bottomRandom = function(c) {
+		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
 	Crumbs.particleBehaviors.idle = function(o, p) {
