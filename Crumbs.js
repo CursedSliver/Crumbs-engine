@@ -194,7 +194,7 @@ var Crumbs_Init_On_Load = function() {
 		for (let i in Crumbs.particles) { 
 			if (Crumbs.particlesEnabled(i)) {
 				for (let ii in Crumbs.particles[i]) {
-					if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].triggerBehavior(); Crumbs.particles[i][ii].updateChildren(); }
+					if (Crumbs.particles[i][ii] !== null) { Crumbs.particles[i][ii].t++; Crumbs.particles[i][ii].updateChildren(); Crumbs.particles[i][ii].triggerBehavior(); }
 				} 
 			}
 		} 
