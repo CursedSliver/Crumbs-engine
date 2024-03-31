@@ -332,6 +332,14 @@ var Crumbs_Init_On_Load = function() {
 		Crumbs.foregroundCanvas.canvas.height=Crumbs.foregroundCanvas.canvas.parentNode.offsetHeight;
 	});
 
+	Crumbs.scopedCanvas = {
+		left: Game.LeftBackground,
+		foreground: Crumbs.foregroundCanvas,
+		background: Game.Background,
+		middle: Game.Background,
+		right: Game.Background
+	};
+
 	Crumbs.compileParticles = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i in Crumbs.particles[s]) {
@@ -386,25 +394,28 @@ var Crumbs_Init_On_Load = function() {
 		behaviors: Crumbs.particleBehaviors.rise
 	};
 
-	Crumbs.drawParticlesLeft = function() {
-		let list = Crumbs.compileParticles('left');
-		let ctx = Game.LeftBackground;
-		for (let i in list) {
-			let o = list[i];
-			if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
-			let p = Pic(o.imgs[o.imgUsing]);
-			if (o.rotation) {
-				ctx.save();
-				ctx.translate((ctx.width / 2 - p.width / 2) + p.width / 2, (ctx.height / 2 - p.height / 2) + p.height / 2);
-				ctx.rotate(angleInRadians);
-			}
-			if (o.patternFill) { 
-				ctx.fillPattern(p, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.width, o.height, 128, 128);
-			} else {
-				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.scaleX * o.scaleFactor[0], o.scaleY * o.scaleFactor[1]);
-			}
-			if (o.rotation) { ctx.restore(); }
-		};
+	Crumbs.drawParticles = function() {
+		for (let c in Crumbs.scopedCanvas) {
+			let list = Crumbs.compileParticles(c);
+			let ctx = Crumbs.scopedCanvas[c];
+			ctx.globalAlpha = 1;
+			for (let i in list) {
+				let o = list[i];
+				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
+				let p = Pic(o.imgs[o.imgUsing]);
+				if (o.rotation) {
+					ctx.save();
+					ctx.translate((ctx.width / 2 - p.width / 2) + p.width / 2, (ctx.height / 2 - p.height / 2) + p.height / 2);
+					ctx.rotate(angleInRadians);
+				}
+				if (o.patternFill) { 
+					ctx.fillPattern(p, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.width, o.height, 128, 128);
+				} else {
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.scaleX * o.scaleFactor[0], o.scaleY * o.scaleFactor[1]);
+				}
+				if (o.rotation) { ctx.restore(); }
+			};
+		}
 	};
 	
 	//extreme unfunniness intensifies
@@ -754,7 +765,7 @@ var Crumbs_Init_On_Load = function() {
 						Timer.track('cursors');
 					}
 
-					Crumbs.drawParticlesLeft();
+					Crumbs.drawParticles();
 				}
 				else
 				{
