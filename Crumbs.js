@@ -444,14 +444,14 @@ var Crumbs_Init_On_Load = function() {
 				let pWidth = p.width * o.scaleX * o.scaleFactor[0];
 				let pHeight = p.height * o.scaleY * o.scaleFactor[1];
 				ctx.save();
-				ctx.translate(o.x + o.canvaCenter[0] - pWidth / 2, o.y + o.canvaCenter[1] - pHeight / 2);
+				ctx.translate(o.x + o.canvaCenter[0] + (pWidth / 2), o.y + o.canvaCenter[1] + (pHeight / 2));
 				if (o.rotation) {
 					ctx.rotate(o.rotation);
 				}
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, 0, 0, pWidth, pHeight);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -pWidth / 2, -pHeight / 2, pWidth, pHeight);
 				}
 				ctx.restore(); 
 			};
