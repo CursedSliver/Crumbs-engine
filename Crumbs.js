@@ -444,7 +444,7 @@ var Crumbs_Init_On_Load = function() {
 				let pWidth = p.width * o.scaleX * o.scaleFactor[0];
 				let pHeight = p.height * o.scaleY * o.scaleFactor[1];
 				ctx.save();
-				ctx.translate(o.x + o.canvaCenter[0] + pWidth / 2, o.y + o.canvaCenter[1] + pHeight / 2);
+				ctx.translate(o.x + o.canvaCenter[0] - pWidth / 2, o.y + o.canvaCenter[1] - pHeight / 2);
 				if (o.rotation) {
 					ctx.rotate(o.rotation);
 				}
