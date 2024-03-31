@@ -326,7 +326,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.compileParticles = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i in Crumbs.particles[s]) {
-			arr = Crumbs.merge(arr, Crumbs.particles[s][i].compile());
+			if (Crumbs.particles[i] !== null) { arr = Crumbs.merge(arr, Crumbs.particles[s][i].compile()); }
 		}
 		return arr;
 	};
