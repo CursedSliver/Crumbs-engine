@@ -397,6 +397,7 @@ var Crumbs_Init_On_Load = function() {
 			let list = Crumbs.compileParticles(c);
 			let ctx = Crumbs.scopedCanvas[c];
 			ctx.globalAlpha = 1;
+			if (c == 'foreground') { ctx.clearRect(0, 0, ctx.width, ctx.height); }
 			for (let i in list) {
 				let o = list[i];
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
