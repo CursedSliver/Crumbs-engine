@@ -320,10 +320,10 @@ var Crumbs_Init_On_Load = function() {
 
 	//below for the actual drawing
 	let div = document.createElement('canvas');
-	Crumbs.foregroundCanvas = l('foregroundCanvas').getContext('2d');
 	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+(Math.pow(2, 31) - 1);
 	l('game').appendChild(div);
 
+	Crumbs.foregroundCanvas = l('foregroundCanvas').getContext('2d');
 	Game.registerHook('draw', function() { 
 		Crumbs.foregroundCanvas.canvas.width=Crumbs.foregroundCanvas.canvas.parentNode.offsetWidth;
 		Crumbs.foregroundCanvas.canvas.height=Crumbs.foregroundCanvas.canvas.parentNode.offsetHeight;
