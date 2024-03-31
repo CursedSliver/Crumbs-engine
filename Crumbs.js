@@ -745,6 +745,8 @@ var Crumbs_Init_On_Load = function() {
 						ctx.restore();
 						Timer.track('cursors');
 					}
+
+					Crumbs.drawParticlesLeft();
 				}
 				else
 				{
