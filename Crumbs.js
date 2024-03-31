@@ -441,15 +441,17 @@ var Crumbs_Init_On_Load = function() {
 				let o = list[i];
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
 				let p = Pic(o.imgs[o.imgUsing]);
+				let pWidth = p.width * o.scaleX * o.scaleFactor[0];
+				let pHeight = p.height * o.scaleY * o.scaleFactor[1];
 				if (o.rotation) {
 					ctx.save();
-					ctx.translate(o.x + p.width * o.scaleX * o.scaleFactor[0] / 2, o.y + p.height * o.scaleY * o.scaleFactor[1] / 2);
+					ctx.translate(o.x + pWidth / 2, o.y + pHeight / 2);
 					ctx.rotate(o.rotation);
 				}
 				if (o.patternFill) { 
 					ctx.fillPattern(p, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.scaleX * o.scaleFactor[0], o.scaleY * o.scaleFactor[1]);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, o.x + o.canvaCenter[0] - pWidth / 2, o.y + o.canvaCenter[1] - pHeight / 2, o.scaleX * o.scaleFactor[0], o.scaleY * o.scaleFactor[1]);
 				}
 				if (o.rotation) { ctx.restore(); }
 			};
