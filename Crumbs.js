@@ -405,7 +405,7 @@ var Crumbs_Init_On_Load = function() {
 				if (o.rotation) {
 					ctx.save();
 					ctx.translate((ctx.width / 2 - p.width / 2) + p.width / 2, (ctx.height / 2 - p.height / 2) + p.height / 2);
-					ctx.rotate(angleInRadians);
+					ctx.rotate(o.rotation);
 				}
 				if (o.patternFill) { 
 					ctx.fillPattern(p, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.width, o.height, 128, 128);
