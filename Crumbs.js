@@ -404,7 +404,7 @@ var Crumbs_Init_On_Load = function() {
 				let p = Pic(o.imgs[o.imgUsing]);
 				if (o.rotation) {
 					ctx.save();
-					ctx.translate((ctx.width / 2 - p.width / 2) + p.width / 2, (ctx.height / 2 - p.height / 2) + p.height / 2);
+					ctx.translate(o.x + p.width * o.scaleX * o.scaleFactor[0] / 2, o.y + p.height * o.scaleY * o.scaleFactor[1] / 2);
 					ctx.rotate(o.rotation);
 				}
 				if (o.patternFill) { 
