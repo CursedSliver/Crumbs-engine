@@ -303,10 +303,23 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleBehaviors.idle = function(o, p) {
 		return {};
 	};
-	Crumbs.particleBehaviors.rise = function(o, p) {
-		if (o.t > 256) { return 't'; }
-		let l = Math.pow(0.5, Math.log2(Math.max(o.t, 2)) / Game.fps);
-		return {y: o.y * Math.pow(0.75, (1 / Game.fps)), scaleX: o.scaleX * l, scaleY: o.scaleY * l}; 
+	Crumbs.particleBehaviors.fly = function(o, p) {
+		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through direction and t
+		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through speed and t
+		p.direction = p.direction?p.direction:0;
+		if (typeof p.direction === 'function') { p.direction = p.direction(p.direction, o.t); }
+		p.speed = p.speed?p.speed:1;
+		if (typeof p.speed === 'function') { p.speed = p.speed(p.speed, o.t);}		
+		return {x: o.x + Math.sin(p.direction) * p.speed, y: o.y + Math.cos(p.direction) * p.speed;};
+	};
+	Crumbs.particleBehaviors.cycleFrames = function(o, p) {
+		//parameters: 'cooldown', which is the amount of draw ticks to wait for between each frame switch; can be a function, in which case it tries to pass through cooldown and t
+		//'back' (default false), which is boolean telling it to cycle forwards or backwards
+		p.cooldown = p.cooldown?p.cooldown:1;
+		if (typeof p.cooldown === 'function') { p.cooldown = p.cooldown(p.cooldown, o.t); }
+		let frame = o.imgUsing;
+		if (o.t % p.cooldown == 0) { if (p.back) { frame--; if (frame < 0) { frame = o.imgs.length; } } else { frame++; if (frame >= o.imgs.length) { frame = 0; } } }
+		return {imgUsing: frame};
 	};
 
 	Crumbs.particleDefaults = {
