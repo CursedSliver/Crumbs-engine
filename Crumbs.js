@@ -320,7 +320,7 @@ var Crumbs_Init_On_Load = function() {
 
 	//below for the actual drawing
 	let div = document.createElement('canvas');
-	div.id = 'foregroundCanvas'; div.style = 'background: none;';
+	div.id = 'foregroundCanvas'; div.style = 'background: none; width: 100%; height: 100%;';
 	l('game').appendChild(div);
 
 	Crumbs.compileParticles = function(s) {
