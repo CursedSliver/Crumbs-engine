@@ -345,6 +345,7 @@ var Crumbs_Init_On_Load = function() {
 	div = document.createElement('canvas');
 	div.id = 'middleCanvas'; div.style = 'background: none;';
 	cont.classList.add('CrumbsCanvaContainer');
+	cont.style = 'position: absolute; top: 0; left: 0;';
 	cont.appendChild(div);
 	l('rows').appendChild(cont);
 
@@ -352,6 +353,7 @@ var Crumbs_Init_On_Load = function() {
 	div = document.createElement('canvas');
 	div.id = 'rightCanvas'; div.style = 'background: none;';
 	cont.classList.add('CrumbsCanvaContainer');
+	cont.style = 'position: absolute; top: 0; left: 0;';
 	cont.appendChild(div);
 	l('store').appendChild(cont);
 
