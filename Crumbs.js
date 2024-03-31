@@ -55,7 +55,7 @@ var Crumbs_Init_On_Load = function() {
 		this.alpha = obj.alpha?obj.alpha:Crumbs.particleDefaults.alpha;
 		this.patternFill = obj.patternFill?obj.patternFill:Crumbs.particleDefaults.patternFill;
 		this.width = obj.width?obj.width:Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
-		this.height = obj.height?obj.height:crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
+		this.height = obj.height?obj.height:Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
 		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
 		this.children = [];
@@ -272,7 +272,7 @@ var Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.particleInits.bottomRandom = function(c) {
-		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1};
+		return {x: Math.random() * c.offsetWidth};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
 	/*
