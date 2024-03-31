@@ -322,7 +322,7 @@ var Crumbs_Init_On_Load = function() {
 	let div = document.createElement('canvas');
 	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+(Math.pow(2, 31) - 1);
 	let cont = document.createElement('div');
-	cont.style = 'width: 100%; height: 100%; position: absolute; z-index: '+(Math.pow(2, 31) - 1);
+	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+(Math.pow(2, 31) - 1);
 	cont.appendChild(div);
 	l('game').appendChild(cont);
 
