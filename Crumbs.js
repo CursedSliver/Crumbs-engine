@@ -320,8 +320,14 @@ var Crumbs_Init_On_Load = function() {
 
 	//below for the actual drawing
 	let div = document.createElement('canvas');
-	div.id = 'foregroundCanvas'; div.style = 'background: none; width: 100%; height: 100%;';
+	Crumbs.foregroundCanvas = l('foregroundCanvas').getContext('2d');
+	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+(Math.pow(2, 31) - 1);
 	l('game').appendChild(div);
+
+	Game.registerHook('draw', function() { 
+		Crumbs.foregroundCanvas.canvas.width=Crumbs.foregroundCanvas.canvas.parentNode.offsetWidth;
+		Crumbs.foregroundCanvas.canvas.height=Crumbs.foregroundCanvas.canvas.parentNode.offsetHeight;
+	});
 
 	Crumbs.compileParticles = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
