@@ -1,6 +1,7 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var Crumbs_Init_On_Load = function() {
+	Crumbs.h = {};
 	Crumbs.h.injectCSS = function(str, index) {
 		if (Game.styleSheets === null) { return false; }
 		if (typeof index === 'undefined') { index = Game.styleSheets.cssRules.length; }
