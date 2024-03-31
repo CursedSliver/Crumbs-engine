@@ -12,7 +12,8 @@ var Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.particleImgs = {
 		empty: 'img/empty.png',
-		glint: 'img/glint.png'
+		glint: 'img/glint.png',
+		icons: 'img/icons.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		let targetL = '';
@@ -33,6 +34,7 @@ var Crumbs_Init_On_Load = function() {
 		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.imgs)) { this.imgs = Crumbs.particleImgs[obj.imgs]; } else { this.imgs = obj.imgs?obj.imgs:Crumbs.particleDefaults.imgs; }
+		if (typeof this.imgs == 'function') { this.imgs = this.imgs(); }
 		this.imgs = [].concat(this.imgs);
 		this.imgUsing = obj.imgUsing?obj.imgUsing:Crumbs.particleDefaults.imgUsing;
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
@@ -45,13 +47,17 @@ var Crumbs_Init_On_Load = function() {
 		} else if (typeof init === 'undefined') {
 			initRe = Crumbs.particleDefaults.init(Crumbs.getCanvasByScope(this.scope));
 		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
-		this.x = initRe.x;
-		this.y = initRe.y;
-		this.scaleX = initRe.scaleX;
-		this.scaleY = initRe.scaleY;
-		this.rotation = initRe.rotation; //euler, clockwise
-		this.alpha = initRe.alpha;
+		this.x = obj.x?obj.x:Crumbs.particleDefaults.x;
+		this.y = obj.y?obj.y:Crumbs.particleDefaults.y;
+		this.scaleX = obj.scaleX?obj.scaleX:Crumbs.particleDefaults.scaleX;
+		this.scaleY = obj.scaleY?obj.scaleY:Crumbs.particleDefaults.scaleY;
+		this.rotation = obj.rotation?obj.rotation:Crumbs.particleDefaults.rotation; //euler, clockwise
+		this.alpha = obj.alpha?obj.alpha:Crumbs.particleDefaults.alpha;
 		this.patternFill = obj.patternFill?obj.patternFill:Crumbs.particleDefaults.patternFill;
+		this.width = obj.width?obj.width:Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
+		this.height = obj.height?obj.height:crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
+		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
+		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -64,6 +70,7 @@ var Crumbs_Init_On_Load = function() {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [Crumbs.particleDefaults.behaviors]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
 		this.t = 0; //amount of draw ticks since its creation
+		this.set(initRe);
 		if (this.parent === null) {
 			let pushed = false;
 			for (let i in Crumbs.particles[this.scope]) {
@@ -80,14 +87,20 @@ var Crumbs_Init_On_Load = function() {
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.nonQuickSettable = ['filters'];
-	Crumbs.nonValidProperties = ['scope', 'behaviors'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill'];
+	Crumbs.nonQuickSettable = ['filters', 'newChild'];
+	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
 			else if (Crumbs.nonValidProperties.includes(i)) { throw 'Cannot set particle property "'+i+'"!'; }
-			else { throw 'Unrecognized particle property: "'+i+'"!'; }
+			else if (!Crumbs.allProperties.includes(i)) { throw 'Unrecognized particle property: "'+i+'"!'; }
+		}
+		if (o.newChild) {
+			let childsToSpawn = [].concat(o.newChild); //light bulb moment
+			for (let i in childsToSpawn) {
+				this.spawnChild(childsToSpawn[i]);
+			}
 		}
 		if (o.filters) {
 			for (let i in o.filters) {
@@ -128,13 +141,6 @@ var Crumbs_Init_On_Load = function() {
 			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
-			if (e.newChild) {
-				let childsToSpawn = [].concat(e.newChild); //light bulb moment
-				for (let i in childsToSpawn) {
-					this.spawnChild(childsToSpawn[i]);
-				}
-				delete e.newChild;
-			}
 			this.set(e);
 		}
 	};
@@ -263,7 +269,7 @@ var Crumbs_Init_On_Load = function() {
 	
 	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
 	Crumbs.particleInits.default = function(s) {
-		return {x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1};
+		return {};
 	};
 	Crumbs.particleInits.bottomRandom = function(c) {
 		return {x: Math.random() * c.offsetWidth, y: c.offsetHeight, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1};
@@ -283,12 +289,18 @@ var Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.particleBehaviors.rise = function(o, p) {
-		if (o.t > 64) { return 't'; }
+		if (o.t > 256) { return 't'; }
 		let l = Math.log2(Math.max(o.t, 2));
 		return {y: o.y - l, scaleX: o.scaleX * (1 / l), scaleY: o.scaleY * (1 / l)}; 
 	};
 
 	Crumbs.particleDefaults = {
+		x: 0,
+		y: 0,
+		scaleX: 1,
+		scaleY: 1,
+		rotation: 0,
+		alpha: 1,
 		imgs: Crumbs.particleImgs.empty,
 		imgUsing: 0,
 		scope: 'foreground',
@@ -297,7 +309,11 @@ var Crumbs_Init_On_Load = function() {
 		id: '',
 		order: 0,
 		behaviorParams: {},
-		patternFill: 0
+		patternFill: 0,
+		width: null,
+		height: null,
+		sx: 0,
+		sy: 0
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
@@ -349,7 +365,39 @@ var Crumbs_Init_On_Load = function() {
 	    return mergedArray;
 	};
 
-	Crumbs.leftBackgroundElements = [{}, {}, {}];
+	Crumbs.leftBackgroundElements = [{
+		id: 'cFall',
+		imgs: 'icons'
+	}, {}, {}];
+
+	Crumbs.test = {
+		id: 'tester',
+		imgs: 'glint',
+		init: Crumbs.particleInits.bottomRandom,
+		behaviors: Crumbs.particleBehaviors.rise
+	};
+
+	Crumbs.drawParticlesLeft = function() {
+		let list = Crumbs.compileParticles('left');
+		let ctx = Game.LeftBackground;
+		const dx = ctx.width / 2 - originalImageWidth / 2;
+		for (let i in list) {
+			let o = list[i];
+			if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
+			let p = Pic(o.imgs[o.imgUsing]);
+			if (o.rotation) {
+				ctx.save();
+				ctx.translate((ctx.width / 2 - p.width / 2) + p.width / 2, (ctx.height / 2 - p.height / 2) + p.height / 2);
+				ctx.rotate(angleInRadians);
+			}
+			if (o.patternFill) { 
+				ctx.fillPattern(p, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.width, o.height, 128, 128);
+			} else {
+				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, o.x + o.canvaCenter[0], o.y + o.canvaCenter[1], o.scaleX * o.scaleFactor[0], o.scaleY * o.scaleFactor[1]);
+			}
+			if (o.rotation) { ctx.restore(); }
+		};
+	};
 	
 	//extreme unfunniness intensifies
 	Game.DrawBackground = function() {
@@ -425,7 +473,8 @@ var Crumbs_Init_On_Load = function() {
 			}
 			else
 			{
-			
+				//let list = Crumbs.compileParticles('left');
+				
 				var goodBuff=0;
 				var badBuff=0;
 				for (var i in Game.buffs)
@@ -591,31 +640,7 @@ var Crumbs_Init_On_Load = function() {
 						}
 						
 						//big cookie
-						if (false)//don't do that
-						{
-							ctx.globalAlpha=1;
-							var amount=Math.floor(Game.cookies).toString();
-							var digits=amount.length;
-							var space=0;
-							for (var i=0;i<digits;i++)
-							{
-								var s=16*(digits-i);
-								var num=parseInt(amount[i]);
-								if (i>0) space-=s*(1-num/10)/2;
-								if (i==0 && num>1) space+=s*0.1;
-								for (var ii=0;ii<num;ii++)
-								{
-									var x=Game.cookieOriginX;
-									var y=Game.cookieOriginY;
-									var spin=Game.T*(0.005+i*0.001)+i+(ii/num)*Math.PI*2;
-									x+=Math.sin(spin)*space;
-									y+=Math.cos(spin)*space;
-									ctx.drawImage(Pic('perfectCookie.png'),x-s/2,y-s/2,s,s);
-								}
-								space+=s/2;
-							}
-						}
-						else
+						if (true)
 						{
 							ctx.globalAlpha=1;
 							var s=256*Game.BigCookieSize;
