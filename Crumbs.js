@@ -2,6 +2,12 @@ if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var Crumbs_Init_On_Load = function() {
 	Crumbs.h = {};
+	Game.styleSheets = null; 
+	for (let i in document.styleSheets) { 
+		try { if (document.styleSheets[i].cssRules.length > 500) { Game.styleSheets = document.styleSheets[i]; break; } } 
+		catch(error) { } 
+	} 	
+	if (Game.styleSheets === null) { Game.Notify('Unable to inject CSS!', 'Something went wrong. Please contact the mod developers. '); }
 	Crumbs.h.injectCSS = function(str, index) {
 		if (Game.styleSheets === null) { return false; }
 		if (typeof index === 'undefined') { index = Game.styleSheets.cssRules.length; }
