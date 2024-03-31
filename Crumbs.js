@@ -380,7 +380,6 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.drawParticlesLeft = function() {
 		let list = Crumbs.compileParticles('left');
 		let ctx = Game.LeftBackground;
-		const dx = ctx.width / 2 - originalImageWidth / 2;
 		for (let i in list) {
 			let o = list[i];
 			if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
