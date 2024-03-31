@@ -305,8 +305,8 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.particleBehaviors.rise = function(o, p) {
 		if (o.t > 256) { return 't'; }
-		let l = Math.log2(Math.max(o.t, 2));
-		return {y: o.y - l, scaleX: o.scaleX * (1 / l), scaleY: o.scaleY * (1 / l)}; 
+		let l = Math.pow(0.5, Math.log2(Math.max(o.t, 2)) / Game.fps);
+		return {y: o.y * Math.pow(0.75, (1 / Game.fps)), scaleX: o.scaleX * l, scaleY: o.scaleY * l}; 
 	};
 
 	Crumbs.particleDefaults = {
@@ -380,7 +380,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.compileParticles = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i in Crumbs.particles[s]) {
-			if (Crumbs.particles[i] !== null) { arr = Crumbs.merge(arr, Crumbs.particles[s][i].compile()); }
+			if (Crumbs.particles[s][i] !== null) { arr = Crumbs.merge(arr, Crumbs.particles[s][i].compile()); }
 		}
 		return arr;
 	};
