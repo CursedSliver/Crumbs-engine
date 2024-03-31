@@ -319,23 +319,44 @@ var Crumbs_Init_On_Load = function() {
 	Game.registerHook('draw', Crumbs.updateParticles);
 
 	//below for the actual drawing
+	let maximumZ = Math.pow(2, 31) - 1;
 	let div = document.createElement('canvas');
-	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+(Math.pow(2, 31) - 1);
+	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+maximumZ;
 	let cont = document.createElement('div');
-	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+(Math.pow(2, 31) - 1);
+	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
 	cont.appendChild(div);
 	l('game').appendChild(cont);
+
+	cont = document.createElement('div');
+	div = document.createElement('canvas');
+	div.id = 'middleCanvas'; div.style = 'background: none; z-index: '+maximumZ;
+	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
+	cont.appendChild(div);
+	l('rows').appendChild(cont);
+
+	cont = document.createElement('store');
+	div = document.createElement('canvas');
+	div.id = 'rightCanvas'; div.style = 'background: none; z-index: '+maximumZ;
+	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
+	cont.appendChild(div);
+	l('store').appendChild(cont);
 
 	Crumbs.foregroundCanvas = l('foregroundCanvas').getContext('2d');
 	Crumbs.foregroundCanvas.canvas.width=Crumbs.foregroundCanvas.canvas.parentNode.offsetWidth;
 	Crumbs.foregroundCanvas.canvas.height=Crumbs.foregroundCanvas.canvas.parentNode.offsetHeight;
+	Crumbs.middleCanvas = l('middleCanvas').getContext('2d');
+	Crumbs.middleCanvas.canvas.width=Crumbs.middleCanvas.canvas.parentNode.offsetWidth;
+	Crumbs.middleCanvas.canvas.height=Crumbs.middleCanvas.canvas.parentNode.offsetHeight;
+	Crumbs.rightCanvas = l('rightCanvas').getContext('2d');
+	Crumbs.rightCanvas.canvas.width=Crumbs.rightCanvas.canvas.parentNode.offsetWidth;
+	Crumbs.rightCanvas.canvas.height=Crumbs.rightCanvas.canvas.parentNode.offsetHeight;
 
 	Crumbs.scopedCanvas = {
 		left: Game.LeftBackground,
 		foreground: Crumbs.foregroundCanvas,
 		background: Game.Background,
-		middle: Game.Background,
-		right: Game.Background
+		middle: Crumbs.middleCanvas,
+		right: Crumbs.rightCanvas
 	};
 
 	Crumbs.compileParticles = function(s) {
@@ -397,7 +418,7 @@ var Crumbs_Init_On_Load = function() {
 			let list = Crumbs.compileParticles(c);
 			let ctx = Crumbs.scopedCanvas[c];
 			ctx.globalAlpha = 1;
-			if (c == 'foreground') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
+			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 			for (let i in list) {
 				let o = list[i];
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
