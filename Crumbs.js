@@ -272,7 +272,7 @@ var Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.particleInits.bottomRandom = function(c) {
-		return {x: Math.random() * c.offsetWidth};
+		return {x: Math.random() * c.offsetWidth, y: l('backgroundLeftCanvas').height};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
 	/*
