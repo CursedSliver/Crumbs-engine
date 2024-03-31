@@ -1,6 +1,12 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var Crumbs_Init_On_Load = function() {
+	Crumbs.h.injectCSS = function(str, index) {
+		if (Game.styleSheets === null) { return false; }
+		if (typeof index === 'undefined') { index = Game.styleSheets.cssRules.length; }
+		Game.styleSheets.insertRule(str, index);
+	} //h stands for helper
+	
 	Crumbs.prefs = {
 		particles: {
 			left: 1,
@@ -319,25 +325,26 @@ var Crumbs_Init_On_Load = function() {
 	Game.registerHook('draw', Crumbs.updateParticles);
 
 	//below for the actual drawing
-	let maximumZ = Math.pow(2, 31) - 1;
+	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
+	
 	let div = document.createElement('canvas');
-	div.id = 'foregroundCanvas'; div.style = 'background: none; z-index: '+maximumZ;
+	div.id = 'foregroundCanvas'; div.style = 'background: none;';
 	let cont = document.createElement('div');
-	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
+	cont.classList.add('CrumbsCanvaContainer');
 	cont.appendChild(div);
 	l('game').appendChild(cont);
 
 	cont = document.createElement('div');
 	div = document.createElement('canvas');
-	div.id = 'middleCanvas'; div.style = 'background: none; z-index: '+maximumZ;
-	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
+	div.id = 'middleCanvas'; div.style = 'background: none;';
+	cont.classList.add('CrumbsCanvaContainer');
 	cont.appendChild(div);
 	l('rows').appendChild(cont);
 
 	cont = document.createElement('store');
 	div = document.createElement('canvas');
-	div.id = 'rightCanvas'; div.style = 'background: none; z-index: '+maximumZ;
-	cont.style = 'width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: '+maximumZ;
+	div.id = 'rightCanvas'; div.style = 'background: none;';
+	cont.classList.add('CrumbsCanvaContainer');
 	cont.appendChild(div);
 	l('store').appendChild(cont);
 
