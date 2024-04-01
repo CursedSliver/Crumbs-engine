@@ -491,7 +491,6 @@ var Crumbs_Init_On_Load = function() {
 	}, {}, {}];
 
 	Crumbs.cookieIcons = [[10, 0]];
-	Game.registerHook('check', Crumbs.compileCookieIcons);
 
 	Crumbs.compileCookieIcons = function() {
 		Crumbs.cookieIcons=[[10,0]];
@@ -500,7 +499,8 @@ var Crumbs_Init_On_Load = function() {
 			if (cookie.bought>0 && cookie.pool=='cookie') { Crumbs.cookieIcons.push(cookie.icon); }
 		}
 	};
-	Crumbs.compileCookieIcons();
+	Game.registerHook('check', Crumbs.compileCookieIcons);
+	if (Game.ready) { Crumbs.compileCookieIcons(); } else { Game.registerHook('create', Crumbs.compileCookieIcons); }
 
 	Crumbs.randomCookie = function() {
 		let i = [];
