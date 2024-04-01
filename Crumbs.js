@@ -283,11 +283,23 @@ var Crumbs_Init_On_Load = function() {
 	};
 	
 	Crumbs.particleInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
-	Crumbs.particleInits.default = function(s) {
+	Crumbs.particleInits.default = function(c) {
 		return {};
 	};
 	Crumbs.particleInits.bottomRandom = function(c) {
-		return {x: Math.random() * c.offsetWidth, y: l('backgroundLeftCanvas').height};
+		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: c.canvas.parentNode.offsetHeight};
+	};
+	Crumbs.particleInits.topRandom = function(c) {
+		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: 0};
+	};
+	Crumbs.particleInits.totalRandom = function(c) {
+		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: Math.random() * c.canvas.parentNode.offsetHeight};
+	};
+	Crumbs.particleInits.center = function() {
+		return {x: c.canvas.parentNode.offsetWidth / 2, y: c.canvas.parentNode.offsetHeight / 2};
+	};
+	Crumbs.particleInits.bigCookie = function() {
+		return {x: c.canvas.parentNode.offsetWidth / 2, y: c.canvas.parentNode.offsetHeight * 0.4};
 	};
 	Crumbs.particleBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
 	/*
@@ -304,22 +316,33 @@ var Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.particleBehaviors.fly = function(o, p) {
-		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through direction and t
-		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through speed and t
+		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through o
+		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through o
 		p.direction = p.direction?p.direction:0;
-		if (typeof p.direction === 'function') { p.direction = p.direction(p.direction, o.t); }
+		if (typeof p.direction === 'function') { p.direction = p.direction(o); }
 		p.speed = p.speed?p.speed:1;
-		if (typeof p.speed === 'function') { p.speed = p.speed(p.speed, o.t);}		
+		if (typeof p.speed === 'function') { p.speed = p.speed(o);}		
 		return {x: o.x + Math.sin(p.direction) * p.speed, y: o.y + Math.cos(p.direction) * p.speed};
 	};
 	Crumbs.particleBehaviors.cycleFrames = function(o, p) {
-		//parameters: 'cooldown', which is the amount of draw ticks to wait for between each frame switch; can be a function, in which case it tries to pass through cooldown and t
+		//parameters: 'cooldown', which is the amount of draw ticks to wait for between each frame switch; can be a function, in which case it tries to pass through o
 		//'back' (default false), which is boolean telling it to cycle forwards or backwards
 		p.cooldown = p.cooldown?p.cooldown:1;
-		if (typeof p.cooldown === 'function') { p.cooldown = p.cooldown(p.cooldown, o.t); }
+		if (typeof p.cooldown === 'function') { p.cooldown = p.cooldown(o); }
 		let frame = o.imgUsing;
 		if (o.t % p.cooldown == 0) { if (p.back) { frame--; if (frame < 0) { frame = o.imgs.length; } } else { frame++; if (frame >= o.imgs.length) { frame = 0; } } }
 		return {imgUsing: frame};
+	};
+	Crumbs.particleBehaviors.fade = function(o, p) {
+		//parameters: 'speed', which is the amount of alpha decreased (multiplicative) each draw frame
+		p.speed = p.speed?p.speed:0.05;
+		return {alpha:o.alpha*(1 - 0.1)};
+	};
+	Crumbs.particleBehaviors.spin = function(o, p) {
+		//parameters: 'spin', which is the amount of radians rotated each draw frame, negative for counterclockwise; can be a function, in which case it tries to pass through o
+		p.spin = p.spin?p.spin:0.312;
+		if (typeof p.spin === 'function') { p.spin = p.spin(o); }
+		return {rotation:o.rotation+p.spin};
 	};
 
 	Crumbs.particleDefaults = {
