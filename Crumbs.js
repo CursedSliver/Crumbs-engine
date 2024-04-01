@@ -494,16 +494,17 @@ var Crumbs_Init_On_Load = function() {
 			sx: i[0] * 48,
 			sy: i[1] * 48,
 			scope: 'left',
-			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter],
+			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fade],
 		};
 	};
 
 	Crumbs.spawnCookieShower = function() {
 		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
 			let c = Crumbs.randomCookie();
-			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}];
+			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}, {speed: 1 / (2 * Game.fps)}];
 			c.init = Crumbs.particleInits.topRandom;
 			c.y = -64;
+			c.rotation = Math.random() * 2 * Math.PI;
 			let p = new Crumbs.particle(c);
 		}
 	};
