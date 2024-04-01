@@ -28,7 +28,8 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleImgs = {
 		empty: 'img/empty.png',
 		glint: 'img/glint.png',
-		icons: 'img/icons.png'
+		icons: 'img/icons.png',
+		dollar: 'img/smallDollar.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s];
@@ -523,6 +524,7 @@ var Crumbs_Init_On_Load = function() {
 			c.init = Crumbs.particleInits.topRandom;
 			c.y = -64;
 			c.rotation = Math.random() * 2 * Math.PI;
+			if (Game.season=='fools') { c.imgs = 'dollar'; }
 			Crumbs.spawn(c);
 		}
 	};
