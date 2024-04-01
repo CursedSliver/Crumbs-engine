@@ -486,7 +486,7 @@ var Crumbs_Init_On_Load = function() {
 			sy: i[1] * 48,
 			init: Crumbs.particleInits.topRandom,
 			scope: 'left',
-			behaviors: []
+			behaviors: [Crumbs.particleBehaviors.cookieFall]
 		};
 	};
 
