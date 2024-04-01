@@ -546,7 +546,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
-	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace(`Game.prefs.particles`, `false`));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', ''));
 
 	Game.registerHook('click', function() {
 		if (Game.prefs.particles) {
@@ -564,13 +564,6 @@ var Crumbs_Init_On_Load = function() {
 			Crumbs.spawn(c);
 		}
 	});
-	
-	Crumbs.test = {
-		id: 'tester',
-		imgs: 'glint',
-		init: Crumbs.particleInits.bottomRandom,
-		behaviors: Crumbs.particleBehaviors.rise
-	};
 
 	Crumbs.drawParticles = function() {
 		for (let c in Crumbs.scopedCanvas) {
