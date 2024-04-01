@@ -229,7 +229,7 @@ var Crumbs_Init_On_Load = function() {
 		if (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now()) { return false; } //if more than 3 draw ticks have elapsed without anything happening, it will refuse to spawn as game most likely optimized away
 		return new Crumbs.particle(obj);
 	};
-	Crumbs.sleepDetectionBuffer = Game.fps * 10; //a third of a second
+	Crumbs.sleepDetectionBuffer = 1000 * (Game.fps / 30); //one second
 	
 	Crumbs.findParticle = function(id, scope) {
 		if (scope) {
