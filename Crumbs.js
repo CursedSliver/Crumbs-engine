@@ -517,14 +517,27 @@ var Crumbs_Init_On_Load = function() {
 		};
 	};
 
+	Crumbs.dollar = function() {
+		return {
+			imgs: 'dollar',
+			width: 64,
+			height: 64,
+			sx: Math.floor(Math.random() * 8) * 64,
+			sy: 0,
+			scope: 'left',
+			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fadeout]
+		};
+	};
+
 	Crumbs.spawnCookieShower = function() {
 		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
-			let c = Crumbs.randomCookie();
+			let c = 0;
+			if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}, {speed: 1 / (2 * Game.fps)}];
 			c.init = Crumbs.particleInits.topRandom;
 			c.y = -64;
+			c.id = 'fallingCookie';
 			c.rotation = Math.random() * 2 * Math.PI;
-			if (Game.season=='fools') { c.imgs = 'dollar'; }
 			Crumbs.spawn(c);
 		}
 	};
