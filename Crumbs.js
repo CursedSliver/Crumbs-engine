@@ -55,11 +55,11 @@ var Crumbs_Init_On_Load = function() {
 		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
 		this.order = obj.order?obj.order:Crumbs.particleDefaults.order;
 		let initRe = null;
-		if (typeof init === 'function') {
-			initRe = init(Crumbs.getCanvasByScope(this.scope));  
-		} else if (typeof init === 'object') {
-			initRe = init;
-		} else if (typeof init === 'undefined') {
+		if (typeof obj.init === 'function') {
+			initRe = obj.init(Crumbs.getCanvasByScope(this.scope));  
+		} else if (typeof obj.init === 'object') {
+			initRe = obj.init;
+		} else if (typeof obj.init === 'undefined') {
 			initRe = Crumbs.particleDefaults.init(Crumbs.getCanvasByScope(this.scope));
 		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
 		this.x = obj.x?obj.x:Crumbs.particleDefaults.x;
