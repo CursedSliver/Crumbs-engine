@@ -310,7 +310,7 @@ var Crumbs_Init_On_Load = function() {
 		if (typeof p.direction === 'function') { p.direction = p.direction(p.direction, o.t); }
 		p.speed = p.speed?p.speed:1;
 		if (typeof p.speed === 'function') { p.speed = p.speed(p.speed, o.t);}		
-		return {x: o.x + Math.sin(p.direction) * p.speed, y: o.y + Math.cos(p.direction) * p.speed;};
+		return {x: o.x + Math.sin(p.direction) * p.speed, y: o.y + Math.cos(p.direction) * p.speed};
 	};
 	Crumbs.particleBehaviors.cycleFrames = function(o, p) {
 		//parameters: 'cooldown', which is the amount of draw ticks to wait for between each frame switch; can be a function, in which case it tries to pass through cooldown and t
