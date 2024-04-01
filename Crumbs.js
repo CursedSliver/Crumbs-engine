@@ -531,18 +531,38 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.spawnCookieShower = function() {
 		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
-			let c = 0;
-			if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
-			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}, {speed: 1 / (2 * Game.fps)}];
-			c.init = Crumbs.particleInits.topRandom;
-			c.y = -64;
-			c.id = 'fallingCookie';
-			c.rotation = Math.random() * 2 * Math.PI;
-			Crumbs.spawn(c);
+			Crumbs.spawnFallingCookie();
 		}
+	};
+	Crumbs.spawnFallingCookie = function() {
+		let c = 0;
+		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
+		c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}, {speed: 1 / (2 * Game.fps)}];
+		c.init = Crumbs.particleInits.topRandom;
+		c.y = -64;
+		c.id = 'fallingCookie';
+		c.rotation = Math.random() * 2 * Math.PI;
+		Crumbs.spawn(c);
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
+
+	Game.registerHook('click', function() {
+		if (Game.prefs.particles) {
+			Crumbs.spawnFallingCookie();
+			let c = 0;
+			if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
+			c.behaviorParams = [{yd: Math.random()*-2-2}, {speed: Math.random()*4-2}, {t: 1 * Game.fps}, {speed: 1 / (1 * Game.fps)}];
+			c.x = Game.mouseX;
+			c.y = Game.mouseY;
+			let sc = Math.random()*0.5+0.75;
+			c.scaleX = sc; c.scaleY = sc;
+			c.order = 2;
+			c.rotation = Math.random() * 2 * Math.PI;
+			c.id = 'clickedCookie';
+			Crumbs.spawn(c);
+		}
+	});
 	
 	Crumbs.test = {
 		id: 'tester',
