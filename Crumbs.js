@@ -353,16 +353,16 @@ var Crumbs_Init_On_Load = function() {
 		p.yd = p.yd?p.yd:0;
 		return {y:o.y+p.yd, behaviorParams:{yd: p.yd + 0.2 + Math.random() * 0.1}}
 	};
-	Crumbs.particleBehavior.horizontal = function(o, p) {
+	Crumbs.particleBehaviors.horizontal = function(o, p) {
 		//a simplified version of particleBehaviors.fly that only supports having one value in params ('speed') that makes it go horizontal or vertical
 		//mainly used to support orteil old code
 		p.speed = p.speed?p.speed:0;
 		return {x:o.x+p.speed};
 	};
-	Crumbs.particleBehavior.expireAfter = function(o, p) {
+	Crumbs.particleBehaviors.expireAfter = function(o, p) {
 		//parameters: 't', which is the amount of draw frames to do before it dies
 		//if p.time is undefined, it essentially never expires
-		if (o.t >= p.time) { return 't'; } else { return {}; }
+		if (o.t >= p.t) { return 't'; } else { return {}; }
 	};
 
 	Crumbs.particleDefaults = {
