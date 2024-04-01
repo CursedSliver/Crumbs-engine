@@ -102,7 +102,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.nonQuickSettable = ['filters', 'newChild'];
+	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
 	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild'];
 	Crumbs.particle.prototype.set = function(o) {
@@ -156,6 +156,7 @@ var Crumbs_Init_On_Load = function() {
 			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
+			if (e.behaviorParams) { this.behaviorParams[b] = e.behaviorParams; }
 			this.set(e);
 		}
 	};
@@ -344,6 +345,12 @@ var Crumbs_Init_On_Load = function() {
 		if (typeof p.spin === 'function') { p.spin = p.spin(o); }
 		return {rotation:o.rotation+p.spin};
 	};
+	Crumbs.particleBehaviors.cookieFall = function(o, p) {
+		//the exact same code that orteil uses to simulate cookie falling
+		//parameters: 'yd', which you can give a starting value but you better not modify
+		p.yd = p.yd?p.yd?0;
+		return {y:o.y+p.yd, behaviorParams:{yd: p.yd + 0.2 + Math.random() * 0.1}}
+	};
 
 	Crumbs.particleDefaults = {
 		x: 0,
@@ -457,8 +464,31 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.leftBackgroundElements = [{
 		id: 'cFall',
-		imgs: 'icons'
+		imgs: 'icons',
+		
 	}, {}, {}];
+
+	Crumbs.cookieIcons = [[10, 0]];
+	Game.registerHook('check', function() { Crumbs.cookieIcons=[[10,0]];
+		for (var i in Game.Upgrades) {
+			let cookie=Game.Upgrades[i];
+			if (cookie.bought>0 && cookie.pool=='cookie') { Crumbs.cookieIcons.push(cookie.icon); }
+		}
+	});
+
+	Crumbs.randomCookie = function() {
+		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { let i=[17,5]; } else { let i = choose(cookieIcons); }
+		return {
+			imgs: 'icons',
+			width: 48,
+			height: 48,
+			sx: i[0] * 48,
+			sy: i[1] * 48,
+			init: Crumbs.particleInits.topRandom,
+			scope: 'left',
+			behaviors: []
+		};
+	};
 
 	Crumbs.test = {
 		id: 'tester',
