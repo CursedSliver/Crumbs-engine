@@ -491,12 +491,16 @@ var Crumbs_Init_On_Load = function() {
 	}, {}, {}];
 
 	Crumbs.cookieIcons = [[10, 0]];
-	Game.registerHook('check', function() { Crumbs.cookieIcons=[[10,0]];
-		for (var i in Game.Upgrades) {
+	Game.registerHook('check', Crumbs.compileCookieIcons);
+
+	Crumbs.compileCookieIcons = function() {
+		Crumbs.cookieIcons=[[10,0]];
+		for (let i in Game.Upgrades) {
 			let cookie=Game.Upgrades[i];
 			if (cookie.bought>0 && cookie.pool=='cookie') { Crumbs.cookieIcons.push(cookie.icon); }
 		}
-	});
+	};
+	Crumbs.compileCookieIcons();
 
 	Crumbs.randomCookie = function() {
 		let i = [];
@@ -523,6 +527,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
+	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
 	
 	Crumbs.test = {
 		id: 'tester',
