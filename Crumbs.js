@@ -73,6 +73,7 @@ var Crumbs_Init_On_Load = function() {
 		this.height = obj.height?obj.height:Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
 		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
+		this.text = obj.text?obj.text:Crumbs.particleDefaults.text;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -104,7 +105,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -308,6 +309,7 @@ var Crumbs_Init_On_Load = function() {
   	x, y, scaleX, scaleY, rotation: self explanatory
     alpha: opacity
    	filter: an object containing all the CSS filters
+	text: an object containing text parameters
 	imgs: a new array of the images
  	imgUsing: the img frame selected
 	newChild: an object or an array containing objects for spawning children
@@ -348,8 +350,19 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleBehaviors.cookieFall = function(o, p) {
 		//the exact same code that orteil uses to simulate cookie falling
 		//parameters: 'yd', which you can give a starting value but you better not modify
-		p.yd = p.yd?p.yd?0;
+		p.yd = p.yd?p.yd:0;
 		return {y:o.y+p.yd, behaviorParams:{yd: p.yd + 0.2 + Math.random() * 0.1}}
+	};
+	Crumbs.particleBehavior.horizontal = function(o, p) {
+		//a simplified version of particleBehaviors.fly that only supports having one value in params ('speed') that makes it go horizontal or vertical
+		//mainly used to support orteil old code
+		p.speed = p.speed?p.speed:0;
+		return {x:o.x+p.speed};
+	};
+	Crumbs.particleBehavior.expireAfter = function(o, p) {
+		//parameters: 't', which is the amount of draw frames to do before it dies
+		//if p.time is undefined, it essentially never expires
+		if (o.t >= p.time) { return 't'; } else { return {}; }
 	};
 
 	Crumbs.particleDefaults = {
@@ -371,7 +384,8 @@ var Crumbs_Init_On_Load = function() {
 		width: null,
 		height: null,
 		sx: 0,
-		sy: 0
+		sy: 0,
+		text: null
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
@@ -477,19 +491,28 @@ var Crumbs_Init_On_Load = function() {
 	});
 
 	Crumbs.randomCookie = function() {
-		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { let i=[17,5]; } else { let i = choose(cookieIcons); }
+		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { let i=[17,5]; } else { let i = choose(Crumbs.cookieIcons); }
 		return {
 			imgs: 'icons',
 			width: 48,
 			height: 48,
 			sx: i[0] * 48,
 			sy: i[1] * 48,
-			init: Crumbs.particleInits.topRandom,
 			scope: 'left',
-			behaviors: [Crumbs.particleBehaviors.cookieFall]
+			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter],
 		};
 	};
 
+	Crumbs.spawnCookieShower = function() {
+		if (Game.prefs.particle && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
+			let c = Crumbs.randomCookie();
+			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}];
+			c.init = Crumbs.particleInits.topRandom;
+			new Crumbs.particle(c);
+		}
+	};
+	Game.registerHook('logic', Crumbs.spawnCookieShower);
+	
 	Crumbs.test = {
 		id: 'tester',
 		imgs: 'glint',
