@@ -212,6 +212,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particlesEnabled = function(scope) {
 		return Crumbs.prefs.particles[scope];
 	};
+	Crumbs.lastUpdate = Date.now();
 	Crumbs.updateParticles = function() { //called every draw frame
 		for (let i in Crumbs.particles) { 
 			if (Crumbs.particlesEnabled(i)) {
@@ -220,7 +221,13 @@ var Crumbs_Init_On_Load = function() {
 				} 
 			}
 		} 
+		Crumbs.lastUpdate = Date.now();
 		if (Game.drawT % 3600 == 0) { Crumbs.reorderAllParticles(); } 
+	};
+
+	Crumbs.spawn = function(obj) {
+		if (Crumbs.lastUpdate + Game.fps / 10 < Date.now()) { return false; } //if more than 3 draw ticks have elapsed without anything happening, it will refuse to spawn as game most likely optimized away
+		return new Crumbs.particle(obj);
 	};
 	
 	Crumbs.findParticle = function(id, scope) {
@@ -511,7 +518,7 @@ var Crumbs_Init_On_Load = function() {
 			c.init = Crumbs.particleInits.topRandom;
 			c.y = -64;
 			c.rotation = Math.random() * 2 * Math.PI;
-			let p = new Crumbs.particle(c);
+			Crumbs.spawn(c);
 		}
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
