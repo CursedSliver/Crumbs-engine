@@ -534,7 +534,7 @@ var Crumbs_Init_On_Load = function() {
 				let pWidth = 0;
 				if (o.width) { pWidth = o.width; } else { pWidth = p.width * o.scaleX * o.scaleFactor[0]; }
 				let pHeight = 0;
-				if (o.height) { pWidth = o.height; } else { pWidth = p.height * o.scaleY * o.scaleFactor[1]; }
+				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
 				ctx.translate(o.x + o.canvaCenter[0] + (pWidth / 2), o.y + o.canvaCenter[1] + (pHeight / 2));
 				if (o.rotation) {
