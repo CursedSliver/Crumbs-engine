@@ -31,13 +31,7 @@ var Crumbs_Init_On_Load = function() {
 		icons: 'img/icons.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
-		let targetL = '';
-		if (s == 'left') { targetL = 'backgroundLeftCanvas'; } 
-		else if (s == 'background') { targetL = 'backgroundCanvas'; }
-		else if (s == 'foreground') { }
-		else if (s == 'middle') { }
-		else if (s == 'right') { }
-		return l(targetL);
+		return Crumbs.scopedCanvas[s];
 	} 
 	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
 	Crumbs.particle = function(obj, parent) {
