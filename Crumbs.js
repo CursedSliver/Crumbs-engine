@@ -505,12 +505,11 @@ var Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.spawnCookieShower = function() {
-		if (Game.prefs.particle && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
+		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
 			let c = Crumbs.randomCookie();
 			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}];
 			c.init = Crumbs.particleInits.topRandom;
 			let p = new Crumbs.particle(c);
-			console.log(p);
 		}
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
