@@ -491,7 +491,8 @@ var Crumbs_Init_On_Load = function() {
 	});
 
 	Crumbs.randomCookie = function() {
-		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { let i=[17,5]; } else { let i = choose(Crumbs.cookieIcons); }
+		let i = [];
+		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { i=[17,5]; } else { i = choose(Crumbs.cookieIcons); }
 		return {
 			imgs: 'icons',
 			width: 48,
@@ -508,7 +509,8 @@ var Crumbs_Init_On_Load = function() {
 			let c = Crumbs.randomCookie();
 			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}];
 			c.init = Crumbs.particleInits.topRandom;
-			new Crumbs.particle(c);
+			let p = new Crumbs.particle(c);
+			console.log(p);
 		}
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
