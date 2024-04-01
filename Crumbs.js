@@ -286,7 +286,7 @@ var Crumbs_Init_On_Load = function() {
 		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: c.canvas.parentNode.offsetHeight};
 	};
 	Crumbs.particleInits.topRandom = function(c) {
-		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: 0};
+		return {x: Math.random() * c.canvas.parentNode.offsetWidth};
 	};
 	Crumbs.particleInits.totalRandom = function(c) {
 		return {x: Math.random() * c.canvas.parentNode.offsetWidth, y: Math.random() * c.canvas.parentNode.offsetHeight};
@@ -503,6 +503,7 @@ var Crumbs_Init_On_Load = function() {
 			let c = Crumbs.randomCookie();
 			c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}];
 			c.init = Crumbs.particleInits.topRandom;
+			c.y = -64;
 			let p = new Crumbs.particle(c);
 		}
 	};
