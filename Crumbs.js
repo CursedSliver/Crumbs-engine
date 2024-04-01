@@ -79,7 +79,7 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.filters = {};
 		this.behaviors = [];
-		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = this.behaviorParams.concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
+		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = [].concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
 		if (typeof obj.behaviors == 'function' || Array.isArray(obj.behaviors)) { 
 			this.behaviors = this.behaviors.concat(obj.behaviors);
 		} else {
