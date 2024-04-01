@@ -227,10 +227,10 @@ var Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.spawn = function(obj) {
-		if (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now()) { return false; } //if more than 3 draw ticks have elapsed without anything happening, it will refuse to spawn as game most likely optimized away
+		if (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) { return false; } 
 		return new Crumbs.particle(obj);
 	};
-	Crumbs.sleepDetectionBuffer = 1000 * (5 / Game.fps); //equal to 5 draw frames
+	Crumbs.sleepDetectionBuffer = 1000 * (30 / Game.fps); //equal to 30 draw frames
 	
 	Crumbs.findParticle = function(id, scope) {
 		if (scope) {
