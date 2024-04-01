@@ -29,7 +29,7 @@ var Crumbs_Init_On_Load = function() {
 		empty: 'img/empty.png',
 		glint: 'img/glint.png',
 		icons: 'img/icons.png',
-		dollar: 'img/smallDollar.png'
+		dollar: 'img/smallDollars.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s];
