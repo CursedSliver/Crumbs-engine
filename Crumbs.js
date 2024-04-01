@@ -546,6 +546,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace(`Game.prefs.particles`, `false`));
 
 	Game.registerHook('click', function() {
 		if (Game.prefs.particles) {
@@ -553,8 +554,8 @@ var Crumbs_Init_On_Load = function() {
 			let c = 0;
 			if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 			c.behaviorParams = [{yd: Math.random()*-2-2}, {speed: Math.random()*4-2}, {t: 1 * Game.fps}, {speed: 1 / (1 * Game.fps)}];
-			c.x = Game.mouseX;
-			c.y = Game.mouseY;
+			c.x = Game.mouseX - c.width / 2;
+			c.y = Game.mouseY - c.height / 2;
 			let sc = Math.random()*0.5+0.75;
 			c.scaleX = sc; c.scaleY = sc;
 			c.order = 2;
