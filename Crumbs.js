@@ -335,6 +335,12 @@ var Crumbs_Init_On_Load = function() {
 		p.speed = p.speed?p.speed:0.05;
 		return {alpha:o.alpha*(1 - p.speed)};
 	};
+	Crumbs.particleBehaviors.fadeout = function(o, p) {
+		//fade but not multiplicative
+		//parameters: 'speed', which is the amount of alpha decreased each draw frame
+		p.speed = p.speed?p.speed:0.05;
+		return {alpha:o.alpha-p.speed};
+	};
 	Crumbs.particleBehaviors.spin = function(o, p) {
 		//parameters: 'spin', which is the amount of radians rotated each draw frame, negative for counterclockwise; can be a function, in which case it tries to pass through o
 		p.spin = p.spin?p.spin:0.312;
@@ -494,7 +500,7 @@ var Crumbs_Init_On_Load = function() {
 			sx: i[0] * 48,
 			sy: i[1] * 48,
 			scope: 'left',
-			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fade],
+			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fadeout],
 		};
 	};
 
