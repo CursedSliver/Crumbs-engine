@@ -333,7 +333,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.particleBehaviors.fade = function(o, p) {
 		//parameters: 'speed', which is the amount of alpha decreased (multiplicative) each draw frame
 		p.speed = p.speed?p.speed:0.05;
-		return {alpha:o.alpha*(1 - 0.1)};
+		return {alpha:o.alpha*(1 - p.speed)};
 	};
 	Crumbs.particleBehaviors.spin = function(o, p) {
 		//parameters: 'spin', which is the amount of radians rotated each draw frame, negative for counterclockwise; can be a function, in which case it tries to pass through o
