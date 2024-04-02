@@ -591,7 +591,7 @@ var Crumbs_Init_On_Load = function() {
 		w.x = x - w.width / 2;
 		w.y = y - w.height / 2;
 		w.order = 2;
-		w.rotation = -r;
+		w.rotation = -r * Math.PI / 180;
 		w.id = 'wrinklerBits';
 		Crumbs.spawn(w);
 	};
