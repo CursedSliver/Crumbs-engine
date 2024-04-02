@@ -193,8 +193,8 @@ var Crumbs_Init_On_Load = function() {
 		for (let i in this.children) {
 			if (this.children[i] !== null) {
 				this.children[i].t++;
-				this.children[i].triggerBehavior();
 				this.children[i].updateChildren();
+				this.children[i].triggerBehavior();
 			}
 		}
 	};
