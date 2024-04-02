@@ -531,16 +531,26 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.spawnCookieShower = function() {
 		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
-			Crumbs.spawnFallingCookie();
+			Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie');
 		}
 	};
-	Crumbs.spawnFallingCookie = function() {
+	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
-		c.behaviorParams = [{yd: 0}, {speed: 0}, {t: 2 * Game.fps}, {speed: 1 / (2 * Game.fps)}];
+		c.behaviorParams = [{yd: yd}, {speed: speed}, {t: t * Game.fps}, {speed: 1 / (t * Game.fps)}];
 		c.init = Crumbs.particleInits.topRandom;
-		c.y = -64;
-		c.id = 'fallingCookie';
+		if (!onMouse) {
+			c.x = x;
+			c.y = y;
+		} else {
+			c.x = Game.mouseX - c.width / 2;
+			c.y = Game.mouseY - c.height / 2;
+		}
+		if (sc) {
+			c.scaleX = sc;
+			c.scaleY = sc;
+		}
+		c.id = id;
 		c.rotation = Math.random() * 2 * Math.PI;
 		Crumbs.spawn(c);
 	};
@@ -550,20 +560,12 @@ var Crumbs_Init_On_Load = function() {
 
 	Game.registerHook('click', function() {
 		if (Game.prefs.particles) {
-			Crumbs.spawnFallingCookie();
-			let c = 0;
-			if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
-			c.behaviorParams = [{yd: Math.random()*-2-2}, {speed: Math.random()*4-2}, {t: 1 * Game.fps}, {speed: 1 / (1 * Game.fps)}];
-			c.x = Game.mouseX - c.width / 2;
-			c.y = Game.mouseY - c.height / 2;
-			let sc = Math.random()*0.5+0.75;
-			c.scaleX = sc; c.scaleY = sc;
-			c.order = 2;
-			c.rotation = Math.random() * 2 * Math.PI;
-			c.id = 'clickedCookie';
-			Crumbs.spawn(c);
+			Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie');
+			Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75);
 		}
 	});
+
+	eval('Game.UpdateWrinklers='+Game.UpdateWrinklers.toString().replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, ``))
 
 	Crumbs.drawParticles = function() {
 		for (let c in Crumbs.scopedCanvas) {
