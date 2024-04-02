@@ -585,7 +585,7 @@ var Crumbs_Init_On_Load = function() {
 	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', ''));
 
 	Crumbs.spawnWrinklerBits = function(type, r, x, y, id) {
-		let w = Crumbs.wrinklerBit(id); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
+		let w = Crumbs.wrinklerBit(id + Crumbs.particles.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
 		if (type == 1) { w.imgs = 'shinyWrinklerBits'; }
 		w.behaviors = [[Crumbs.particleBehaviors.cookieFall, {yd: Math.random()*-2-2}], [Crumbs.particleBehaviors.horizontal, {speed: Math.random()*4-2}], [Crumbs.particleBehaviors.expireAfter, {t: 1 * Game.fps}], [Crumbs.particleBehaviors.fadeout, {speed: 1 / (1 * Game.fps)}]];
 		w.x = x - w.width / 2;
@@ -603,7 +603,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 	});
 
-	eval('Game.UpdateWrinklers='+Game.UpdateWrinklers.toString().replace(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75));`).replace('inRect(', 'Crumbs.h.inRect(').replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.r, x, y, Math.floor((ii + me.id + 1) * (1 + Math.random())));`).replace('part.r=-me.r;', ''));
+	eval('Game.UpdateWrinklers='+replaceAll('part.r=-me.r;', '', replaceAll(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75));`, Game.UpdateWrinklers.toString()).replace('inRect(', 'Crumbs.h.inRect(').replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.r, x, y, Math.floor(ii + me.id + 5));`).replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.r, x, y, 0);`)));
 
 	Crumbs.drawParticles = function() {
 		for (let c in Crumbs.scopedCanvas) {
