@@ -45,8 +45,12 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s];
-	} 
+	};
 	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
+	Crumbs.settings = {
+		globalCompositeOperation: 'source-over',
+		imageSmoothingEnabled: true
+	};
 	Crumbs.particle = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
@@ -84,9 +88,13 @@ var Crumbs_Init_On_Load = function() {
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
+		this.rotationAdd = 0; //for if it is a child
 		this.filters = {};
+		this.settings = {};
 		this.behaviors = [];
-		if (typeof obj.behaviors == 'function') { 
+		if (!obj.hasOwnProperty('behaviors')) {
+			if (typeof obj.behaviors === 'undefined') { this.behaviors = [[Crumbs.particleDefaults.behaviors, {}]]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
+		} else if (typeof obj.behaviors == 'function') { 
 			this.behaviors = [[obj.behaviors, {}]];
 		} else if (Array.isArray(obj.behaviors)) {
 			let f = [];
@@ -94,8 +102,6 @@ var Crumbs_Init_On_Load = function() {
 				if (Array.isArray(obj.behaviors[i])) { f.push(obj.behaviors[i]); } else { f.push([obj.behaviors[i], {}]); }
 			}
 			this.behaviors = f;
-		} else {
-			if (typeof obj.behaviors === 'undefined') { this.behaviors = [Crumbs.particleDefaults.behaviors]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
 		this.t = 0; //amount of draw ticks since its creation
 		this.set(initRe);
@@ -115,9 +121,9 @@ var Crumbs_Init_On_Load = function() {
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams'];
+	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -133,6 +139,11 @@ var Crumbs_Init_On_Load = function() {
 		if (o.filters) {
 			for (let i in o.filters) {
 				this.filters[i] = o.filters[i];
+			}
+		}
+		if (o.settings) {
+			for (let i in o.settings) {
+				this.settings[i] = o.settings[i];
 			}
 		}
 	};
@@ -177,6 +188,7 @@ var Crumbs_Init_On_Load = function() {
 		if (this.parent !== null) {
 			this.canvaCenter = [this.parent.x + this.parent.canvaCenter[0], this.parent.y + this.parent.canvaCenter[1]];
 			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
+			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
 		}
 		for (let i in this.children) {
 			this.children[i].t++;
@@ -403,7 +415,7 @@ var Crumbs_Init_On_Load = function() {
 		scope: 'foreground',
 		init: Crumbs.particleInits.default,
 		behaviors: Crumbs.particleBehaviors.idle,
-		id: '',
+		id: null,
 		order: 0,
 		behaviorParams: {},
 		patternFill: 0,
@@ -560,7 +572,7 @@ var Crumbs_Init_On_Load = function() {
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie'));
 		}
 	};
-	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc) {
+	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 		c.behaviors = [[Crumbs.particleBehaviors.cookieFall, {yd: yd}], [Crumbs.particleBehaviors.horizontal, {speed: speed}], [Crumbs.particleBehaviors.expireAfter, {t: t * Game.fps}], [Crumbs.particleBehaviors.fadeout, {speed: 1 / (t * Game.fps)}]];
@@ -621,20 +633,203 @@ var Crumbs_Init_On_Load = function() {
 				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
 				ctx.translate(o.x + o.canvaCenter[0] + (pWidth / 2), o.y + o.canvaCenter[1] + (pHeight / 2));
-				if (o.rotation) {
-					ctx.rotate(o.rotation);
+				if (o.rotation + o.rotationAdd) {
+					ctx.rotate(o.rotation + o.rotationAdd);
+				}
+				for (let i in o.settings) {
+					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings+'"'); } 
+					else { eval('ctx.'+i+'='+o.settings); }
 				}
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
 					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -pWidth / 2, -pHeight / 2, pWidth, pHeight);
 				}
+				for (let i in o.settings) {
+					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
+					else { eval('ctx.'+i+'='+Crumbs.settings); }
+				}
 				ctx.restore(); 
 			};
 		}
 	};
+
+	Crumbs.initWrinklers = function() {
+		for (let i = 0; i < Game.wrinklerLimit; i++) {
+			let w = Crumbs.findParticle('wrinkler'+i, 'left');
+			if (w !== null) { w.die(); }
+		}
+		for (let i = 0; i < Game.wrinklerLimit; i++) {
+			let w = {
+				imgs: [Crumbs.particleImgs.empty, 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'],
+				id: 'wrinkler'+i,
+				order: 1,
+				init: function() {
+					let shadow = {
+						y: 30,
+						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerShadow.png'],
+						behaviors: function(o, p) {
+							if (Game.prefs.fancy) {
+								return {imgUsing: 1};
+							} 
+							return {imgUsing: 0};
+						}
+					};
+					let eyes = {
+						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
+						y: Math.sin(Game.T*0.2+i*3+1.2),
+						behaviors: function() {
+							if (Game.prefs.notScary) {
+								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2};
+							}
+							return {imgUsing: 0};
+						}
+					};
+					return {newChild: [shadow, eyes]};
+				},
+				behaviors: [[
+					function(o, p) {
+						if (Game.wrinklers[p.id].phase > 0) {
+							if (Game.wrinklers[p.id].type > 0) { return {imgUsing: Game.WINKLERS?5:2}; }
+							if (Game.season == 'christmas') { return {imgUsing: Game.WINKLERS?6:3}; }
+							return {imgUsing: Game.WINKLERS?4:1};
+						}
+						return {imgUsing: 0};
+					}, {id: i}
+				], [
+					function(o, p) {
+						let sw=100+2*Math.sin(Game.T*0.2+p.id*3);
+						let sh=200+5*Math.sin(Game.T*0.2-2+p.id*3);
+						return {
+							scaleX: sw, scaleY: sh,
+							x: Game.wrinklers[p.id].x - sw/2,
+							y: Game.wrinklers[p.id].y - 10,
+							alpha: Game.wrinklers[p.id].close
+						};
+					}, {id: i}
+				], [
+					function(o, p) {
+						let me = Game.wrinklers[p.id];
+						if (Game.prefs.particles) {
+							if (me.phase==2 && Math.random()<0.03) {
+								Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*4-2, Math.random()*-2-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 2);
+							}
+							if (me.type == 1 && Math.random()<0.3) {
+								let s = Math.random()*30+5;
+								return {newChild: {
+									imgs: 'glint',
+									alpha: Math.random()*0.65+0.1,
+									settings: {globalCompositeOperation: 'lighter'},
+									x: Math.random()*50-25,
+									y: Math.random()*200-100,
+									scaleX: s,
+									scaleY: s,
+									behaviors: function(o, p) {
+										if (o.t > 1) { return 't'; }
+										return {};
+									}
+								}};
+							}
+						}
+						return {};
+					}, {id: i}
+				]],
+			}
+			Crumbs.spawn(w);
+		}
+	};
+	if (Game.ready) { Crumbs.initWrinklers(); } else { Game.registerHook('create', Crumbs.initWrinklers); }
 	
 	//extreme unfunniness intensifies
+	Game.DrawWrinklers = function() {
+		var ctx=Game.LeftBackground;
+		var selected=0;
+		for (var i in Game.wrinklers)
+		{
+			var me=Game.wrinklers[i];
+			if (me.phase>0)
+			{
+				ctx.globalAlpha=me.close;
+				ctx.save();
+				ctx.translate(me.x,me.y);
+				var sw=100+2*Math.sin(Game.T*0.2+i*3);
+				var sh=200+5*Math.sin(Game.T*0.2-2+i*3);
+				if (Game.prefs.fancy)
+				{
+					ctx.translate(0,30);
+					ctx.rotate(-(me.r)*Math.PI/180);
+					ctx.drawImage(Pic('wrinklerShadow.png'),-sw/2,-10,sw,sh);
+					ctx.rotate((me.r)*Math.PI/180);
+					ctx.translate(0,-30);
+				}
+				ctx.rotate(-(me.r)*Math.PI/180);
+				var pic=Game.WINKLERS?'winkler.png':'wrinkler.png';
+				if (me.type==1) pic=Game.WINKLERS?'shinyWinkler.png':'shinyWrinkler.png';
+				else if (Game.season=='christmas') pic=Game.WINKLERS?'winterWinkler.png':'winterWrinkler.png';
+				ctx.drawImage(Pic(pic),-sw/2,-10,sw,sh);
+				if (!Game.WINKLERS && Game.prefs.notScary) ctx.drawImage(Pic(Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?'wrinklerBlink.png':'wrinklerGooglies.png'),-sw/2,-10+1*Math.sin(Game.T*0.2+i*3+1.2),sw,sh);
+				if (me.type==1 && Math.random()<0.3 && Game.prefs.particles)//sparkle
+				{
+					ctx.globalAlpha=Math.random()*0.65+0.1;
+					var s=Math.random()*30+5;
+					ctx.globalCompositeOperation='lighter';
+					ctx.drawImage(Pic('glint.png'),-s/2+Math.random()*50-25,-s/2+Math.random()*200,s,s);
+				}
+				ctx.restore();
+				
+				if (Game.prefs.particles && me.phase==2 && Math.random()<0.03)
+				{
+					Game.particleAdd(me.x,me.y,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.5,1,2);
+				}
+				
+				if (me.selected) selected=me;
+			}
+			
+			if (selected && Game.Has('Eye of the wrinkler'))
+			{
+				var x=Game.cookieOriginX;
+				var y=Game.cookieOriginY;
+				ctx.font='14px Merriweather';
+				ctx.textAlign='center';
+				var text=loc("Swallowed:");
+				var width=Math.ceil(Math.max(ctx.measureText(text).width,ctx.measureText(Beautify(selected.sucked)).width));
+				ctx.fillStyle='#000';
+				ctx.globalAlpha=0.65;
+				/*ctx.strokeStyle='#000';
+				ctx.lineWidth=8;
+				ctx.beginPath();
+				ctx.moveTo(x,y);
+				ctx.lineTo(Math.floor(selected.x),Math.floor(selected.y));
+				ctx.stroke();*/
+				var xO=x-width/2-16;
+				var yO=y-4;
+				var dist=Math.floor(Math.sqrt((selected.x-xO)*(selected.x-xO)+(selected.y-yO)*(selected.y-yO)));
+				var angle=-Math.atan2(yO-selected.y,xO-selected.x)+Math.PI/2;
+				ctx.strokeStyle='#fff';
+				ctx.lineWidth=1;
+				for (var i=0;i<Math.floor(dist/12);i++)
+				{
+					var xC=selected.x+Math.sin(angle)*i*12;
+					var yC=selected.y+Math.cos(angle)*i*12;
+					ctx.beginPath();
+					ctx.arc(xC,yC,4+(Game.prefs.fancy?2*Math.pow(Math.sin(-Game.T*0.2+i*0.3),4):0),0,2*Math.PI,false);
+					ctx.fill();
+					ctx.stroke();
+				}
+				ctx.fillRect(x-width/2-8-10,y-23,width+16+20,38);
+				ctx.strokeStyle='#fff';
+				ctx.lineWidth=1;
+				ctx.strokeRect(x-width/2-8-10+1.5,y-23+1.5,width+16+20-3,38-3);
+				ctx.globalAlpha=1;
+				ctx.fillStyle='#fff';
+				ctx.fillText(text,x+14,y-8);
+				ctx.fillText(Beautify(selected.sucked),x+10,y+8);
+				var s=54+2*Math.sin(Game.T*0.4);
+				ctx.drawImage(Pic('icons.png'),27*48,26*48,48,48,x-width/2-16-s/2,y-4-s/2,s,s);
+			}
+		}
+	}
+	
 	Game.DrawBackground = function() {
 		Timer.clean();
 			//background
