@@ -485,7 +485,7 @@ var Crumbs_Init_On_Load = function() {
 		let arr = [];
 		arr.push(this);
 		for (let i in this.children) {
-			arr = Crumbs.merge(arr, this.children[i].compile());
+			if (this.children[i] !== null) { arr = Crumbs.merge(arr, this.children[i].compile()); }
 		}
 		return arr;
 	};
