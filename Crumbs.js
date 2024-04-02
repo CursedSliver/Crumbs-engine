@@ -748,9 +748,9 @@ var Crumbs_Init_On_Load = function() {
 	Game.DrawWrinklers = function() {
 		var ctx=Game.LeftBackground;
 		var selected=0;
-		/*
 		for (var i in Game.wrinklers)
 		{
+			/*
 			var me=Game.wrinklers[i];
 			if (me.phase>0)
 			{
