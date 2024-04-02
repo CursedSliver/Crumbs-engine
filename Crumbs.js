@@ -666,6 +666,7 @@ var Crumbs_Init_On_Load = function() {
 				imgs: [Crumbs.particleImgs.empty, 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'],
 				id: 'wrinkler'+i,
 				order: 1,
+				scope: 'left',
 				init: function() {
 					let shadow = {
 						y: 30,
@@ -743,10 +744,11 @@ var Crumbs_Init_On_Load = function() {
 	if (Game.ready) { Crumbs.initWrinklers(); } else { Game.registerHook('create', Crumbs.initWrinklers); }
 	
 	//extreme unfunniness intensifies
-	/*
+	
 	Game.DrawWrinklers = function() {
 		var ctx=Game.LeftBackground;
 		var selected=0;
+		/*
 		for (var i in Game.wrinklers)
 		{
 			var me=Game.wrinklers[i];
@@ -787,6 +789,7 @@ var Crumbs_Init_On_Load = function() {
 				
 				if (me.selected) selected=me;
 			}
+   			*/
 			
 			if (selected && Game.Has('Eye of the wrinkler'))
 			{
@@ -826,7 +829,6 @@ var Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
- 	*/
 	
 	Game.DrawBackground = function() {
 		Timer.clean();
