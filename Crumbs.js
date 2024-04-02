@@ -191,9 +191,11 @@ var Crumbs_Init_On_Load = function() {
 			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
 		}
 		for (let i in this.children) {
-			this.children[i].t++;
-			this.children[i].triggerBehavior();
-			this.children[i].updateChildren();
+			if (this.children[i] !== null) {
+				this.children[i].t++;
+				this.children[i].triggerBehavior();
+				this.children[i].updateChildren();
+			}
 		}
 	};
 	Crumbs.particle.prototype.findChild = function(id) {
