@@ -531,7 +531,7 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.spawnCookieShower = function() {
 		if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) {
-			Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie');
+			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie'));
 		}
 	};
 	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc) {
@@ -552,7 +552,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 		c.id = id;
 		c.rotation = Math.random() * 2 * Math.PI;
-		Crumbs.spawn(c);
+		return c;
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
@@ -560,12 +560,12 @@ var Crumbs_Init_On_Load = function() {
 
 	Game.registerHook('click', function() {
 		if (Game.prefs.particles) {
-			Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie');
-			Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75);
+			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie'));
+			Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75));
 		}
 	});
 
-	eval('Game.UpdateWrinklers='+Game.UpdateWrinklers.toString().replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, ``))
+	eval('Game.UpdateWrinklers='+Game.UpdateWrinklers.toString().replace(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75));`));
 
 	Crumbs.drawParticles = function() {
 		for (let c in Crumbs.scopedCanvas) {
