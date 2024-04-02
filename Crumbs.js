@@ -743,6 +743,7 @@ var Crumbs_Init_On_Load = function() {
 	if (Game.ready) { Crumbs.initWrinklers(); } else { Game.registerHook('create', Crumbs.initWrinklers); }
 	
 	//extreme unfunniness intensifies
+	/*
 	Game.DrawWrinklers = function() {
 		var ctx=Game.LeftBackground;
 		var selected=0;
@@ -797,12 +798,6 @@ var Crumbs_Init_On_Load = function() {
 				var width=Math.ceil(Math.max(ctx.measureText(text).width,ctx.measureText(Beautify(selected.sucked)).width));
 				ctx.fillStyle='#000';
 				ctx.globalAlpha=0.65;
-				/*ctx.strokeStyle='#000';
-				ctx.lineWidth=8;
-				ctx.beginPath();
-				ctx.moveTo(x,y);
-				ctx.lineTo(Math.floor(selected.x),Math.floor(selected.y));
-				ctx.stroke();*/
 				var xO=x-width/2-16;
 				var yO=y-4;
 				var dist=Math.floor(Math.sqrt((selected.x-xO)*(selected.x-xO)+(selected.y-yO)*(selected.y-yO)));
@@ -831,6 +826,7 @@ var Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
+ 	*/
 	
 	Game.DrawBackground = function() {
 		Timer.clean();
