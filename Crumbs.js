@@ -39,7 +39,8 @@ var Crumbs_Init_On_Load = function() {
 		empty: 'img/empty.png',
 		glint: 'img/glint.png',
 		icons: 'img/icons.png',
-		dollar: 'img/smallDollars.png'
+		dollar: 'img/smallDollars.png',
+		wrinklerBits: 'img/wrinklerBits.png'
 	};
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s];
@@ -84,9 +85,14 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.filters = {};
 		this.behaviors = [];
-		if (typeof obj.behaviorParams !== 'undefined') { this.behaviorParams = [].concat(obj.behaviorParams); } else { this.behaviorParams = [{}]; }
-		if (typeof obj.behaviors == 'function' || Array.isArray(obj.behaviors)) { 
-			this.behaviors = this.behaviors.concat(obj.behaviors);
+		if (typeof obj.behaviors == 'function') { 
+			this.behaviors = [[obj.behaviors, {}]];
+		} else if (Array.isArray(obj.behaviors)) {
+			let f = [];
+			for (let i in obj.behaviors) {
+				if (Array.isArray(obj.behaviors[i])) { f.concat(obj.behaviors[i]); } else { f.concat([obj.behaviors[i], {}]); }
+			}
+			this.behaviors = f;
 		} else {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [Crumbs.particleDefaults.behaviors]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
 		}
@@ -159,10 +165,10 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.particle.prototype.triggerBehavior = function() {
 		for (let b in this.behaviors) {
-			let e = this.behaviors[b](this.getInfo(), this.behaviorParams[b]);
+			let e = this.behaviors[b][0](this.getInfo(), this.behaviors[b][1]);
 			if (e == 't') { this.die(); break; }
 			if (!e) { continue; }
-			if (e.behaviorParams) { this.behaviorParams[b] = e.behaviorParams; }
+			if (e.behaviorParams) { this.behaviors[b][1] = e.behaviorParams; }
 			this.set(e);
 		}
 	};
@@ -522,8 +528,7 @@ var Crumbs_Init_On_Load = function() {
 			height: 48,
 			sx: i[0] * 48,
 			sy: i[1] * 48,
-			scope: 'left',
-			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fadeout],
+			scope: 'left'
 		};
 	};
 
@@ -534,8 +539,18 @@ var Crumbs_Init_On_Load = function() {
 			height: 64,
 			sx: Math.floor(Math.random() * 8) * 64,
 			sy: 0,
-			scope: 'left',
-			behaviors: [Crumbs.particleBehaviors.cookieFall, Crumbs.particleBehaviors.horizontal, Crumbs.particleBehaviors.expireAfter, Crumbs.particleBehaviors.fadeout]
+			scope: 'left'
+		};
+	};
+
+	Crumbs.wrinklerBit = function() {
+		return {
+			imgs: 'wrinklerBits',
+			width: 64,
+			height: 64,
+			sx: Math.floor(Math.random() * 8) * 64,
+			sy: 0,
+			scope: 'left'
 		};
 	};
 
@@ -547,7 +562,7 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
-		c.behaviorParams = [{yd: yd}, {speed: speed}, {t: t * Game.fps}, {speed: 1 / (t * Game.fps)}];
+		c.behaviors = [[Crumbs.particleBehaviors.cookieFall, {yd: yd}], [Crumbs.particleBehaviors.horizontal, {speed: speed}], [Crumbs.particleBehaviors.expireAfter, {t: t * Game.fps}], [Crumbs.particleBehaviors.fadeout, {speed: 1 / (t * Game.fps)}]];
 		if (!onMouse) {
 			c.x = x;
 			c.y = y;
