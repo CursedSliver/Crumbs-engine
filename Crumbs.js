@@ -548,10 +548,10 @@ var Crumbs_Init_On_Load = function() {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 		c.behaviorParams = [{yd: yd}, {speed: speed}, {t: t * Game.fps}, {speed: 1 / (t * Game.fps)}];
-		c.init = Crumbs.particleInits.topRandom;
 		if (!onMouse) {
 			c.x = x;
 			c.y = y;
+			c.init = Crumbs.particleInits.topRandom;
 		} else {
 			c.x = Game.mouseX - c.width / 2;
 			c.y = Game.mouseY - c.height / 2;
