@@ -142,7 +142,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY', 'absX', 'absY'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
