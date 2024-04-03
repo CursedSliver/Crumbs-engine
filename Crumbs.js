@@ -89,6 +89,8 @@ var Crumbs_Init_On_Load = function() {
 		this.height = obj.height?obj.height:Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
 		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
+		this.offsetX = obj.offsetX?obj.offsetX:Crumbs.particleDefaults.offsetX; 
+		this.offsetY = obj.offsetY?obj.offsetY:Crumbs.particleDefaults.offsetY; //those are so dumb
 		this.text = obj.text?obj.text:Crumbs.particleDefaults.text;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
@@ -128,7 +130,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -431,6 +433,8 @@ var Crumbs_Init_On_Load = function() {
 		patternFill: 0,
 		width: null,
 		height: null,
+		offsetX: 0,
+		offsetY: 0,
 		sx: 0,
 		sy: 0,
 		text: null
@@ -678,13 +682,13 @@ var Crumbs_Init_On_Load = function() {
 					ctx.rotate(o.rotation + o.rotationAdd);
 				}
 				for (let i in o.settings) {
-					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings+'"'); } 
-					else { eval('ctx.'+i+'='+o.settings); }
+					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
+					else { eval('ctx.'+i+'='+o.settings[i]); }
 				}
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox, -oy, pWidth, pHeight);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 				}
 				for (let i in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
@@ -751,8 +755,10 @@ var Crumbs_Init_On_Load = function() {
 						let sh=200+5*Math.sin(Game.T*0.2-2+p.id*3);
 						return {
 							scaleX: sw / 100, scaleY: sh / 200,
-							x: Game.wrinklers[p.id].x - sw/2,
-							y: Game.wrinklers[p.id].y - 10,
+							x: Game.wrinklers[p.id].x,
+							offsetX: -sw/2,
+							y: Game.wrinklers[p.id].y,
+							offsetY: -10,
 							rotation: -(Game.wrinklers[p.id].r)*Math.PI/180,
 							alpha: Game.wrinklers[p.id].close
 						};
