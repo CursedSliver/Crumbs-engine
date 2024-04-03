@@ -118,7 +118,7 @@ var Crumbs_Init_On_Load = function() {
 			for (let i in obj.behaviors) {
 				if (Array.isArray(obj.behaviors[i])) { f.push(obj.behaviors[i]); }
 				else if (typeof obj.behaviors[i] === 'function') { f.push([obj.behaviors[i], {}]); } 
-				else { f = [obj.behaviors[i]]; break; }
+				else { f = [obj.behaviors]; break; }
 			}
 			this.behaviors = f;
 		}
