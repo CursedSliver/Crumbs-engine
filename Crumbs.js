@@ -641,7 +641,7 @@ var Crumbs_Init_On_Load = function() {
 				let pHeight = 0;
 				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
-				ctx.translate(o.x + o.canvaCenter[0] + (pWidth / 2), o.y + o.canvaCenter[1] + (pHeight / 2));
+				ctx.translate(o.x + o.canvaCenter[0]/* + (pWidth / 2)*/, o.y + o.canvaCenter[1]/* + (pHeight / 2)*/);
 				if (o.rotation + o.rotationAdd) {
 					ctx.rotate(o.rotation + o.rotationAdd);
 				}
@@ -652,7 +652,7 @@ var Crumbs_Init_On_Load = function() {
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -pWidth, -pHeight, pWidth, pHeight);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, /*-pWidth, -pHeight*/0, 0/**/, pWidth, pHeight);
 				}
 				for (let i in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
