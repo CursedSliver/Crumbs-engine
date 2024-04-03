@@ -25,6 +25,13 @@ var Crumbs_Init_On_Load = function() {
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
+	Crumbs.h.bypassRotation = function(r, x, y) {
+		//obtains a vector that goes in the direction specified globally regardless of the current rotation
+		if (!(x && y)) { return [0, 0]; }
+		let rn = Math.atan(y / x) + r;
+		let l = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		return [Math.cos(rn) * l, Math.sin(rn) * l]; //x, y
+	}
 	
 	Crumbs.prefs = {
 		particles: {
@@ -91,11 +98,14 @@ var Crumbs_Init_On_Load = function() {
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
 		this.offsetX = obj.offsetX?obj.offsetX:Crumbs.particleDefaults.offsetX; 
 		this.offsetY = obj.offsetY?obj.offsetY:Crumbs.particleDefaults.offsetY; //those are so dumb
+		this.absX = obj.absX?obj.absX:Crumbs.particleDefaults.absX;
+		this.absY = obj.absY?obj.absY:Crumbs.particleDefaults.absY;
 		this.text = obj.text?obj.text:Crumbs.particleDefaults.text;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
+		this.noRotate = obj.noRotate?obj.noRotate:Crumbs.particleDefaults.noRotate;
 		this.filters = {};
 		this.settings = {};
 		this.behaviors = [];
@@ -439,7 +449,10 @@ var Crumbs_Init_On_Load = function() {
 		offsetY: 0,
 		sx: 0,
 		sy: 0,
-		text: null
+		text: null,
+		noRotate: false,
+		absX: 0,
+		absY: 0
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
@@ -680,9 +693,10 @@ var Crumbs_Init_On_Load = function() {
 				let ox = Crumbs.getOffsetX(o.anchor, pWidth);
 				let oy = Crumbs.getOffsetY(o.anchor, pHeight);
 				ctx.translate(o.x + o.canvaCenter[0] + ox, o.y + o.canvaCenter[1] + oy);
+				let axy = Crumbs.h.br(o.rotation + (o.noRotate?0:o.rotationAdd), o.absX, o.absY);;
 				if (o.rotation + o.rotationAdd) {
-					ctx.rotate(o.rotation + o.rotationAdd);
-				}
+					ctx.rotate(o.rotation + (o.noRotate?0:o.rotationAdd));
+				} 
 				for (let i in o.settings) {
 					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
 					else { eval('ctx.'+i+'='+o.settings[i]); }
@@ -690,7 +704,7 @@ var Crumbs_Init_On_Load = function() {
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX + axy[0], -oy + o.offsetY + axy[1], pWidth, pHeight);
 				}
 				for (let i in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
@@ -716,14 +730,14 @@ var Crumbs_Init_On_Load = function() {
 				init: function() {
 					let shadow = {
 						anchor: 'top-left',
-						offsetY: 30,
+						absY: 30,
 						scaleX: 5,
 						scaleY: 5,
 						order: 1,
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerShadow.png'],
 						behaviors: [[function(o, p) {
-							if (Game.prefs.fancy && Game.wrinklers[i].close > 0) {
-								return {imgUsing: 1};
+							if (Game.prefs.fancy && Game.wrinklers[p.id].close > 0) {
+								return {imgUsing: 1, alpha: Game.wrinklers[p.id].close};
 							} 
 							return {imgUsing: 0};
 						}, {id: i}]]
@@ -733,12 +747,12 @@ var Crumbs_Init_On_Load = function() {
 						anchor: 'top-left',
 						y: Math.sin(Game.T*0.2+i*3+1.2),
 						order: 3,
-						behaviors: function(o, p) {
-							if (Game.prefs.notScary) {
-								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2};
+						behaviors: [function(o, p) {
+							if (Game.prefs.notScary && Game.wrinklers[p.id].close > 0) {
+								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2, alpha: Game.wrinklers[p.id].close};
 							}
 							return {imgUsing: 0};
-						}
+						}, {id: i}]
 					};
 					return {newChild: [shadow, eyes]};
 				},
