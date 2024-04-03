@@ -25,7 +25,7 @@ var Crumbs_Init_On_Load = function() {
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
-	Crumbs.h.bypassRotation = function(r, x, y) {
+	Crumbs.h.br = function(r, x, y) {
 		//obtains a vector that goes in the direction specified globally regardless of the current rotation
 		if (!(x && y)) { return [0, 0]; }
 		let rn = Math.atan(y / x) + r;
