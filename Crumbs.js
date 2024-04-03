@@ -683,7 +683,7 @@ var Crumbs_Init_On_Load = function() {
 					let eyes = {
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
 						y: Math.sin(Game.T*0.2+i*3+1.2),
-						behaviors: function() {
+						behaviors: function(o, p) {
 							if (Game.prefs.notScary) {
 								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2};
 							}
