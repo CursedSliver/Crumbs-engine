@@ -47,6 +47,7 @@ var Crumbs_Init_On_Load = function() {
 		return Crumbs.scopedCanvas[s];
 	};
 	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
+	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
 		imageSmoothingEnabled: true
@@ -78,6 +79,10 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleX = obj.scaleX?obj.scaleX:Crumbs.particleDefaults.scaleX;
 		this.scaleY = obj.scaleY?obj.scaleY:Crumbs.particleDefaults.scaleY;
 		this.rotation = obj.rotation?obj.rotation:Crumbs.particleDefaults.rotation; //euler, clockwise
+		if (Crumbs.validAnchors.includes(obj.anchor)) { this.anchor = obj.anchor; }
+		else if (typeof obj.anchor === 'undefined') { this.anchor = Crumbs.particleDefaults.anchor; } else {
+			throw '"'+obj.anchor+'" is not a valid anchor!"';
+		}
 		this.alpha = obj.alpha?obj.alpha:Crumbs.particleDefaults.alpha;
 		this.patternFill = obj.patternFill?obj.patternFill:Crumbs.particleDefaults.patternFill;
 		this.width = obj.width?obj.width:Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
@@ -123,7 +128,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -669,9 +674,14 @@ var Crumbs_Init_On_Load = function() {
 				id: 'wrinkler'+i,
 				order: 1,
 				scope: 'left',
+				anchor: 'top-left',
 				init: function() {
 					let shadow = {
+						anchor: 'top-left',
 						y: 30,
+						scaleX: 5,
+						scaleY: 5,
+						order: 1,
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerShadow.png'],
 						behaviors: function(o, p) {
 							if (Game.prefs.fancy) {
@@ -682,7 +692,9 @@ var Crumbs_Init_On_Load = function() {
 					};
 					let eyes = {
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
+						anchor: 'top-left',
 						y: Math.sin(Game.T*0.2+i*3+1.2),
+						order: 3,
 						behaviors: function(o, p) {
 							if (Game.prefs.notScary) {
 								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2};
@@ -709,6 +721,7 @@ var Crumbs_Init_On_Load = function() {
 							scaleX: sw / 100, scaleY: sh / 200,
 							x: Game.wrinklers[p.id].x - sw/2,
 							y: Game.wrinklers[p.id].y - 10,
+							rotation: -(Game.wrinklers[p.id].r)*Math.PI/180,
 							alpha: Game.wrinklers[p.id].close
 						};
 					}, {id: i}
@@ -727,8 +740,8 @@ var Crumbs_Init_On_Load = function() {
 									settings: {globalCompositeOperation: 'lighter'},
 									x: Math.random()*50-25,
 									y: Math.random()*200-100,
-									scaleX: s,
-									scaleY: s,
+									scaleX: s / 32,
+									scaleY: s / 32,
 									behaviors: function(o, p) {
 										if (o.t > 1) { return 't'; }
 										return {};
