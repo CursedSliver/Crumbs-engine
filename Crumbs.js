@@ -708,7 +708,7 @@ var Crumbs_Init_On_Load = function() {
 			let w = {
 				imgs: [Crumbs.particleImgs.empty, 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'],
 				id: 'wrinkler'+i,
-				order: 1,
+				order: 1.5,
 				scope: 'left',
 				anchor: 'top-left',
 				init: function() {
