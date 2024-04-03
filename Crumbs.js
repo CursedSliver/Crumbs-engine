@@ -106,7 +106,9 @@ var Crumbs_Init_On_Load = function() {
 		} else if (Array.isArray(obj.behaviors)) {
 			let f = [];
 			for (let i in obj.behaviors) {
-				if (Array.isArray(obj.behaviors[i])) { f.push(obj.behaviors[i]); } else { f.push([obj.behaviors[i], {}]); }
+				if (Array.isArray(obj.behaviors[i])) { f.push(obj.behaviors[i]); }
+				else if (typeof obj.behaviors[i] === 'function') { f.push([obj.behaviors[i], {}]); } 
+				else { f = [obj.behaviors[i]]; break; }
 			}
 			this.behaviors = f;
 		}
@@ -719,12 +721,12 @@ var Crumbs_Init_On_Load = function() {
 						scaleY: 5,
 						order: 1,
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerShadow.png'],
-						behaviors: [function(o, p) {
+						behaviors: [[function(o, p) {
 							if (Game.prefs.fancy && Game.wrinklers[i].close > 0) {
 								return {imgUsing: 1};
 							} 
 							return {imgUsing: 0};
-						}, {id: i}]
+						}, {id: i}]]
 					};
 					let eyes = {
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
