@@ -738,7 +738,7 @@ var Crumbs_Init_On_Load = function() {
 				anchor: 'top-left',
 				init: function() {
 					let shadow = {
-						anchor: 'center',
+						anchor: 'top-left',
 						y: 30,
 						scaleX: 5,
 						scaleY: 5,
@@ -803,6 +803,7 @@ var Crumbs_Init_On_Load = function() {
 									settings: {globalCompositeOperation: 'lighter'},
 									offsetX: Math.random()*50-25,
 									offsetY: Math.random()*200-100,
+									order: 5,
 									scaleX: s / 32,
 									scaleY: s / 32,
 									behaviors: function(o, p) {
