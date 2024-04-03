@@ -25,21 +25,11 @@ var Crumbs_Init_On_Load = function() {
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
-	Crumbs.h.br = function(r, x, y) {
-		//obtains a vector that goes in the direction specified globally regardless of the current rotation
-		/*
-		if (!(x || y)) { return [0, 0]; }
-		let rn = Math.atan(y / x) + r;
-		let l = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-		return [Math.cos(rn) * l, Math.sin(rn) * l]; */
-		let cos_neg = Math.cos(-r);
-    	let sin_neg = Math.sin(-r);
-    	
-    	// Apply the rotation matrix to the original vector
-    	let new_x = x * cos_neg - y * sin_neg;
-    	let new_y = x * sin_neg + y * cos_neg;
-    
-    	return [new_x, new_y];
+	Crumbs.h.rv = function(r, x, y) {
+		//rotates the given vector by "r"
+		let n = Math.atan(y/x) + r;
+		let d = Math.sqrt(x*x+y*y);
+		return [Math.cos(n)*d, Math.sin(n)*d]; //x, y
 	}
 	
 	Crumbs.prefs = {
@@ -107,8 +97,6 @@ var Crumbs_Init_On_Load = function() {
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
 		this.offsetX = obj.offsetX?obj.offsetX:Crumbs.particleDefaults.offsetX; 
 		this.offsetY = obj.offsetY?obj.offsetY:Crumbs.particleDefaults.offsetY; //those are so dumb
-		this.absX = obj.absX?obj.absX:Crumbs.particleDefaults.absX;
-		this.absY = obj.absY?obj.absY:Crumbs.particleDefaults.absY;
 		this.text = obj.text?obj.text:Crumbs.particleDefaults.text;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
@@ -151,7 +139,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY', 'absX', 'absY'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -216,9 +204,10 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.particle.prototype.updateChildren = function() {
 		if (this.parent !== null) {
-			this.canvaCenter = [this.parent.x + this.parent.canvaCenter[0], this.parent.y + this.parent.canvaCenter[1]];
-			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
 			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
+			let m = Crumbs.h.rv(this.rotationAdd, this.parent.x + this.parent.canvaCenter[0], this.parent.y + this.parent.canvaCenter[1]);
+			this.canvaCenter = [m[0], m[1]];
+			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
 		}
 		for (let i in this.children) {
 			if (this.children[i] !== null) {
@@ -459,9 +448,7 @@ var Crumbs_Init_On_Load = function() {
 		sx: 0,
 		sy: 0,
 		text: null,
-		noRotate: false,
-		absX: 0,
-		absY: 0
+		noRotate: false
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
