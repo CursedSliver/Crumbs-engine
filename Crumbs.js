@@ -719,12 +719,12 @@ var Crumbs_Init_On_Load = function() {
 						scaleY: 5,
 						order: 1,
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerShadow.png'],
-						behaviors: function(o, p) {
-							if (Game.prefs.fancy) {
+						behaviors: [function(o, p) {
+							if (Game.prefs.fancy && Game.wrinklers[i].close > 0) {
 								return {imgUsing: 1};
 							} 
 							return {imgUsing: 0};
-						}
+						}, {id: i}]
 					};
 					let eyes = {
 						imgs: [Crumbs.particleImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
