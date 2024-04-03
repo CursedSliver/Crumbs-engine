@@ -27,10 +27,19 @@ var Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.br = function(r, x, y) {
 		//obtains a vector that goes in the direction specified globally regardless of the current rotation
+		/*
 		if (!(x || y)) { return [0, 0]; }
 		let rn = Math.atan(y / x) + r;
 		let l = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-		return [Math.cos(rn) * l, Math.sin(rn) * l]; //x, y
+		return [Math.cos(rn) * l, Math.sin(rn) * l]; */
+		let cos_neg = Math.cos(-rotation);
+    	let sin_neg = Math.sin(-rotation);
+    	
+    	// Apply the rotation matrix to the original vector
+    	let new_x = x * cos_neg - y * sin_neg;
+    	let new_y = x * sin_neg + y * cos_neg;
+    
+    	return [new_x, new_y];
 	}
 	
 	Crumbs.prefs = {
