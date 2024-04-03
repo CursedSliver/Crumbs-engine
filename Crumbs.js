@@ -719,8 +719,8 @@ var Crumbs_Init_On_Load = function() {
 						let sh=200+5*Math.sin(Game.T*0.2-2+p.id*3);
 						return {
 							scaleX: sw / 100, scaleY: sh / 200,
-							x: Game.wrinklers[p.id].x - sw/2,
-							y: Game.wrinklers[p.id].y - 10,
+							x: Game.wrinklers[p.id].x/* - sw/2*/,
+							y: Game.wrinklers[p.id].y/* - 10*/,
 							rotation: -(Game.wrinklers[p.id].r)*Math.PI/180,
 							alpha: Game.wrinklers[p.id].close
 						};
