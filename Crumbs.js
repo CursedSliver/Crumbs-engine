@@ -739,7 +739,7 @@ var Crumbs_Init_On_Load = function() {
 				init: function() {
 					let shadow = {
 						anchor: 'top-left',
-						absY: 30,
+						y: 30,
 						scaleX: 5,
 						scaleY: 5,
 						order: 1,
