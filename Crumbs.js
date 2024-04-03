@@ -32,8 +32,8 @@ var Crumbs_Init_On_Load = function() {
 		let rn = Math.atan(y / x) + r;
 		let l = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 		return [Math.cos(rn) * l, Math.sin(rn) * l]; */
-		let cos_neg = Math.cos(-rotation);
-    	let sin_neg = Math.sin(-rotation);
+		let cos_neg = Math.cos(-r);
+    	let sin_neg = Math.sin(-r);
     	
     	// Apply the rotation matrix to the original vector
     	let new_x = x * cos_neg - y * sin_neg;
