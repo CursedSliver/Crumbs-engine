@@ -27,8 +27,8 @@ var Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.rv = function(r, x, y) {
 		//rotates the given vector by "r"
-		const c = Math.cos(r);
-		const s = Math.sin(r);
+		const c = Math.cos(-r);
+		const s = Math.sin(-r);
 		return [
 			x * c - y * s,
 			x * s + y * c
