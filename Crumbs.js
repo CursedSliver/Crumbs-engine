@@ -689,11 +689,12 @@ var Crumbs_Init_On_Load = function() {
 				let pHeight = 0;
 				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
-				let ox = Crumbs.getOffsetX(o.anchor, pWidth);
-				let oy = Crumbs.getOffsetY(o.anchor, pHeight);
+				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
+				const oy = Crumbs.getOffsetY(o.anchor, pHeight);
+				const r = o.rotation + (o.noRotate?0:o.rotationAdd);
 				ctx.translate(o.x + o.canvaCenter[0] + ox, o.y + o.canvaCenter[1] + oy);
 				if (o.rotation + o.rotationAdd) {
-					ctx.rotate(o.rotation + (o.noRotate?0:o.rotationAdd));
+					ctx.rotate(r);
 				} 
 				for (let i in o.settings) {
 					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
@@ -702,7 +703,7 @@ var Crumbs_Init_On_Load = function() {
 				if (o.patternFill) { 
 					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
 				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -2 * ox + o.offsetX, -2 * oy + o.offsetY, pWidth, pHeight);
+					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 				}
 				for (let i in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
