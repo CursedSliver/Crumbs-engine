@@ -45,6 +45,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 	}
 	Crumbs.particleImgs = {
+		none: 'img/empty.png',
 		empty: 'img/empty.png',
 		glint: 'img/glint.png',
 		icons: 'img/icons.png',
@@ -67,14 +68,20 @@ var Crumbs_Init_On_Load = function() {
 		if (typeof obj !== 'object') { throw 'Crumbs.particle constructor parameter must be an object or undefined.'; }
 		for (let i in obj) { if (!Crumbs.allProperties.includes(i)) { throw '"'+i+'" is not a valid property for a particle.'; } }
 		this.parent = parent?parent:null;
-		this.scope = obj.scope?obj.scope:Crumbs.particleDefaults.scope;
+		this.scope = obj.scope||Crumbs.particleDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs particle type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.particleImgs.hasOwnProperty(obj.imgs)) { this.imgs = Crumbs.particleImgs[obj.imgs]; } else { this.imgs = obj.imgs?obj.imgs:Crumbs.particleDefaults.imgs; }
-		if (typeof this.imgs == 'function') { this.imgs = this.imgs(); }
-		this.imgs = [].concat(this.imgs);
-		this.imgUsing = obj.imgUsing?obj.imgUsing:Crumbs.particleDefaults.imgUsing;
-		this.id = obj.id?obj.id:Crumbs.particleDefaults.id;
-		this.order = obj.order?obj.order:Crumbs.particleDefaults.order;
+		if (typeof obj.imgs === 'function') { obj.imgs = obj.imgs(); }
+		else if (typeof obj.imgs === 'undefined') { obj.imgs = Crumbs.particleDefaults.imgs; }
+		this.imgs = [].concat(obj.imgs);
+		for (let i in this.imgs) {
+			if (Crumbs.particleImgs.hasOwnProperty(this.imgs[i])) {
+				this.imgs[i] = Crumbs.particleImgs[this.imgs[i]];
+			}
+		}
+		this.imgUsing = obj.imgUsing||Crumbs.particleDefaults.imgUsing;
+		this.id = obj.id||Crumbs.particleDefaults.id;
+		this.order = obj.order||Crumbs.particleDefaults.order;
 		let initRe = null;
 		if (typeof obj.init === 'function') {
 			initRe = obj.init(Crumbs.getCanvasByScope(this.scope));  
@@ -83,30 +90,30 @@ var Crumbs_Init_On_Load = function() {
 		} else if (typeof obj.init === 'undefined') {
 			initRe = Crumbs.particleDefaults.init(Crumbs.getCanvasByScope(this.scope));
 		} else { throw 'Crumbs particle init type not applicable. Applicable types include: function, object, undefined'; }
-		this.x = obj.x?obj.x:Crumbs.particleDefaults.x;
-		this.y = obj.y?obj.y:Crumbs.particleDefaults.y;
-		this.scaleX = obj.scaleX?obj.scaleX:Crumbs.particleDefaults.scaleX;
-		this.scaleY = obj.scaleY?obj.scaleY:Crumbs.particleDefaults.scaleY;
-		this.rotation = obj.rotation?obj.rotation:Crumbs.particleDefaults.rotation; //euler, clockwise
+		this.x = obj.x||Crumbs.particleDefaults.x;
+		this.y = obj.y||Crumbs.particleDefaults.y;
+		this.scaleX = obj.scaleX||Crumbs.particleDefaults.scaleX;
+		this.scaleY = obj.scaleY||Crumbs.particleDefaults.scaleY;
+		this.rotation = obj.rotation||Crumbs.particleDefaults.rotation; //euler, clockwise
 		if (Crumbs.validAnchors.includes(obj.anchor)) { this.anchor = obj.anchor; }
 		else if (typeof obj.anchor === 'undefined') { this.anchor = Crumbs.particleDefaults.anchor; } else {
 			throw '"'+obj.anchor+'" is not a valid anchor!"';
 		}
-		this.alpha = obj.alpha?obj.alpha:Crumbs.particleDefaults.alpha;
-		this.width = obj.width?obj.width:Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
-		this.height = obj.height?obj.height:Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
-		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
-		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
-		this.offsetX = obj.offsetX?obj.offsetX:Crumbs.particleDefaults.offsetX; 
-		this.offsetY = obj.offsetY?obj.offsetY:Crumbs.particleDefaults.offsetY; //those are so dumb
+		this.alpha = obj.alpha||Crumbs.particleDefaults.alpha;
+		this.width = obj.width||Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
+		this.height = obj.height||Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
+		this.sx = obj.sx||Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
+		this.sy = obj.sy||Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
+		this.offsetX = obj.offsetX||Crumbs.particleDefaults.offsetX; //x and y but affected by rotation
+		this.offsetY = obj.offsetY||Crumbs.particleDefaults.offsetY; 
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
-		this.noRotate = obj.noRotate?obj.noRotate:Crumbs.particleDefaults.noRotate;
+		this.noRotate = obj.noRotate||Crumbs.particleDefaults.noRotate;
 		this.filters = {};
 		this.settings = {};
-		this.components = obj.components?obj.components:Crumbs.particleDefaults.components;
+		this.components = obj.components||Crumbs.particleDefaults.components;
 		this.behaviors = [];
 		if (!obj.hasOwnProperty('behaviors')) {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [[Crumbs.particleDefaults.behaviors, {}]]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
@@ -698,11 +705,9 @@ var Crumbs_Init_On_Load = function() {
 					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
 					else { eval('ctx.'+i+'='+o.settings[i]); }
 				}
-				if (o.patternFill) { 
-					ctx.fillPattern(p, 0, 0, o.width, o.height, 128, 128);
-				} else {
-					ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
-				}
+				
+				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
+				
 				for (let i in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
 					else { eval('ctx.'+i+'='+Crumbs.settings); }
