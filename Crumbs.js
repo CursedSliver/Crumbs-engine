@@ -36,7 +36,7 @@ var Crumbs_Init_On_Load = function() {
 	}
 	
 	Crumbs.prefs = {
-		particles: {
+		objects: {
 			left: 1,
 			middle: 1,
 			right: 1,
@@ -270,7 +270,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.objectsEnabled = function(scope) {
-		return Crumbs.prefs.particles[scope];
+		return Crumbs.prefs.objects[scope];
 	};
 	Crumbs.lastUpdate = Date.now();
 	Crumbs.updateObjects = function() { //called every draw frame
