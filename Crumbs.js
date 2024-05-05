@@ -208,7 +208,7 @@ var Crumbs_Init_On_Load = function() {
 		if (this.parent !== null) {
 			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
 			let m = Crumbs.h.rv(this.rotationAdd, this.parent.offsetX, this.parent.offsetY);
-			this.canvaCenter = [m[0] + this.parent.x + this.parent.canvaCenter[0], m[1] + this.parent.y + this.parent.canvaCenter[1]];
+			this.canvaCenter = [m[0] + this.parent.x + this.parent.canvaCenter[0], -m[1] + this.parent.y + this.parent.canvaCenter[1]];
 			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
 		}
 		for (let i in this.children) {
