@@ -93,14 +93,12 @@ var Crumbs_Init_On_Load = function() {
 			throw '"'+obj.anchor+'" is not a valid anchor!"';
 		}
 		this.alpha = obj.alpha?obj.alpha:Crumbs.particleDefaults.alpha;
-		this.patternFill = obj.patternFill?obj.patternFill:Crumbs.particleDefaults.patternFill;
 		this.width = obj.width?obj.width:Crumbs.particleDefaults.width; //only applicable for patternfill or partial drawing
 		this.height = obj.height?obj.height:Crumbs.particleDefaults.height; //only applicable for patternfill or partial drawing
 		this.sx = obj.sx?obj.sx:Crumbs.particleDefaults.sx; //sub-coordinates for partial drawing
 		this.sy = obj.sy?obj.sy:Crumbs.particleDefaults.sy; //sub-coordinates for partial drawing
 		this.offsetX = obj.offsetX?obj.offsetX:Crumbs.particleDefaults.offsetX; 
 		this.offsetY = obj.offsetY?obj.offsetY:Crumbs.particleDefaults.offsetY; //those are so dumb
-		this.text = obj.text?obj.text:Crumbs.particleDefaults.text;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -108,6 +106,7 @@ var Crumbs_Init_On_Load = function() {
 		this.noRotate = obj.noRotate?obj.noRotate:Crumbs.particleDefaults.noRotate;
 		this.filters = {};
 		this.settings = {};
+		this.components = obj.components?obj.components:Crumbs.particleDefaults.components;
 		this.behaviors = [];
 		if (!obj.hasOwnProperty('behaviors')) {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [[Crumbs.particleDefaults.behaviors, {}]]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
@@ -142,7 +141,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'patternFill', 'width', 'height', 'sx', 'sy', 'newChild', 'text', 'settings', 'anchor', 'offsetX', 'offsetY'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components'];
 	Crumbs.particle.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -443,15 +442,14 @@ var Crumbs_Init_On_Load = function() {
 		id: null,
 		order: 0,
 		behaviorParams: {},
-		patternFill: 0,
 		width: null,
 		height: null,
 		offsetX: 0,
 		offsetY: 0,
 		sx: 0,
 		sy: 0,
-		text: null,
-		noRotate: false
+		noRotate: false,
+		components: {}
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateParticles);
