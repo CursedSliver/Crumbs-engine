@@ -114,7 +114,7 @@ var Crumbs_Init_On_Load = function() {
 		this.noRotate = obj.noRotate||Crumbs.objectDefaults.noRotate;
 		this.filters = {};
 		this.settings = {};
-		this.components = obj.components||Crumbs.objectDefaults.components;
+		this.components = ([].concat(obj.components))||Crumbs.objectDefaults.components;
 		this.behaviors = [];
 		if (!obj.hasOwnProperty('behaviors')) {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [[Crumbs.objectDefaults.behaviors, {}]]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
@@ -147,7 +147,7 @@ var Crumbs_Init_On_Load = function() {
 		}
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings'];
+	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings', 'components'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
 	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components'];
 	Crumbs.object.prototype.set = function(o) {
@@ -197,6 +197,30 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.removeChild = function(index) {
 		this.children[index] = null; //unlike with root level particles, children arrays are not cleaned every 3600 draw ticks, so please use them wisely.
+	};
+	Crumbs.object.prototype.addComponent = function(comp) {
+		for (let i in this.components) {
+			if (this.components[i].type == comp.type) {
+				throw 'One object cannot have two components of the type "'+comp.type+'"!';
+			}
+		}
+		this.components.push(comp);
+	};
+	Crumbs.object.prototype.removeComponent = function(type) {
+		for (let i in this.components) {
+			if (this.components[i].type == type) {
+				return this.components.splice(i, 1);
+			}
+		}
+		return false;
+	};
+	Crumbs.object.prototype.getComponent = function(type) {
+		for (let i in this.components) {
+			if (this.components[i].type == type) {
+				return this.components[i];
+			}
+		}
+		return false;
 	};
 	Crumbs.object.prototype.reorder = function(at) {
 		Crumbs.objects[this.scope][this.index] = null;
@@ -434,10 +458,40 @@ var Crumbs_Init_On_Load = function() {
 		if (o.t >= p.t) { return 't'; } else { return {}; }
 	};
 
-	Crumbs.components = {};
-	Crumbs.components.text = function(content, size, font, ) {
-		
-	}
+	Crumbs.component = {};
+	Crumbs.defaultComp = {};
+	Crumbs.component.text = function(obj) {
+		//obj has: content, size, font, textAlign, dir, color, stroke, outline
+		const def = Crumbs.defaultComp.text;
+		this.enabled = obj.enabled||def.enabled;
+		this.content = obj.content||def.content;
+		this.size = obj.size||def.size;
+		this.font = obj.font||def.font;
+		this.align = obj.align||def.align;
+		this.dir = obj.dir||def.dir;
+		this.color = obj.color||def.color;
+		this.outlineColor = obj.outlineColor||def.outlineColor;
+		this.outline = obj.outline||def.outline;
+
+		this.type = 'text';
+	};
+	Crumbs.component.text.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.text.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.defaultComp.text = {
+		enabled: true,
+		content: '',
+		size: 10,
+		font: 'Merriweather',
+		align: 'left',
+		dir: 'inherit',
+		color: '#fff',
+		outlineColor: '#000',
+		outline: 0,
+	};
 
 	Crumbs.objectDefaults = {
 		x: 0,
@@ -462,7 +516,7 @@ var Crumbs_Init_On_Load = function() {
 		sx: 0,
 		sy: 0,
 		noRotate: false,
-		components: {}
+		components: []
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateObjects);
