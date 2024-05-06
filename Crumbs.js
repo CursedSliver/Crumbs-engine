@@ -751,7 +751,7 @@ var Crumbs_Init_On_Load = function() {
 						order: 3,
 						behaviors: [function(o, p) {
 							if (Game.prefs.notScary && Game.wrinklers[p.id].close > 0) {
-								return {imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2, alpha: Game.wrinklers[p.id].close};
+								return {y: Math.sin(Game.T*0.2+p.id*3+1.2), imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2, alpha: Game.wrinklers[p.id].close};
 							}
 							return {imgUsing: 0};
 						}, {id: i}]
