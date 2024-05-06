@@ -228,6 +228,9 @@ var Crumbs_Init_On_Load = function() {
 		Crumbs.index = at;
 	};
 	Crumbs.object.prototype.triggerBehavior = function() {
+		for (let i in this.components) {
+			this.set(this.components[i].logic(this));
+		}
 		for (let b in this.behaviors) {
 			let e = this.behaviors[b][0](this.getInfo(), this.behaviors[b][1]);
 			if (e == 't') { this.die(); break; }
@@ -480,6 +483,15 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.component.text.prototype.disable = function() {
 		this.enabled = false;
+	};
+	Crumbs.component.text.prototype.logic = function(m) {
+		return {};
+	};
+	Crumbs.component.text.prototype.preDraw = function(m) {
+		return {};
+	};
+	Crumbs.component.text.prototype.postDraw = function(m) {
+		return {};
 	};
 	Crumbs.defaultComp.text = {
 		enabled: true,
@@ -747,6 +759,9 @@ var Crumbs_Init_On_Load = function() {
 			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 			for (let i in list) {
 				let o = list[i];
+				for (let ii in o.components) {
+					o.set(o.components[ii].preDraw(o));
+				}
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
 				let p = Pic(o.imgs[o.imgUsing]);
 				let pWidth = 0;
@@ -761,14 +776,18 @@ var Crumbs_Init_On_Load = function() {
 				if (o.rotation + o.rotationAdd) {
 					ctx.rotate(r);
 				} 
-				for (let i in o.settings) {
+				for (let ii in o.settings) {
 					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
 					else { eval('ctx.'+i+'='+o.settings[i]); }
 				}
 				
 				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
+
+				for (let ii in o.components) {
+					o.set(o.components[ii].postDraw(o));
+				}
 				
-				for (let i in o.settings) {
+				for (let ii in o.settings) {
 					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
 					else { eval('ctx.'+i+'='+Crumbs.settings); }
 				}
@@ -1602,10 +1621,10 @@ var Crumbs_Init_On_Load = function() {
 				}
 			}
 	};
-}
+};
 
 Game.registerMod('Crumbs engine', {
-  init: Crumbs_Init_On_Load,
-  save: function() { },
-  load: function() { }
-})
+	init: Crumbs_Init_On_Load,
+	save: function() { },
+	load: function() { }
+});
