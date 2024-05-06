@@ -801,7 +801,7 @@ var Crumbs_Init_On_Load = function() {
 									scaleX: s / 32, 
 									scaleY: s / 32,
 									behaviors: function(o, p) {
-										if (o.t > 1) { return 't'; }
+										if (o.t > 0) { return 't'; }
 										return {};
 									}
 								}};
