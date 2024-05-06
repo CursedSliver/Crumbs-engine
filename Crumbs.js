@@ -463,6 +463,38 @@ var Crumbs_Init_On_Load = function() {
 
 	Crumbs.component = {};
 	Crumbs.defaultComp = {};
+
+	Crumbs.component.rect = function(obj) {
+		const def = Crumbs.defaultComp.text;
+		this.enabled = obj.enabled||def.enabled;
+		this.color = obj.color||def.color;
+		this.outline = obj.outline||def.outline;
+		this.outlineColor = obj.outlineColor||def.outlineColor;
+
+		this.type = 'rect';
+	};
+	Crumbs.defaultComp.rect = {
+		enabled: true,
+		color: '#fff',
+		outline: 0,
+		outlineColor: '#000'
+	};
+	Crumbs.component.rect.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.rect.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.rect.prototype.logic = function() {
+		
+	};
+	Crumbs.component.rect.prototype.preDraw = function() {
+		
+	};
+	Crumbs.component.rect.prototype.postDraw = function() {
+		
+	};
+	
 	Crumbs.component.text = function(obj) {
 		//obj has: content, size, font, textAlign, dir, color, stroke, outline
 		const def = Crumbs.defaultComp.text;
@@ -477,6 +509,17 @@ var Crumbs_Init_On_Load = function() {
 		this.outline = obj.outline||def.outline;
 
 		this.type = 'text';
+	};
+	Crumbs.defaultComp.text = {
+		enabled: true,
+		content: '',
+		size: 10,
+		font: 'Merriweather',
+		align: 'left',
+		dir: 'inherit',
+		color: '#fff',
+		outlineColor: '#000',
+		outline: 0,
 	};
 	Crumbs.component.text.prototype.enable = function() {
 		this.enabled = true;
@@ -493,17 +536,6 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.postDraw = function(m) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
 		return {};
-	};
-	Crumbs.defaultComp.text = {
-		enabled: true,
-		content: '',
-		size: 10,
-		font: 'Merriweather',
-		align: 'left',
-		dir: 'inherit',
-		color: '#fff',
-		outlineColor: '#000',
-		outline: 0,
 	};
 
 	Crumbs.objectDefaults = {
