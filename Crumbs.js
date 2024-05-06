@@ -491,6 +491,7 @@ var Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.text.prototype.postDraw = function(m) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
 		return {};
 	};
 	Crumbs.defaultComp.text = {
