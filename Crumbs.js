@@ -434,6 +434,11 @@ var Crumbs_Init_On_Load = function() {
 		if (o.t >= p.t) { return 't'; } else { return {}; }
 	};
 
+	Crumbs.components = {};
+	Crumbs.components.text = function(content, size, font, ) {
+		
+	}
+
 	Crumbs.objectDefaults = {
 		x: 0,
 		y: 0,
@@ -824,47 +829,6 @@ var Crumbs_Init_On_Load = function() {
 		var selected=0;
 		for (var i in Game.wrinklers)
 		{
-			/*
-			var me=Game.wrinklers[i];
-			if (me.phase>0)
-			{
-				ctx.globalAlpha=me.close;
-				ctx.save();
-				ctx.translate(me.x,me.y);
-				var sw=100+2*Math.sin(Game.T*0.2+i*3);
-				var sh=200+5*Math.sin(Game.T*0.2-2+i*3);
-				if (Game.prefs.fancy)
-				{
-					ctx.translate(0,30);
-					ctx.rotate(-(me.r)*Math.PI/180);
-					ctx.drawImage(Pic('wrinklerShadow.png'),-sw/2,-10,sw,sh);
-					ctx.rotate((me.r)*Math.PI/180);
-					ctx.translate(0,-30);
-				}
-				ctx.rotate(-(me.r)*Math.PI/180);
-				var pic=Game.WINKLERS?'winkler.png':'wrinkler.png';
-				if (me.type==1) pic=Game.WINKLERS?'shinyWinkler.png':'shinyWrinkler.png';
-				else if (Game.season=='christmas') pic=Game.WINKLERS?'winterWinkler.png':'winterWrinkler.png';
-				ctx.drawImage(Pic(pic),-sw/2,-10,sw,sh);
-				if (!Game.WINKLERS && Game.prefs.notScary) ctx.drawImage(Pic(Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?'wrinklerBlink.png':'wrinklerGooglies.png'),-sw/2,-10+1*Math.sin(Game.T*0.2+i*3+1.2),sw,sh);
-				if (me.type==1 && Math.random()<0.3 && Game.prefs.particles)//sparkle
-				{
-					ctx.globalAlpha=Math.random()*0.65+0.1;
-					var s=Math.random()*30+5;
-					ctx.globalCompositeOperation='lighter';
-					ctx.drawImage(Pic('glint.png'),-s/2+Math.random()*50-25,-s/2+Math.random()*200,s,s);
-				}
-				ctx.restore();
-				
-				if (Game.prefs.particles && me.phase==2 && Math.random()<0.03)
-				{
-					Game.particleAdd(me.x,me.y,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.5,1,2);
-				}
-				
-				if (me.selected) selected=me;
-			}
-   			*/
-			
 			if (selected && Game.Has('Eye of the wrinkler'))
 			{
 				var x=Game.cookieOriginX;
