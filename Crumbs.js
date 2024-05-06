@@ -113,7 +113,6 @@ var Crumbs_Init_On_Load = function() {
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
 		this.noRotate = obj.noRotate||Crumbs.objectDefaults.noRotate;
-		this.filters = {};
 		this.settings = {};
 		this.components = ([].concat(obj.components))||Crumbs.objectDefaults.components;
 		this.behaviors = [];
@@ -132,6 +131,12 @@ var Crumbs_Init_On_Load = function() {
 		}
 		this.t = 0; //amount of draw ticks since its creation
 		this.set(initRe);
+		if (obj.children) {
+			obj.children = [].concat(obj.children);
+			for (let i in obj.children) {
+				this.spawnChild(obj.children[i]);
+			}
+		}
 		if (this.parent === null) {
 			let pushed = false;
 			for (let i in Crumbs.objects[this.scope]) {
@@ -144,13 +149,13 @@ var Crumbs_Init_On_Load = function() {
 				if (this.parent.children[i] === null) { this.index = i; this.parent.children[i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
-			this.updateChildren();
 		}
+		this.updateChildren();
 		//the behavior function takes in x, y, scaleX, scaleY, rotation, as well as the number of draw ticks that has elapsed
 	};
-	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings', 'components'];
+	Crumbs.nonQuickSettable = ['newChild', 'behaviorParams', 'settings', 'components', 'children'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children'];
 	Crumbs.object.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -161,11 +166,6 @@ var Crumbs_Init_On_Load = function() {
 			let childsToSpawn = [].concat(o.newChild); //light bulb moment
 			for (let i in childsToSpawn) {
 				this.spawnChild(childsToSpawn[i]);
-			}
-		}
-		if (o.filters) {
-			for (let i in o.filters) {
-				this.filters[i] = o.filters[i];
 			}
 		}
 		if (o.settings) {
