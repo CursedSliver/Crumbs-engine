@@ -793,6 +793,7 @@ var Crumbs_Init_On_Load = function() {
 								let s = Math.random()*30+5;
 								return {newChild: {
 									imgs: 'glint',
+									anchor: 'top-left',
 									alpha: Math.random()*0.65+0.1,
 									settings: {globalCompositeOperation: 'lighter'},
 									offsetX: Math.random()*50,
