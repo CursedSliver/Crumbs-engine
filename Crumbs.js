@@ -68,6 +68,7 @@ var Crumbs_Init_On_Load = function() {
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.object constructor parameter must be an object or undefined.'; }
 		for (let i in obj) { if (!Crumbs.allProperties.includes(i)) { throw '"'+i+'" is not a valid property for an object.'; } }
+		this.enabled = obj.enabled||Crumbs.objectDefaults.enabled;
 		this.parent = parent?parent:null;
 		this.scope = obj.scope||Crumbs.objectDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
@@ -149,7 +150,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['filters', 'newChild', 'behaviorParams', 'settings', 'components'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'filters', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled'];
 	Crumbs.object.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -229,7 +230,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.triggerBehavior = function() {
 		for (let i in this.components) {
-			this.set(this.components[i].logic(this));
+			if (this.components[i].enabled) { this.set(this.components[i].logic(this)); }
 		}
 		for (let b in this.behaviors) {
 			let e = this.behaviors[b][0](this.getInfo(), this.behaviors[b][1]);
@@ -485,14 +486,28 @@ var Crumbs_Init_On_Load = function() {
 	Crumbs.component.rect.prototype.disable = function() {
 		this.enabled = false;
 	};
-	Crumbs.component.rect.prototype.logic = function() {
-		
+	Crumbs.component.rect.prototype.logic = function(m) {
+		return {};
 	};
-	Crumbs.component.rect.prototype.preDraw = function() {
-		
+	Crumbs.component.rect.prototype.preDraw = function(m) {
+		return {};
 	};
-	Crumbs.component.rect.prototype.postDraw = function() {
-		
+	Crumbs.component.rect.prototype.postDraw = function(m) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
+		const [pColor, pOutline, pOutlineColor] = [ctx.fillStyle, ctx.lineWidth, ctx.strokeStyle];
+		ctx.fillStyle = this.color;
+		ctx.lineWidth = this.outline;
+		ctx.strokeStyle = this.outlineColor;
+		const pWidth = m.scaleFactor[0] * m.scaleX * m.width;
+		const pHeight = m.scaleFactor[1] * m.scaleY * m.height;
+		ctx.fillRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
+		if (this.outline) {
+			ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
+		}
+		ctx.fillStyle = pColor;
+		ctx.lineWidth = pOutline;
+		ctx.strokeStyle = pOutlineColor;
+		return {};
 	};
 	
 	Crumbs.component.text = function(obj) {
@@ -539,6 +554,7 @@ var Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.objectDefaults = {
+		enabled: true,
 		x: 0,
 		y: 0,
 		scaleX: 1,
@@ -792,8 +808,9 @@ var Crumbs_Init_On_Load = function() {
 			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 			for (let i in list) {
 				let o = list[i];
+				if (!o.enabled) { continue; }
 				for (let ii in o.components) {
-					o.set(o.components[ii].preDraw(o));
+					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o)); }
 				}
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
 				let p = Pic(o.imgs[o.imgUsing]);
@@ -817,7 +834,7 @@ var Crumbs_Init_On_Load = function() {
 				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 
 				for (let ii in o.components) {
-					o.set(o.components[ii].postDraw(o));
+					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o)); }
 				}
 				
 				for (let ii in o.settings) {
