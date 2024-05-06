@@ -67,7 +67,7 @@ var Crumbs_Init_On_Load = function() {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.object constructor parameter must be an object or undefined.'; }
-		for (let i in obj) { if (!Crumbs.allProperties.includes(i)) { throw '"'+i+'" is not a valid property for a particle.'; } }
+		for (let i in obj) { if (!Crumbs.allProperties.includes(i)) { throw '"'+i+'" is not a valid property for an object.'; } }
 		this.parent = parent?parent:null;
 		this.scope = obj.scope||Crumbs.objectDefaults.scope;
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
