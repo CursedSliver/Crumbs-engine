@@ -1,6 +1,6 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
-var Crumbs_Init_On_Load = function() {
+const Crumbs_Init_On_Load = function() {
 	Crumbs.h = {};
 	if (!Game.styleSheets) {
 		Game.styleSheets = null; 
