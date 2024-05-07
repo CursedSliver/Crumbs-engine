@@ -296,7 +296,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.killAllObjects = function() {
 		for (let i in Crumbs.objects) {
-			for (let ii in Crumbs.objects[i]) { Crumbs.objects[i][ii].die(); }
+			for (let ii in Crumbs.objects[i]) { if (Crumbs.objects[i][ii] !== null) { Crumbs.objects[i][ii].die(); } }
 		}
 	};
 	Crumbs.objectsEnabled = function(scope) {
