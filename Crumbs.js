@@ -467,6 +467,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.defaultComp = {};
 
 	Crumbs.component.rect = function(obj) {
+		obj = obj||{};
 		const def = Crumbs.defaultComp.text;
 		this.enabled = obj.enabled||def.enabled;
 		this.color = obj.color||def.color;
@@ -513,6 +514,7 @@ const Crumbs_Init_On_Load = function() {
 	
 	Crumbs.component.text = function(obj) {
 		//obj has: content, size, font, textAlign, dir, color, stroke, outline
+		obj = obj||{};
 		const def = Crumbs.defaultComp.text;
 		this.enabled = obj.enabled||def.enabled;
 		this.content = obj.content||def.content;
