@@ -114,7 +114,8 @@ const Crumbs_Init_On_Load = function() {
 		this.rotationAdd = 0; //for if it is a child
 		this.noRotate = obj.noRotate||Crumbs.objectDefaults.noRotate;
 		this.settings = {};
-		this.components = ([].concat(obj.components))||Crumbs.objectDefaults.components;
+		if (obj.components) { this.components = [].concat(obj.components); }
+		else { obj.components = Crumbs.objectDefaults.components; }
 		this.behaviors = [];
 		if (!obj.hasOwnProperty('behaviors')) {
 			if (typeof obj.behaviors === 'undefined') { this.behaviors = [[Crumbs.objectDefaults.behaviors, {}]]; } else { throw 'Crumbs particle behavior not applicable. Applicable types include: function, array, undefined'; } 
