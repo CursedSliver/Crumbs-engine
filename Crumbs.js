@@ -494,14 +494,14 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.rect.prototype.preDraw = function(m) {
 		return {};
 	};
-	Crumbs.component.rect.prototype.postDraw = function(m) {
+	Crumbs.component.rect.prototype.postDraw = function(m, pWidth, pHeight) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
 		const [pColor, pOutline, pOutlineColor] = [ctx.fillStyle, ctx.lineWidth, ctx.strokeStyle];
 		ctx.fillStyle = this.color;
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
-		const pWidth = m.scaleFactor[0] * m.scaleX * m.width;
-		const pHeight = m.scaleFactor[1] * m.scaleY * m.height;
+		pWidth *= m.width / Pic(m.imgs[m.imgUsing]).width;
+		pHeight *= m.height / Pic(m.imgs[m.imgUsing]).height;
 		ctx.fillRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
 		if (this.outline) {
 			ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
@@ -513,7 +513,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	
 	Crumbs.component.text = function(obj) {
-		//obj has: content, size, font, textAlign, dir, color, stroke, outline
+		//obj has: content, size, font, textAlign, direction, color, stroke, outline
 		obj = obj||{};
 		const def = Crumbs.defaultComp.text;
 		this.enabled = obj.enabled||def.enabled;
@@ -521,10 +521,11 @@ const Crumbs_Init_On_Load = function() {
 		this.size = obj.size||def.size;
 		this.font = obj.font||def.font;
 		this.align = obj.align||def.align;
-		this.dir = obj.dir||def.dir;
+		this.direction = obj.direction||def.direction;
 		this.color = obj.color||def.color;
 		this.outlineColor = obj.outlineColor||def.outlineColor;
 		this.outline = obj.outline||def.outline;
+		this.maxWidth = obj.maxWidth||def.maxWidth;
 
 		this.type = 'text';
 	};
@@ -534,10 +535,11 @@ const Crumbs_Init_On_Load = function() {
 		size: 10,
 		font: 'Merriweather',
 		align: 'left',
-		dir: 'inherit',
+		direction: 'inherit',
 		color: '#fff',
 		outlineColor: '#000',
 		outline: 0,
+		maxWidth: null
 	};
 	Crumbs.component.text.prototype.enable = function() {
 		this.enabled = true;
@@ -551,8 +553,33 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.preDraw = function(m) {
 		return {};
 	};
-	Crumbs.component.text.prototype.postDraw = function(m) {
+	Crumbs.component.text.prototype.postDraw = function(m, pWidth, pHeight) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
+		const [font, align, color, outline, outlineColor, direction] = [ctx.font, ctx.textAlign, ctx.fillStyle, ctx.lineWidth, ctx.strokeStyle, ctx.direction];
+		const dims = ctx.measureText(this.content);
+		pWidth *= dims.width / Pic(m.imgs[m.imgUsing]).width;
+		pHeight *= (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
+		ctx.font = this.size+'px '+this.font;
+		ctx.textAlign = this.align;
+		ctx.direction = this.direction;
+		ctx.fillStyle = this.color;
+		ctx.lineWidth = this.outline;
+		ctx.strokeStyle = this.outlineColor;
+		
+		if (this.maxWidth) {
+			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
+		} else {
+			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY);
+		}
+		if (this.outline) {
+			if (this.maxWidth) {
+				ctx.strokeText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
+			} else {
+				ctx.strokeText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY);
+			}
+		}
+
+		ctx.font = font; ctx.textAlign = align; ctx.fillStyle = color; ctx.lineWidth = outline; ctx.strokeStyle = outlineColor; ctx.direction = direction;
 		return {};
 	};
 
@@ -837,7 +864,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 
 				for (let ii in o.components) {
-					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o)); }
+					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o, pWidth, pHeight)); }
 				}
 				
 				for (let ii in o.settings) {
