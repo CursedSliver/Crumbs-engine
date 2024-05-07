@@ -511,6 +511,56 @@ const Crumbs_Init_On_Load = function() {
 		ctx.strokeStyle = pOutlineColor;
 		return {};
 	};
+
+	Crumbs.component.path = function(obj) { //the main purpose of this is because me lazy
+		obj = obj||{};
+		const def = Crumbs.defaultComp.path;
+		this.enabled = obj.enabled||def.enabled;
+		this.paths = obj.paths||def.paths;
+	};
+	Crumbs.defaultComp.path = {
+		enabled: true,
+		paths: []
+	};
+	Crumbs.component.path.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.path.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.path.prototype.logic = function() {
+		return {};
+	};
+	Crumbs.component.path.prototype.preDraw = function() {
+		return {};
+	};
+	Crumbs.component.path.prototype.postDraw = function() {
+		return {};
+	};
+	Crumbs.component.subpaths = {
+		move: function(x, y) {
+			this.type = 'move';
+			this.x = x;
+			this.y = y;
+		},
+		translate: function(x, y) {
+			this.type = 'translate';
+			this.x = x;
+			this.y = y;
+		},
+		close: function() {
+			this.type = 'close';
+		},
+		arc: function(x, y, r, angleStart, angleEnd, antiClockwise) {
+			this.type = 'arc';
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.as = angleStart;
+			this.ae = angleEnd;
+			this.ac = antiClockwise;
+		}
+	};
 	
 	Crumbs.component.text = function(obj) {
 		//obj has: content, size, font, textAlign, direction, color, stroke, outline
