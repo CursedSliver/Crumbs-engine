@@ -559,6 +559,30 @@ const Crumbs_Init_On_Load = function() {
 			this.as = angleStart;
 			this.ae = angleEnd;
 			this.ac = antiClockwise;
+		},
+		arcTo: function(x1, y1, x2, y2, r) {
+			this.type = 'arcTo';
+			this.x1 = x1;
+			this.y1 = y1;
+			this.x2 = x2;
+			this.y2 = y2;
+			this.r = r;
+		},
+		quadratic: function(cp1x, cp1y, x, y) {
+			this.type = 'quadratic';
+			this.cp1x = cp1x;
+			this.cp1y = cp1y;
+			this.x = x;
+			this.y = y;
+		},
+		cubic: function(cp1x, cp1y, cp2x, cp2y, x, y) {
+			this.type = 'cubic';
+			this.cp1x = cp1x;
+			this.cp1y = cp1y;
+			this.cp2x = cp2x;
+			this.cp2y = cp2y;
+			this.x = x;
+			this.y = y;
 		}
 	};
 	
