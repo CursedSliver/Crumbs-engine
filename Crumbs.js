@@ -550,6 +550,7 @@ const Crumbs_Init_On_Load = function() {
 		ctx.lineDashOffset = Crumbs.defaultPathConfigs.lineDashOffset;
 		ctx.setLineDash(Crumbs.defaultPathConfigs.lineDash);
 		ctx.beginPath();
+		ctx.moveTo(0, 0);
 		
 		for (let i in this.paths) {
 			const p = this.paths[i];
