@@ -1162,10 +1162,9 @@ const Crumbs_Init_On_Load = function() {
 	
 	Game.DrawWrinklers = function() {
 		var ctx=Game.LeftBackground;
-		var selected=0;
 		for (var i in Game.wrinklers)
 		{
-			if (selected && Game.Has('Eye of the wrinkler'))
+			if (Game.wrinklers[i].selected && Game.Has('Eye of the wrinkler'))
 			{
 				var x=Game.cookieOriginX;
 				var y=Game.cookieOriginY;
