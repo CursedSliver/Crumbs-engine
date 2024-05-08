@@ -517,10 +517,14 @@ const Crumbs_Init_On_Load = function() {
 		const def = Crumbs.defaultComp.path;
 		this.enabled = obj.enabled||def.enabled;
 		this.paths = obj.paths||def.paths;
+		this.cx = obj.cx||def.cx;
+		this.cy = obj.cy||def.cy;
 	};
 	Crumbs.defaultComp.path = {
 		enabled: true,
-		paths: []
+		paths: [],
+		cx: 0,
+		cy: 0
 	};
 	Crumbs.component.path.prototype.enable = function() {
 		this.enabled = true;
@@ -534,9 +538,41 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.path.prototype.preDraw = function() {
 		return {};
 	};
-	Crumbs.component.path.prototype.postDraw = function() {
+	Crumbs.component.path.prototype.postDraw = function(m) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
+		const [ca, cb, cc, cd, ce, cf, cg] = [ctx.lineWidth, ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.miterLimit, ctx.lineDashOffset, ctx.getLineDash()];
+		ctx.lineWidth = Crumbs.defaultPathConfigs.lineWidth;
+		ctx.strokeStyle = Crumbs.defaultPathConfigs.strokeStyle;
+		ctx.lineCap = Crumbs.defaultPathConfigs.lineCap;
+		ctx.lineJoin = Crumbs.defaultPathConfigs.lineJoin;
+		ctx.miterLimit = Crumbs.defaultPathConfigs.miterLimit;
+		ctx.lineDashOffset = Crumbs.defaultPathConfigs.lineDashOffset;
+		ctx.setLineDash(Crumbs.defaultPathConfigs.lineDash);
+		ctx.beginPath();
+		
+		for (let i in this.paths) {
+			const p = this.paths[i];
+			Crumbs.subPathsLogic[p.type](ctx, p, this);
+		}
+
+		ctx.lineWidth = ca; ctx.strokeStyle = cb; ctx.lineCap = cc; ctx.lineJoin = cd; ctx.miterLimit = ce; ctx.lineDashOffset = cf; ctx.setLineDash(cg);
 		return {};
 	};
+	Crumbs.component.pathConfig = function(obj) {
+		this.type = 'config';
+		this.obj = obj;
+	};
+	Crumbs.defaultPathConfigs = {
+		lineWidth: 1,
+		strokeStyle: '#000000',
+		lineCap: 'butt',
+		lineJoin: 'miter',
+		miterLimit: 10,
+		lineDashOffset: 0,
+		lineDash: []
+	};
+	Crumbs.validPathConfigs = ['lineWidth', 'strokeStyle', 'lineCap', 'lineJoin', 'miterLimit', 'lineDashOffset'];
+	Crumbs.validPathFuncs = ['setLineDash'];
 	Crumbs.component.subpaths = {
 		move: function(x, y) {
 			this.type = 'move';
@@ -551,14 +587,14 @@ const Crumbs_Init_On_Load = function() {
 		close: function() {
 			this.type = 'close';
 		},
-		arc: function(x, y, r, angleStart, angleEnd, antiClockwise) {
+		arc: function(x, y, r, angleStart, angleEnd, counterClockwise) {
 			this.type = 'arc';
 			this.x = x;
 			this.y = y;
 			this.r = r;
 			this.as = angleStart;
 			this.ae = angleEnd;
-			this.ac = antiClockwise;
+			this.cc = counterClockwise;
 		},
 		arcTo: function(x1, y1, x2, y2, r) {
 			this.type = 'arcTo';
@@ -568,10 +604,10 @@ const Crumbs_Init_On_Load = function() {
 			this.y2 = y2;
 			this.r = r;
 		},
-		quadratic: function(cp1x, cp1y, x, y) {
+		quadratic: function(cpx, cpy, x, y) {
 			this.type = 'quadratic';
-			this.cp1x = cp1x;
-			this.cp1y = cp1y;
+			this.cpx = cpx;
+			this.cpy = cpy;
 			this.x = x;
 			this.y = y;
 		},
@@ -583,6 +619,69 @@ const Crumbs_Init_On_Load = function() {
 			this.cp2y = cp2y;
 			this.x = x;
 			this.y = y;
+		},
+		stroke: function() {
+			this.type = 'stroke';
+		},
+		fill: function(evenodd) {
+			this.type = 'fill';
+			this.evenodd = evenodd;
+		}
+	};
+	Crumbs.subPathsLogic = {
+		//ctx, then the subpath object, then the path object (optional
+		config: function(ctx, p) {
+			for (let ii in p.obj) {
+				let str1 = '';
+				let str2 = '';
+				if (typeof p.obj[ii] === 'string') {
+					str1 = '"';
+					str2 = '"';
+				} else if (Array.isArray(p.obj[ii])) {
+					str1 = '[';
+					str2 = ']';
+				}
+				if (Crumbs.validPathConfigs.includes(ii)) {
+					eval('ctx.'+ii+'='+str1+p.obj[ii]+str2);
+				} else if (Crumbs.validPathFuncs.includes(ii)) {
+					eval('ctx.'+ii+'('+str1+p.obj[ii]+str2+');');
+				} else { throw 'Unrecognized config '+ii+'!'; }
+			}
+		},
+		move: function(ctx, p, pm) {
+			ctx.moveTo(p.x, p.y);
+			pm.cx = p.x;
+			pm.cy = p.y;
+		},
+		translate: function(ctx, p, pm) {
+			ctx.moveTo(this.cx+p.x, this.cy+p.y);
+			pm.cx += p.x;
+			pm.cy += p.y;
+		},
+		close: function(ctx) {
+			ctx.closePath();
+		},
+		arc: function(ctx, p) {
+			ctx.arc(p.x, p.y, p.r, p.as, p.ae, p.cc);
+		},
+		arcTo: function(ctx, p) {
+			ctx.arcTo(p.x1, p.y1, p.x2, p.y2, p.r);
+		},
+		quadratic: function(ctx, p) {
+			ctx.quadraticCurveTo(p.cpx, p.cpy, p.x, p.y);
+		},
+		cubic: function(ctx, p) {
+			ctx.bezierCurveTo(p.cp1x, p.cp1y, p.cp2x, p.cp2y, p.x, p.y);
+		},
+		stroke: function(ctx) {
+			ctx.stroke();
+		},
+		fill: function(ctx, p) {
+			if (p.evenodd) {
+				ctx.fill('evenodd');
+			} else {
+				ctx.fill();
+			}
 		}
 	};
 	
