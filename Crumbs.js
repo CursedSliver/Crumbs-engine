@@ -517,6 +517,7 @@ const Crumbs_Init_On_Load = function() {
 		const def = Crumbs.defaultComp.path;
 		this.enabled = obj.enabled||def.enabled;
 		this.paths = obj.paths||def.paths;
+		if (!Array.isArray(this.paths)) { this.paths = [].concat(this.paths); }
 		this.cx = obj.cx||def.cx;
 		this.cy = obj.cy||def.cy;
 	};
