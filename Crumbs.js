@@ -1166,6 +1166,7 @@ const Crumbs_Init_On_Load = function() {
 		{
 			if (Game.wrinklers[i].selected && Game.Has('Eye of the wrinkler'))
 			{
+				var selected = Game.wrinklers[i];
 				var x=Game.cookieOriginX;
 				var y=Game.cookieOriginY;
 				ctx.font='14px Merriweather';
