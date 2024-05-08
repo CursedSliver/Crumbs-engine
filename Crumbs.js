@@ -1035,7 +1035,7 @@ const Crumbs_Init_On_Load = function() {
 				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 				const oy = Crumbs.getOffsetY(o.anchor, pHeight);
 				const r = o.rotation + (o.noRotate?0:o.rotationAdd);
-				ctx.translate(o.x + o.canvaCenter[0] + ox, o.y + o.canvaCenter[1] + oy);
+				ctx.translate(o.x + o.canvaCenter[0], o.y + o.canvaCenter[1]);
 				if (o.rotation + o.rotationAdd) {
 					ctx.rotate(r);
 				} 
