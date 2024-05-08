@@ -587,6 +587,11 @@ const Crumbs_Init_On_Load = function() {
 		close: function() {
 			this.type = 'close';
 		},
+		line: function(x, y) {
+			this.type = 'line';
+			this.x = x;
+			this.y = y;
+		},
 		arc: function(x, y, r, angleStart, angleEnd, counterClockwise) {
 			this.type = 'arc';
 			this.x = x;
@@ -660,6 +665,9 @@ const Crumbs_Init_On_Load = function() {
 		},
 		close: function(ctx) {
 			ctx.closePath();
+		},
+		line: function(ctx, p) {
+			ctx.lineTo(p.x, p.y);
 		},
 		arc: function(ctx, p) {
 			ctx.arc(p.x, p.y, p.r, p.as, p.ae, p.cc);
