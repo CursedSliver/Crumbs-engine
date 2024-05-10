@@ -61,7 +61,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
-		imageSmoothingEnabled: true
+		imageSmoothingEnabled: true,
+		imageSmoothingQuality: 'low'
 	};
 	Crumbs.object = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
@@ -113,7 +114,6 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
 		this.noRotate = obj.noRotate||Crumbs.objectDefaults.noRotate;
-		this.settings = {};
 		if (obj.components) { this.components = [].concat(obj.components); }
 		else { obj.components = Crumbs.objectDefaults.components; }
 		this.behaviors = [];
@@ -156,7 +156,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['newChild', 'behaviorParams', 'settings', 'components', 'children'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'settings', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children'];
 	Crumbs.object.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -694,6 +694,49 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	};
+
+	Crumbs.component.settings = function(obj) {
+		obj = obj||{};
+		const def = Crumbs.defaultComp.settings;
+		this.enabled = obj.enabled||def.enabled;
+		const globals = ['globalCompositeOperation', 'imageSmoothingEnabled', 'imageSmoothingQuality'];
+		for (let i in obj) {
+			if (!globals.includes(i)) { throw '"'+i+'" is not a valid setting for a settings component!'; }
+		} 
+		this.obj = obj||def.obj;
+		this.save = {};
+
+		this.type = 'settings';
+	};
+	Crumbs.defaultComp.settings = {
+		enabled: true,
+		obj: {}
+	};
+	Crumbs.component.settings.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.settings.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.settings.prototype.logic = function() {
+		return {};
+	};
+	Crumbs.component.settings.prototype.preDraw = function(m) {
+		this.save = {};
+		let ctx = Crumbs.scopedCanvas[m.scope];
+		for (let i in this.obj) {
+			this.save[i] = ctx[i];
+			ctx[i] = this.obj[i];
+		}
+		return {};
+	};
+	Crumbs.component.settings.prototype.postDraw = function(m) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
+		for (let i in this.save) {
+			ctx[i] = this.save[i];
+		}
+		return {};
+	};
 	
 	Crumbs.component.text = function(obj) {
 		//obj has: content, size, font, textAlign, direction, color, stroke, outline
@@ -1019,6 +1062,10 @@ const Crumbs_Init_On_Load = function() {
 			let ctx = Crumbs.scopedCanvas[c];
 			ctx.globalAlpha = 1;
 			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
+			const settingObj = {globalCompositeOpertion: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
+			for (let i in Crumbs.settings) {
+				ctx[i] = Crumbs.settings[i];
+			}
 			for (let i in list) {
 				let o = list[i];
 				if (!o.enabled) { continue; }
@@ -1039,10 +1086,6 @@ const Crumbs_Init_On_Load = function() {
 				if (o.rotation + o.rotationAdd) {
 					ctx.rotate(r);
 				} 
-				for (let ii in o.settings) {
-					if (typeof o.settings[i] === 'string') { eval('ctx.'+i+'="'+o.settings[i]+'"'); } 
-					else { eval('ctx.'+i+'='+o.settings[i]); }
-				}
 				
 				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 
@@ -1050,12 +1093,11 @@ const Crumbs_Init_On_Load = function() {
 					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o, pWidth, pHeight)); }
 				}
 				
-				for (let ii in o.settings) {
-					if (typeof Crumbs.settings[i] === 'string') { eval('ctx.'+i+'="'+Crumbs.settings+'"'); } 
-					else { eval('ctx.'+i+'='+Crumbs.settings); }
-				}
 				ctx.restore(); 
-			};
+			}
+			for (let i in settingObj) {
+				ctx[i] = settingObj[i];
+			}
 		}
 	};
 
@@ -1136,7 +1178,7 @@ const Crumbs_Init_On_Load = function() {
 									imgs: 'glint',
 									anchor: 'top-left',
 									alpha: Math.random()*0.65+0.1,
-									settings: {globalCompositeOperation: 'lighter'},
+									component: new Crumbs.component.settings({globalCompositeOperation: 'lighter'}),
 									offsetX: Math.random()*50,
 									offsetY: Math.random()*200,
 									order: 5,
