@@ -998,8 +998,8 @@ const Crumbs_Init_On_Load = function() {
 		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
 		if (type == 1) { w.imgs = 'shinyWrinklerBits'; }
 		w.behaviors = [[Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}], [Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}], [Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}], [Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)}]];
-		w.x = x - w.width / 2;
-		w.y = y - w.height / 2;
+		w.x = x/* - w.width / 2*/;
+		w.y = y/* - w.height / 2*/;
 		w.order = 2;
 		w.rotation = -r * Math.PI / 180;
 		w.id = 'wrinklerBits';
