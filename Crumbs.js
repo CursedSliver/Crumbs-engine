@@ -1166,6 +1166,7 @@ const Crumbs_Init_On_Load = function() {
 		{
 			if (Game.wrinklers[i].selected && Game.Has('Eye of the wrinkler'))
 			{
+				//lazy lazy lazy lazy lazy
 				var selected = Game.wrinklers[i];
 				var x=Game.cookieOriginX;
 				var y=Game.cookieOriginY;
@@ -1200,6 +1201,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.fillText(Beautify(selected.sucked),x+10,y+8);
 				var s=54+2*Math.sin(Game.T*0.4);
 				ctx.drawImage(Pic('icons.png'),27*48,26*48,48,48,x-width/2-16-s/2,y-4-s/2,s,s);
+				break;
 			}
 		}
 	}
