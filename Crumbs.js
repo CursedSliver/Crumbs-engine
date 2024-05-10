@@ -704,7 +704,6 @@ const Crumbs_Init_On_Load = function() {
 			if (!globals.includes(i)) { throw '"'+i+'" is not a valid setting for a settings component!'; }
 		} 
 		this.obj = obj||def.obj;
-		this.save = {};
 
 		this.type = 'settings';
 	};
@@ -722,19 +721,13 @@ const Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.settings.prototype.preDraw = function(m) {
-		this.save = {};
 		let ctx = Crumbs.scopedCanvas[m.scope];
 		for (let i in this.obj) {
-			this.save[i] = ctx[i];
 			ctx[i] = this.obj[i];
 		}
 		return {};
 	};
 	Crumbs.component.settings.prototype.postDraw = function(m) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
-		for (let i in this.save) {
-			ctx[i] = this.save[i];
-		}
 		return {};
 	};
 	
@@ -1070,9 +1063,6 @@ const Crumbs_Init_On_Load = function() {
 			for (let i in list) {
 				let o = list[i];
 				if (!o.enabled) { continue; }
-				for (let ii in o.components) {
-					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o)); }
-				}
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
 				let p = Pic(o.imgs[o.imgUsing]);
 				let pWidth = 0;
@@ -1080,6 +1070,9 @@ const Crumbs_Init_On_Load = function() {
 				let pHeight = 0;
 				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
+				for (let ii in o.components) {
+					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o)); }
+				}
 				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 				const oy = Crumbs.getOffsetY(o.anchor, pHeight);
 				const r = o.rotation + (o.noRotate?0:o.rotationAdd);
