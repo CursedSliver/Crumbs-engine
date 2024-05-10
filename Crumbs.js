@@ -1178,7 +1178,7 @@ const Crumbs_Init_On_Load = function() {
 									imgs: 'glint',
 									anchor: 'top-left',
 									alpha: Math.random()*0.65+0.1,
-									component: new Crumbs.component.settings({globalCompositeOperation: 'lighter'}),
+									components: new Crumbs.component.settings({globalCompositeOperation: 'lighter'}),
 									offsetX: Math.random()*50,
 									offsetY: Math.random()*200,
 									order: 5,
