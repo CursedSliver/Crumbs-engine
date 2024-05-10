@@ -492,23 +492,19 @@ const Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.rect.prototype.preDraw = function(m) {
+		ctx.fillStyle = this.color;
+		ctx.lineWidth = this.outline;
+		ctx.strokeStyle = this.outlineColor;
 		return {};
 	};
 	Crumbs.component.rect.prototype.postDraw = function(m, pWidth, pHeight) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
-		const [pColor, pOutline, pOutlineColor] = [ctx.fillStyle, ctx.lineWidth, ctx.strokeStyle];
-		ctx.fillStyle = this.color;
-		ctx.lineWidth = this.outline;
-		ctx.strokeStyle = this.outlineColor;
 		pWidth *= m.width / Pic(m.imgs[m.imgUsing]).width;
 		pHeight *= m.height / Pic(m.imgs[m.imgUsing]).height;
 		ctx.fillRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
 		if (this.outline) {
 			ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
 		}
-		ctx.fillStyle = pColor;
-		ctx.lineWidth = pOutline;
-		ctx.strokeStyle = pOutlineColor;
 		return {};
 	};
 
@@ -537,11 +533,7 @@ const Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.path.prototype.preDraw = function() {
-		return {};
-	};
-	Crumbs.component.path.prototype.postDraw = function(m) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
-		const [ca, cb, cc, cd, ce, cf, cg] = [ctx.lineWidth, ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.miterLimit, ctx.lineDashOffset, ctx.getLineDash()];
 		ctx.lineWidth = Crumbs.defaultPathConfigs.lineWidth;
 		ctx.strokeStyle = Crumbs.defaultPathConfigs.strokeStyle;
 		ctx.lineCap = Crumbs.defaultPathConfigs.lineCap;
@@ -549,6 +541,10 @@ const Crumbs_Init_On_Load = function() {
 		ctx.miterLimit = Crumbs.defaultPathConfigs.miterLimit;
 		ctx.lineDashOffset = Crumbs.defaultPathConfigs.lineDashOffset;
 		ctx.setLineDash(Crumbs.defaultPathConfigs.lineDash);
+		return {};
+	};
+	Crumbs.component.path.prototype.postDraw = function(m) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
 		
@@ -557,7 +553,6 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.subPathsLogic[p.type](ctx, p, this);
 		}
 
-		ctx.lineWidth = ca; ctx.strokeStyle = cb; ctx.lineCap = cc; ctx.lineJoin = cd; ctx.miterLimit = ce; ctx.lineDashOffset = cf; ctx.setLineDash(cg);
 		return {};
 	};
 	Crumbs.component.pathConfig = function(obj) {
@@ -770,20 +765,20 @@ const Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.text.prototype.preDraw = function(m) {
-		return {};
-	};
-	Crumbs.component.text.prototype.postDraw = function(m, pWidth, pHeight) {
 		let ctx = Crumbs.scopedCanvas[m.scope];
-		const [font, align, color, outline, outlineColor, direction] = [ctx.font, ctx.textAlign, ctx.fillStyle, ctx.lineWidth, ctx.strokeStyle, ctx.direction];
-		const dims = ctx.measureText(this.content);
-		pWidth *= dims.width / Pic(m.imgs[m.imgUsing]).width;
-		pHeight *= (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		ctx.font = this.size+'px '+this.font;
 		ctx.textAlign = this.align;
 		ctx.direction = this.direction;
 		ctx.fillStyle = this.color;
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
+		return {};
+	};
+	Crumbs.component.text.prototype.postDraw = function(m, pWidth, pHeight) {
+		let ctx = Crumbs.scopedCanvas[m.scope];
+		const dims = ctx.measureText(this.content);
+		pWidth *= dims.width / Pic(m.imgs[m.imgUsing]).width;
+		pHeight *= (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		
 		if (this.maxWidth) {
 			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
@@ -797,8 +792,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.strokeText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY);
 			}
 		}
-
-		ctx.font = font; ctx.textAlign = align; ctx.fillStyle = color; ctx.lineWidth = outline; ctx.strokeStyle = outlineColor; ctx.direction = direction;
+		
 		return {};
 	};
 
