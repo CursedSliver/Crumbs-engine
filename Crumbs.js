@@ -973,6 +973,7 @@ const Crumbs_Init_On_Load = function() {
 			height: 200,
 			sx: ((id * 3) % 8) * 100,
 			sy: 0,
+			anchor: 'top-left',
 			scope: 'left'
 		};
 	};
