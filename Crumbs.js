@@ -792,8 +792,8 @@ const Crumbs_Init_On_Load = function() {
 		obj = obj||{};
 		const def = Crumbs.defaultComp.patternFill;
 		this.enabled = obj.enabled||def.enabled;
-		this.repsX = obj.repsX||def.repsX;
-		this.repsY = obj.repsY||def.repsY;
+		this.width = obj.width||def.width;
+		this.height = obj.height||def.height;
 		this.offX = obj.offX||def.offX;
 		this.offY = obj.offY||def.offY;
 		this.noDrawStatus = false;
@@ -802,8 +802,8 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.defaultComp.patternFill = {
 		enabled: true,
-		repsX: 2,
-		repsY: 2,
+		width: 2,
+		height: 2,
 		offX: 0,
 		offY: 0
 	};
@@ -821,7 +821,7 @@ const Crumbs_Init_On_Load = function() {
 		return {noDraw: true};
 	};
 	Crumbs.component.patternFill.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
-		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.repsX * pWidth + 0.001, this.repsY * pHeight + 0.001, pWidth, pHeight, this.offX, this.offY); }
+		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.width, this.height, pWidth, pHeight, this.offX, this.offY); }
 		
 		return {noDraw: this.noDrawStatus};
 	};
@@ -1069,6 +1069,12 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.getOffsetY = function(anchor, height) {
 		return Crumbs.OYFA[anchor] * height;
 	};
+	Crumbs.getPWidth = function(o) {
+		if (o.width) { return o.width; } else { return Pic(o.imgs[o.imgUsing]).width * o.scaleX * o.scaleFactor[0]; }
+	};
+	Crumbs.getPHeight = function(o) {
+		if (o.height) { return o.height; } else { return Pic(o.imgs[o.imgUsing]).height * o.scaleY * o.scaleFactor[1]; }
+	};
 
 	Crumbs.drawObjects = function() {
 		for (let c in Crumbs.scopedCanvas) {
@@ -1084,11 +1090,9 @@ const Crumbs_Init_On_Load = function() {
 				let o = list[i];
 				if (!o.enabled) { continue; }
 				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
-				let p = Pic(o.imgs[o.imgUsing]);
-				let pWidth = 0;
-				if (o.width) { pWidth = o.width; } else { pWidth = p.width * o.scaleX * o.scaleFactor[0]; }
-				let pHeight = 0;
-				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
+				const p = Pic(o.imgs[o.imgUsing]);
+				const pWidth = Crumbs.getPWidth(o);
+				const pHeight = Crumbs.getPHeight(o);
 				ctx.save();
 				for (let ii in o.components) {
 					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o, ctx)); }
@@ -1211,6 +1215,42 @@ const Crumbs_Init_On_Load = function() {
 			}
 			Crumbs.spawn(w);
 		}
+	};
+	Crumbs.initMilk = function() {
+		Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'left',
+			id: 'milk',
+			scaleX: 2,
+			scaleY: 2,
+			components: new Crumbs.component.patternFill({
+				height: 1,
+				width: 1
+			}),
+			behaviors: function(o) {
+				if (!Game.prefs.milk) { return {imgs: [Crumbs.objectImgs.empty]}; }
+				let toReturn = {imgs: [Game.Milk.pic]};
+				if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
+				let x=Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
+				let y=(Game.milkHd)*height;
+				let a=1;
+				if (Game.AscendTimer>0)
+				{
+					y*=1-Math.pow((Game.AscendTimer/Game.AscendBreakpoint),2)*2;
+					a*=1-Math.pow((Game.AscendTimer/Game.AscendBreakpoint),2)*2;
+				}
+				else if (Game.ReincarnateTimer>0)
+				{
+					y*=1-Math.pow(1-(Game.ReincarnateTimer/Game.ReincarnateDuration),2)*2;
+					a*=1-Math.pow(1-(Game.ReincarnateTimer/Game.ReincarnateDuration),2)*2;
+				}
+				toReturn.alpha = a;
+				toReturn.y = Crumbs.scopedCanvas.left.canvas.height - y;
+				o.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
+				o.getComponent('patternFill').offX = x;
+				return toReturn;
+			}
+		});
 	};
 	if (Game.ready) { Crumbs.initWrinklers(); } else { Game.registerHook('create', Crumbs.initWrinklers); }
 	
