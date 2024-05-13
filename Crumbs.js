@@ -1901,10 +1901,10 @@ const Crumbs_Init_On_Load = function() {
 						}
 					}
 					
-					var pic=Game.Milk.pic;
+					/*var pic=Game.Milk.pic;
 					if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;
 					ctx.globalAlpha=0.95*a;
-					ctx.fillPattern(Pic(pic),0,height-y,width+480,1,480,480,x,0);
+					ctx.fillPattern(Pic(pic),0,height-y,width+480,1,480,480,x,0);*/
 					
 					ctx.fillStyle='#000';
 					ctx.fillRect(0,height-y+480,width,Math.max(0,(y-480)));
