@@ -1223,17 +1223,13 @@ const Crumbs_Init_On_Load = function() {
 			id: 'milk',
 			scaleX: 2,
 			scaleY: 2,
-			components: new Crumbs.component.patternFill({
-				height: 1,
-				width: 1
-			}),
+			components: new Crumbs.component.patternFill({ height: 1 }),
 			behaviors: function(o) {
 				if (!Game.prefs.milk) { return {imgs: [Crumbs.objectImgs.empty]}; }
 				let toReturn = {imgs: [Game.Milk.pic]};
 				if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
-				let x=Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
-				let y=(Game.milkHd)*height;
 				let a=1;
+				let y = Crumbs.scopedCanvas.left.canvas.height * Game.milkHd;
 				if (Game.AscendTimer>0)
 				{
 					y*=1-Math.pow((Game.AscendTimer/Game.AscendBreakpoint),2)*2;
@@ -1247,7 +1243,7 @@ const Crumbs_Init_On_Load = function() {
 				toReturn.alpha = a;
 				toReturn.y = Crumbs.scopedCanvas.left.canvas.height - y;
 				o.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
-				o.getComponent('patternFill').offX = x;
+				o.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
 				return toReturn;
 			}
 		});
