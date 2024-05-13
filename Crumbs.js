@@ -901,7 +901,6 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.scopedCanvas[i].canvas.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
 		}
 	};
-	Game.registerHook('draw', Crumbs.updateCanvas);
 
 	Crumbs.scopedCanvas = {
 		left: Game.LeftBackground,
@@ -1283,12 +1282,7 @@ const Crumbs_Init_On_Load = function() {
 			//background
 			if (!Game.Background)//init some stuff
 			{
-				Game.Background=l('backgroundCanvas').getContext('2d');
-				Game.Background.canvas.width=Game.Background.canvas.parentNode.offsetWidth;
-				Game.Background.canvas.height=Game.Background.canvas.parentNode.offsetHeight;
-				Game.LeftBackground=l('backgroundLeftCanvas').getContext('2d');
-				Game.LeftBackground.canvas.width=Game.LeftBackground.canvas.parentNode.offsetWidth;
-				Game.LeftBackground.canvas.height=Game.LeftBackground.canvas.parentNode.offsetHeight;
+				Crumbs.updateCanvas();
 					//preload ascend animation bits so they show up instantly
 					Game.LeftBackground.globalAlpha=0;
 					Game.LeftBackground.drawImage(Pic('brokenCookie.png'),0,0);
@@ -1297,10 +1291,7 @@ const Crumbs_Init_On_Load = function() {
 				
 				window.addEventListener('resize',function(event)
 				{
-					Game.Background.canvas.width=Game.Background.canvas.parentNode.offsetWidth;
-					Game.Background.canvas.height=Game.Background.canvas.parentNode.offsetHeight;
-					Game.LeftBackground.canvas.width=Game.LeftBackground.canvas.parentNode.offsetWidth;
-					Game.LeftBackground.canvas.height=Game.LeftBackground.canvas.parentNode.offsetHeight;
+					Crumbs.updateCanvas();
 				});
 			}
 			
