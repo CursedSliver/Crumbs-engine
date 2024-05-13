@@ -901,6 +901,10 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.scopedCanvas[i].canvas.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
 		}
 	};
+	window.addEventListener('resize',function(event)
+	{
+		Crumbs.updateCanvas();
+	});
 
 	Crumbs.scopedCanvas = {
 		left: Game.LeftBackground,
@@ -1288,11 +1292,6 @@ const Crumbs_Init_On_Load = function() {
 					Game.LeftBackground.drawImage(Pic('brokenCookie.png'),0,0);
 					Game.LeftBackground.drawImage(Pic('brokenCookieHalo.png'),0,0);
 					Game.LeftBackground.drawImage(Pic('starbg.jpg'),0,0);
-				
-				window.addEventListener('resize',function(event)
-				{
-					Crumbs.updateCanvas();
-				});
 			}
 			
 			var ctx=Game.LeftBackground;
