@@ -1252,7 +1252,8 @@ const Crumbs_Init_On_Load = function() {
 			}
 		});
 	};
-	if (Game.ready) { Crumbs.initWrinklers(); } else { Game.registerHook('create', Crumbs.initWrinklers); }
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); }
+	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
 	
