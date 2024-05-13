@@ -109,6 +109,7 @@ const Crumbs_Init_On_Load = function() {
 		this.sy = obj.sy||Crumbs.objectDefaults.sy; //sub-coordinates for partial drawing
 		this.offsetX = obj.offsetX||Crumbs.objectDefaults.offsetX; //x and y but affected by rotation
 		this.offsetY = obj.offsetY||Crumbs.objectDefaults.offsetY; 
+		this.noDraw = obj.noDraw||Crumbs.objectDefaults.noDraw;
 		this.children = [];
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
@@ -156,7 +157,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.nonQuickSettable = ['newChild', 'behaviorParams', 'settings', 'components', 'children'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
-	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children'];
+	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children', 'noDraw'];
 	Crumbs.object.prototype.set = function(o) {
 		for (let i in o) {
 			if (!Crumbs.nonQuickSettable.includes(i) && !Crumbs.nonValidProperties.includes(i)) { this[i] = o[i]; } 
@@ -760,8 +761,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.logic = function(m) {
 		return {};
 	};
-	Crumbs.component.text.prototype.preDraw = function(m) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.text.prototype.preDraw = function(m, ctx) {
 		ctx.font = this.size+'px '+this.font;
 		ctx.textAlign = this.align;
 		ctx.direction = this.direction;
@@ -770,8 +770,7 @@ const Crumbs_Init_On_Load = function() {
 		ctx.strokeStyle = this.outlineColor;
 		return {};
 	};
-	Crumbs.component.text.prototype.postDraw = function(m, pWidth, pHeight) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.text.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
 		const dims = ctx.measureText(this.content);
 		pWidth *= dims.width / Pic(m.imgs[m.imgUsing]).width;
 		pHeight *= (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
@@ -790,6 +789,44 @@ const Crumbs_Init_On_Load = function() {
 		}
 		
 		return {};
+	};
+
+	Crumbs.component.patternFill = function(obj) {
+		obj = obj||{};
+		const def = Crumbs.defaultComp.patternFill;
+		this.enabled = obj.enabled||def.enabled;
+		this.repsX = obj.repsX||def.repsX;
+		this.repsY = obj.repsY||def.repsY;
+		this.offX = obj.offX||def.offX;
+		this.offY = obj.offY||def.offY;
+		this.noDrawStatus = false;
+
+		this.type = 'patternFill';
+	};
+	Crumbs.defaultComp.patternFill = {
+		enabled: true,
+		repsX: 2,
+		repsY: 2,
+		offX: 0,
+		offY: 0
+	};
+	Crumbs.component.patternFill.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.patternFill.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.patternFill.prototype.logic = function(m) {
+		return {}
+	};
+	Crumbs.component.patternFill.prototype.preDraw = function(m, ctx) {
+		this.noDrawStatus = m.noDraw;
+		return {noDraw: true};
+	};
+	Crumbs.component.patternFill.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.repsX * pWidth + 0.001, this.repsY * pHeight + 0.001, pWidth, pHeight, this.offX, this.offY); }
+		
+		return {noDraw: this.noDrawStatus};
 	};
 
 	Crumbs.objectDefaults = {
@@ -816,7 +853,8 @@ const Crumbs_Init_On_Load = function() {
 		sx: 0,
 		sy: 0,
 		noRotate: false,
-		components: []
+		components: [],
+		noDraw: false
 	}; //needs to be down here for some reason
 	
 	Game.registerHook('draw', Crumbs.updateObjects);
@@ -1071,7 +1109,7 @@ const Crumbs_Init_On_Load = function() {
 					ctx.rotate(r);
 				} 
 				
-				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
+				if (!o.noDraw) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
 
 				for (let ii in o.components) {
 					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o, ctx, pWidth, pHeight)); }
