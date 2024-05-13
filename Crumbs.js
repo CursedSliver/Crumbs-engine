@@ -862,38 +862,18 @@ const Crumbs_Init_On_Load = function() {
 	//below for the actual drawing
 	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
 	
-	let div = document.createElement('canvas');
-	div.id = 'foregroundCanvas'; div.style = 'background: none;';
-	let cont = document.createElement('div');
-	cont.classList.add('CrumbsCanvaContainer');
-	cont.appendChild(div);
-	l('game').appendChild(cont);
-
-	cont = document.createElement('div');
-	div = document.createElement('canvas');
-	div.id = 'middleCanvas'; div.style = 'background: none;';
-	cont.classList.add('CrumbsCanvaContainer');
-	cont.style = 'position: absolute; top: 0; left: 0;';
-	cont.appendChild(div);
-	l('rows').appendChild(cont);
-
-	cont = document.createElement('store');
-	div = document.createElement('canvas');
-	div.id = 'rightCanvas'; div.style = 'background: none;';
-	cont.classList.add('CrumbsCanvaContainer');
-	cont.style = 'position: absolute; top: 0; left: 0;';
-	cont.appendChild(div);
-	l('store').appendChild(cont);
-
-	Crumbs.foregroundCanvas = l('foregroundCanvas').getContext('2d');
-	Crumbs.foregroundCanvas.canvas.width=Crumbs.foregroundCanvas.canvas.parentNode.offsetWidth;
-	Crumbs.foregroundCanvas.canvas.height=Crumbs.foregroundCanvas.canvas.parentNode.offsetHeight;
-	Crumbs.middleCanvas = l('middleCanvas').getContext('2d');
-	Crumbs.middleCanvas.canvas.width=Crumbs.middleCanvas.canvas.parentNode.offsetWidth;
-	Crumbs.middleCanvas.canvas.height=Crumbs.middleCanvas.canvas.parentNode.offsetHeight;
-	Crumbs.rightCanvas = l('rightCanvas').getContext('2d');
-	Crumbs.rightCanvas.canvas.width=Crumbs.rightCanvas.canvas.parentNode.offsetWidth;
-	Crumbs.rightCanvas.canvas.height=Crumbs.rightCanvas.canvas.parentNode.offsetHeight;
+	Crumbs.createCanvas = function(id, parentElement, css) {
+		let div = document.createElement('canvas');
+		div.id = id; div.style = 'background: none;';
+		let cont = document.createElement('div');
+		cont.classList.add('CrumbsCanvaContainer');
+		if (css) { cont.style = css; }
+		cont.appendChild(div);
+		parentElement.appendChild(cont);
+	}
+	Crumbs.createCanvas('foregroundCanvas', l('game'));
+	Crumbs.createCanvas('middleCanvas', l('rows'), 'position: absolute; top: 0; left: 0;');
+	Crumbs.createCanvas('rightCanvas', l('store'), 'position: absolute; top: 0; left: 0;');
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
@@ -901,8 +881,8 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.scopedCanvas[i].canvas.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
 		}
 	};
-	window.addEventListener('resize',function(event)
-	{
+	Crumbs.updateCanvas();
+	window.addEventListener('resize',function(event) {
 		Crumbs.updateCanvas();
 	});
 
