@@ -719,6 +719,7 @@ const Crumbs_Init_On_Load = function() {
 		let ctx = Crumbs.scopedCanvas[m.scope];
 		for (let i in this.obj) {
 			ctx[i] = this.obj[i];
+			console.log('setting: ctx.'+i+' set to '+ctx[i]);
 		}
 		return {};
 	};
@@ -1067,6 +1068,7 @@ const Crumbs_Init_On_Load = function() {
 				for (let ii in o.components) {
 					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o)); }
 				}
+				/*debug*/ if (o.getComponent('settings')) { console.log('real settings: '+ctx.globalCompositeOperation); }
 				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 				const oy = Crumbs.getOffsetY(o.anchor, pHeight);
 				const r = o.rotation + (o.noRotate?0:o.rotationAdd);
