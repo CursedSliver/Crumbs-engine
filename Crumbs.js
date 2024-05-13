@@ -895,6 +895,14 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.rightCanvas.canvas.width=Crumbs.rightCanvas.canvas.parentNode.offsetWidth;
 	Crumbs.rightCanvas.canvas.height=Crumbs.rightCanvas.canvas.parentNode.offsetHeight;
 
+	Crumbs.updateCanvas = function() {
+		for (let i in Crumbs.scopedCanvas) {
+			Crumbs.scopedCanvas[i].canvas.width = Crumbs.scopedCanvas[i].canvas.parentNode.offsetWidth;
+			Crumbs.scopedCanvas[i].canvas.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
+		}
+	};
+	Game.registerHook('draw', Crumbs.updateCanvas);
+
 	Crumbs.scopedCanvas = {
 		left: Game.LeftBackground,
 		foreground: Crumbs.foregroundCanvas,
