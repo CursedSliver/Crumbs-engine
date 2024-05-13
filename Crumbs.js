@@ -491,14 +491,13 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.rect.prototype.logic = function(m) {
 		return {};
 	};
-	Crumbs.component.rect.prototype.preDraw = function(m) {
+	Crumbs.component.rect.prototype.preDraw = function(m, ctx) {
 		ctx.fillStyle = this.color;
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
 		return {};
 	};
-	Crumbs.component.rect.prototype.postDraw = function(m, pWidth, pHeight) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.rect.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
 		pWidth *= m.width / Pic(m.imgs[m.imgUsing]).width;
 		pHeight *= m.height / Pic(m.imgs[m.imgUsing]).height;
 		ctx.fillRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
@@ -532,8 +531,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.path.prototype.logic = function() {
 		return {};
 	};
-	Crumbs.component.path.prototype.preDraw = function() {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.path.prototype.preDraw = function(m, ctx) {
 		ctx.lineWidth = Crumbs.defaultPathConfigs.lineWidth;
 		ctx.strokeStyle = Crumbs.defaultPathConfigs.strokeStyle;
 		ctx.lineCap = Crumbs.defaultPathConfigs.lineCap;
@@ -543,8 +541,7 @@ const Crumbs_Init_On_Load = function() {
 		ctx.setLineDash(Crumbs.defaultPathConfigs.lineDash);
 		return {};
 	};
-	Crumbs.component.path.prototype.postDraw = function(m) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.path.prototype.postDraw = function(m, ctx) {
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
 		
@@ -712,18 +709,17 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.settings.prototype.disable = function() {
 		this.enabled = false;
 	};
-	Crumbs.component.settings.prototype.logic = function() {
+	Crumbs.component.settings.prototype.logic = function(m) {
 		return {};
 	};
-	Crumbs.component.settings.prototype.preDraw = function(m) {
-		let ctx = Crumbs.scopedCanvas[m.scope];
+	Crumbs.component.settings.prototype.preDraw = function(m, ctx) {
 		for (let i in this.obj) {
 			ctx[i] = this.obj[i];
 			console.log('setting: ctx.'+i+' set to '+ctx[i]);
 		}
 		return {};
 	};
-	Crumbs.component.settings.prototype.postDraw = function(m) {
+	Crumbs.component.settings.prototype.postDraw = function(m, ctx) {
 		return {};
 	};
 	
@@ -1066,7 +1062,7 @@ const Crumbs_Init_On_Load = function() {
 				if (o.height) { pHeight = o.height; } else { pHeight = p.height * o.scaleY * o.scaleFactor[1]; }
 				ctx.save();
 				for (let ii in o.components) {
-					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o)); }
+					if (o.components[ii].enabled) { o.set(o.components[ii].preDraw(o, ctx)); }
 				}
 				/*debug*/ if (o.getComponent('settings')) { console.log('real settings: '+ctx.globalCompositeOperation); }
 				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
@@ -1080,7 +1076,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight);
 
 				for (let ii in o.components) {
-					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o, pWidth, pHeight)); }
+					if (o.components[ii].enabled) { o.set(o.components[ii].postDraw(o, ctx, pWidth, pHeight)); }
 				}
 				
 				ctx.restore(); 
