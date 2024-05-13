@@ -54,9 +54,6 @@ const Crumbs_Init_On_Load = function() {
 		wrinklerBits: 'img/wrinklerBits.png',
 		shinyWrinklerBits: 'img/shinyWrinklerBits.png'
 	};
-	Crumbs.getCanvasByScope = function(s) {
-		return Crumbs.scopedCanvas[s];
-	};
 	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
 	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
@@ -870,10 +867,11 @@ const Crumbs_Init_On_Load = function() {
 		if (css) { cont.style = css; }
 		cont.appendChild(div);
 		parentElement.appendChild(cont);
+		return l(id).getContext('2d');
 	}
-	Crumbs.createCanvas('foregroundCanvas', l('game'));
-	Crumbs.createCanvas('middleCanvas', l('rows'), 'position: absolute; top: 0; left: 0;');
-	Crumbs.createCanvas('rightCanvas', l('store'), 'position: absolute; top: 0; left: 0;');
+	Crumbs.foregroundCanvas = Crumbs.createCanvas('foregroundCanvas', l('game'));
+	Crumbs.middleCanvas = Crumbs.createCanvas('middleCanvas', l('rows'), 'position: absolute; top: 0; left: 0;');
+	Crumbs.rightCanvas = Crumbs.createCanvas('rightCanvas', l('store'), 'position: absolute; top: 0; left: 0;');
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
@@ -892,6 +890,9 @@ const Crumbs_Init_On_Load = function() {
 		background: Game.Background,
 		middle: Crumbs.middleCanvas,
 		right: Crumbs.rightCanvas
+	};
+	Crumbs.getCanvasByScope = function(s) {
+		return Crumbs.scopedCanvas[s];
 	};
 
 	Crumbs.compileObjects = function(s) {
