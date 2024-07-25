@@ -1281,7 +1281,7 @@ const Crumbs_Init_On_Load = function() {
 		var pic=Pic('cursor.png');
 		var fancy=Game.prefs.fancy;
 		
-		if (showDragon) ctx.globalAlpha=0.25;
+		if (Game.hasBuff('Dragonflight') || Game.hasBuff('Dragon Harvest')) ctx.globalAlpha=0.25;
 		var amount=Game.Objects['Cursor'].amount;
 		for (var i=0;i<amount;i++)
 		{
