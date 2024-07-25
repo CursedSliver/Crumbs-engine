@@ -1108,7 +1108,7 @@ const Crumbs_Init_On_Load = function() {
 				offsetY: -10,
 				wId: i,
 				init: function() {
-					const shadow = {
+					const shadows = {
 						anchor: 'top-left',
 						y: 30,
 						scaleX: 5,
