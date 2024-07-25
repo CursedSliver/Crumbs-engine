@@ -757,7 +757,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.defaultComp.canvasManipulator = {
 		enabled: true,
-		func: function(m, ctx) { }
+		funcion: function(m, ctx) { }
 	};
 	Crumbs.component.canvasManipulator.prototype.enable = function() {
 		this.enabled = true;
@@ -768,7 +768,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.canvasManipulator.prototype.logic = function(m) { };
 	Crumbs.component.canvasManipulator.prototype.preDraw = function(m, ctx) { };
 	Crumbs.component.canvasManipulator.prototype.postDraw = function(m, ctx) {
-		this.func(m, ctx);
+		this.function(m, ctx);
 	};
 	
 	Crumbs.component.text = function(obj) {
