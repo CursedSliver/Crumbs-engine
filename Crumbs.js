@@ -60,7 +60,7 @@ const Crumbs_Init_On_Load = function() {
 			foreground: 1,
 			background: 1
 		},
-		anchorDisplay: 1
+		anchorDisplay: 0
 	}
 	Crumbs.objectImgs = {
 		none: 'img/empty.png',
@@ -1098,7 +1098,7 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie'));
 		}
 	};
-	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, noInit, offsetX, offsetY) {
+	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, noInit) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 		c.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: yd}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: speed}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)})];
@@ -1114,8 +1114,6 @@ const Crumbs_Init_On_Load = function() {
 			c.scaleX = sc;
 			c.scaleY = sc;
 		}
-		if (offsetX) { c.offsetX = offsetX; }
-		if (offsetY) { c.offsetY = offsetY; }
 		if (typeof order === 'number') { c.order = order; }
 		c.id = id;
 		c.rotation = Math.random() * 2 * Math.PI;
