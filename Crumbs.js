@@ -998,7 +998,6 @@ const Crumbs_Init_On_Load = function() {
 		if (type == 1) { w.imgs = 'shinyWrinklerBits'; }
 		w.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})];
 		const o = Crumbs.findObject('wrinkler'+originId);
-		console.log(o);
 		w.x = o.x;
 		w.y = o.y;
 		w.offsetX = o.offsetX;
@@ -1006,7 +1005,7 @@ const Crumbs_Init_On_Load = function() {
 		w.rotation = o.rotation;
 		w.order = 2;
 		w.id = 'wrinklerBits';
-		Crumbs.spawn(w);
+		console.log(Crumbs.spawn(w));
 	};
 
 	Game.registerHook('click', function() {
