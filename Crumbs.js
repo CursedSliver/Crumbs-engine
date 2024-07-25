@@ -131,7 +131,9 @@ const Crumbs_Init_On_Load = function() {
 		this.init = init;
 	};
 	Crumbs.behaviorInstance = function(b, init) {
+		this.f = null;
 		if (b instanceof Crumbs.behavior) { 
+			console.log(b.f);
 			this.f = b.f;
 			const b = typeof b.init;
 			if (b === 'object') {
