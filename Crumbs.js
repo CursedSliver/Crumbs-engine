@@ -97,7 +97,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in this.behaviors) {
 			if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
 			else if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
-			else if (typeof this.behaviors[i] === 'function') { this.behaviors[i] = new Crumbs.behaviorInstance(new Crumbs.behavior(this.behaviors[i])); }
+			else if (typeof this.behaviors[i] === 'function') { const b = new Crumbs.behavior(this.behaviors[i]); this.behaviors[i] = new Crumbs.behaviorInstance(b); }
 			else { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		}
 		
@@ -1206,7 +1206,7 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 2,
 			scaleY: 2,
 			components: new Crumbs.component.patternFill({ height: 1 }),
-			behaviors: function() {
+			behaviors: new Crumbs.behavior(function() {
 				if (!Game.prefs.milk) { this.imgs = Crumbs.objectImgs.empty; return; }
 				let toReturn = {imgs: [Game.Milk.pic]};
 				if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
@@ -1227,7 +1227,7 @@ const Crumbs_Init_On_Load = function() {
 				o.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
 				o.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
 				this.set(toReturn);
-			}
+			})
 		});
 	};
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); }
