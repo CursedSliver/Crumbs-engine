@@ -1025,6 +1025,7 @@ const Crumbs_Init_On_Load = function() {
 				if (Crumbs.prefs.anchorDisplay) {
 					ctx.save();
 					if (o.parent) { ctx.fillStyle = '#57d2f2'; } else { ctx.fillstyle = '#ccfffb'; }
+					ctx.globalAlpha = 1;
 					ctx.fillRect(o.offsetX - 3, o.offsetY - 3, 6, 6);
 					ctx.restore();
 				}
