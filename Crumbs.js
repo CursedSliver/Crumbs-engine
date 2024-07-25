@@ -75,10 +75,10 @@ const Crumbs_Init_On_Load = function() {
 		}
 		if (parent) { this.parent = parent; }
 		
-		this.imgs = [].concat(this.imgs);
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
 		if (Crumbs.objectImgs.hasOwnProperty(this.imgs)) { this.imgs = Crumbs.objectImgs[this.imgs]; }
 		if (typeof this.imgs === 'function') { this.imgs = this.imgs(); }
+		this.imgs = [].concat(this.imgs);
 		for (let i in this.imgs) {
 			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) {
 				this.imgs[i] = Crumbs.objectImgs[this.imgs[i]];
