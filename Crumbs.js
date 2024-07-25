@@ -165,8 +165,8 @@ const Crumbs_Init_On_Load = function() {
 		imgUsing: 0,
 		scope: 'foreground',
 		anchor: 'center',
-		init: Crumbs.objectInits.default,
-		behaviors: Crumbs.objectBehaviors.idle,
+		init: null, //Crumbs.objectInits.default, set after it is initialized
+		behaviors: null, //Crumbs.objectBehaviors.idle, set after it is initialized
 		id: null,
 		order: 0,
 		behaviorParams: {},
@@ -394,9 +394,8 @@ const Crumbs_Init_On_Load = function() {
 	};
 	
 	Crumbs.objectInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
-	Crumbs.objectInits.default = function(c) {
-		
-	};
+	Crumbs.objectInits.default = function(c) { };
+	Crumbs.objectDefaults.init = Crumbs.objectInits.default;
 	Crumbs.objectInits.bottomRandom = function(c) {
 		this.x = Math.random() * c.canvas.parentNode.offsetWidth;
 		this.y = c.canvas.parentNode.offsetHeight;
@@ -428,9 +427,8 @@ const Crumbs_Init_On_Load = function() {
 	newChild: an object or an array containing objects for spawning children
  	behaviorParams: an object to replace the original params for this behavior
   	*/
-	Crumbs.objectBehaviors.idle = function(o, p) {
-		return {};
-	};
+	Crumbs.objectBehaviors.idle = function(p) { };
+	Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
 	Crumbs.objectBehaviors.fly = new Crumbs.behavior(function(p) {
 		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through o
 		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through o
