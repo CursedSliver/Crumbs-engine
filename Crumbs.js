@@ -59,7 +59,8 @@ const Crumbs_Init_On_Load = function() {
 			right: 1,
 			foreground: 1,
 			background: 1
-		}
+		},
+		anchorDisplay: 0
 	}
 	Crumbs.objectImgs = {
 		none: 'img/empty.png',
@@ -1019,6 +1020,13 @@ const Crumbs_Init_On_Load = function() {
 
 				for (let ii in o.components) {
 					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx, pWidth, pHeight); }
+				}
+
+				if (Crumbs.prefs.anchorDisplay) {
+					ctx.save();
+					ctx.fillStyle = '#5bc3de';
+					ctx.fillRect(o.offsetX - 3, o.offsetY - 3, 6, 6);
+					ctx.restore();
 				}
 				
 				ctx.restore(); 
