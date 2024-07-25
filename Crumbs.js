@@ -1312,6 +1312,7 @@ const Crumbs_Init_On_Load = function() {
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
 			}),
+			behaviors: new Crumbs.behavior(function() { this.x = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / 2; this.y = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight * 0.4; }),
 			id: 'cursors'
 		})
 	}
