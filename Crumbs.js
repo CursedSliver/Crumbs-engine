@@ -133,7 +133,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.behaviorInstance = function(b, init) {
 		this.f = null;
 		if (typeof b === 'object') { 
-			console.log(b);
 			this.f = b.f;
 			const bb = typeof b.init;
 			if (bb === 'object') {
