@@ -1005,7 +1005,8 @@ const Crumbs_Init_On_Load = function() {
 		w.rotation = o.rotation;
 		w.order = 2;
 		w.id = 'wrinklerBits';
-		console.log(Crumbs.spawn(w));
+		const spawned = Crumbs.spawn(w);
+		console.log(spawned.x, spawned.y, spawned.alpha);
 	};
 
 	Game.registerHook('click', function() {
