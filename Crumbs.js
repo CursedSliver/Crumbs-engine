@@ -1306,6 +1306,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.initCursors = function() {
 		Crumbs.spawn({
 			init: Crumbs.objectInits.bigCookie,
+			anchor: 'top-left',
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
 			}),
