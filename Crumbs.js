@@ -427,11 +427,11 @@ const Crumbs_Init_On_Load = function() {
 		this.x = Math.random() * c.canvas.parentNode.offsetWidth;
 		this.y = Math.random() * c.canvas.parentNode.offsetHeight;
 	};
-	Crumbs.objectInits.center = function() {
+	Crumbs.objectInits.center = function(c) {
 		this.x = c.canvas.parentNode.offsetWidth / 2;
 		this.y = c.canvas.parentNode.offsetHeight / 2;
 	};
-	Crumbs.objectInits.bigCookie = function() {
+	Crumbs.objectInits.bigCookie = function(c) {
 		this.x = c.canvas.parentNode.offsetWidth / 2;
 		this.y = c.canvas.parentNode.offsetHeight * 0.4;
 	};
