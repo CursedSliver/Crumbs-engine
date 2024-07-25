@@ -491,6 +491,7 @@ const Crumbs_Init_On_Load = function() {
 		//if p.time is undefined, it essentially never expires
 		if (this.t >= p.t) { return 't'; } else { return {}; }
 	}, { t: 1e21 });
+	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / 2; this.y = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight * 0.4; });
 
 	Crumbs.component = {};
 	Crumbs.defaultComp = {};
@@ -977,7 +978,8 @@ const Crumbs_Init_On_Load = function() {
 			height: 48,
 			sx: i[0] * 48,
 			sy: i[1] * 48,
-			scope: 'left'
+			scope: 'left',
+			anchor: 'top-left'
 		};
 	};
 
@@ -988,7 +990,8 @@ const Crumbs_Init_On_Load = function() {
 			height: 64,
 			sx: Math.floor(Math.random() * 8) * 64,
 			sy: 0,
-			scope: 'left'
+			scope: 'left',
+			anchor: 'top-left'
 		};
 	};
 
@@ -1312,8 +1315,22 @@ const Crumbs_Init_On_Load = function() {
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
 			}),
-			behaviors: new Crumbs.behavior(function() { this.x = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / 2; this.y = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight * 0.4; }),
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
 			id: 'cursors'
+		})
+	}
+	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
+		this.scaleX = Game.BigCookieSize;
+		this.scaleY = Game.BigCookieSize;
+	});
+	Crumbs.initCookie = function() {
+		Crumbs.spawn({
+			anchor: 'center',
+			scope: 'left',
+			behaviors: [
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieWobble),
+			]
 		})
 	}
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); }
