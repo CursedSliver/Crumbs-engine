@@ -1230,7 +1230,7 @@ const Crumbs_Init_On_Load = function() {
 						if (Game.prefs.particles) {
 							if (me.phase == 2 && Math.random() < 0.03) {
 								console.log('what?');
-								Crumbs.spawn(Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, true, this.offsetX, this.offsetY));
+								Crumbs.spawn(Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, true));
 							}
 							if (me.type == 1 && Math.random()<0.3) {
 								const s = Math.random()*30+5;
