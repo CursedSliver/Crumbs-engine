@@ -1363,6 +1363,7 @@ const Crumbs_Init_On_Load = function() {
 				this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width;
 				this.getComponent('patternFill').offY = (Math.floor(Game.T*2)%512);
 			})
+		});
 	};
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
