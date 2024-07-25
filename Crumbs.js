@@ -131,14 +131,16 @@ const Crumbs_Init_On_Load = function() {
 		this.init = init;
 	};
 	Crumbs.behaviorInstance = function(b, init) {
-		this.f = b.f;
-		const b = typeof b.init;
-		if (b === 'object') {
-			for (let i in b.init) { this[i] = b.init[i]; }
-		} 
-		if (b === 'function') {
-			b.init.call(this);
-		}
+		if (b instanceof Crumbs.behavior) { 
+			this.f = b.f;
+			const b = typeof b.init;
+			if (b === 'object') {
+				for (let i in b.init) { this[i] = b.init[i]; }
+			} 
+			if (b === 'function') {
+				b.init.call(this);
+			}
+		} else { this.f = b; }
 		const t = typeof init;
 		if (t === 'object') {
 			for (let i in init) { this[i] = init[i]; }
@@ -189,11 +191,6 @@ const Crumbs_Init_On_Load = function() {
 			let childsToSpawn = [].concat(o.newChild); //light bulb moment
 			for (let i in childsToSpawn) {
 				this.spawnChild(childsToSpawn[i]);
-			}
-		}
-		if (o.settings) {
-			for (let i in o.settings) {
-				this.settings[i] = o.settings[i];
 			}
 		}
 	};
@@ -974,7 +971,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
-		c.behaviors = [[Crumbs.objectBehaviors.cookieFall, {yd: yd}], [Crumbs.objectBehaviors.horizontal, {speed: speed}], [Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}], [Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)}]];
+		c.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: yd}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: speed}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)})];
 		if (!onMouse) {
 			c.x = x;
 			c.y = y;
@@ -998,7 +995,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
 		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
 		if (type == 1) { w.imgs = 'shinyWrinklerBits'; }
-		w.behaviors = [[Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}], [Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}], [Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}], [Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)}]];
+		w.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})];
 		const o = Crumbs.findObject('wrinkler'+originId);
 		console.log(o);
 		w.x = o.x;
@@ -1110,6 +1107,8 @@ const Crumbs_Init_On_Load = function() {
 				order: 1.5,
 				scope: 'left',
 				anchor: 'top-left',
+				offsetY: -10,
+				wId: i,
 				init: function() {
 					const shadow = {
 						anchor: 'top-left',
@@ -1117,61 +1116,68 @@ const Crumbs_Init_On_Load = function() {
 						scaleX: 5,
 						scaleY: 5,
 						order: 1,
+						wId: i,
 						imgs: [Crumbs.objectImgs.empty, 'img/wrinklerShadow.png'],
-						behaviors: [[function(o, p) {
-							if (Game.prefs.fancy && Game.wrinklers[p.id].close > 0) {
-								return {imgUsing: 1, alpha: Game.wrinklers[p.id].close};
+						behaviors: new Crumbs.behaviorInstance(function(p) {
+							if (Game.prefs.fancy && Game.wrinklers[this.wId].close > 0) {
+								this.imgUsing = 1;
+								this.alpha = Game.wrinklers[this.wId].close;
+								return;
 							} 
-							return {imgUsing: 0};
-						}, {id: i}]]
+							this.imgUsing = 0;
+						})
 					};
 					const eyes = {
 						imgs: [Crumbs.objectImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
 						anchor: 'top-left',
 						offsetY: -10+Math.sin(Game.T*0.2+i*3+1.2),
 						order: 3,
-						behaviors: [function(o, p) {
-							if (Game.prefs.notScary && Game.wrinklers[p.id].close > 0) {
-								return {offsetY: -10+Math.sin(Game.T*0.2+p.id*3+1.2), imgUsing: Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2, alpha: Game.wrinklers[p.id].close};
+						wId: i,
+						behaviors: new Crumbs.behaviorInstance(function(p) {
+							if (Game.prefs.notScary && Game.wrinklers[this.wId].close > 0) {
+								this.offsetY = -10+Math.sin(Game.T*0.2+this.wId*3+1.2);
+								this.imgUsing = Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2;
+								this.alpha = Game.wrinklers[this.wId].close;
+								return;
 							}
-							return {imgUsing: 0};
-						}, {id: i}]
+							this.imgUsing = 0;
+						})
 					};
-					return {newChild: [shadow, eyes]};
+					this.spawnChild(shadows);
+					this.spawnChild(eyes);
 				},
-				behaviors: [[
-					function(o, p) {
-						if (Game.wrinklers[p.id].phase > 0) {
-							if (Game.wrinklers[p.id].type > 0) { return {imgUsing: Game.WINKLERS?5:2}; }
-							if (Game.season == 'christmas') { return {imgUsing: Game.WINKLERS?6:3}; }
-							return {imgUsing: Game.WINKLERS?4:1};
+				behaviors: [new Crumbs.behaviorInstance(
+					function(p) {
+						if (Game.wrinklers[this.wId].phase > 0) {
+							if (Game.wrinklers[this.wId].type > 0) { this.imgUsing = Game.WINKLERS?5:2; return; }
+							if (Game.season == 'christmas') { this.imgUsing: Game.WINKLERS?6:3; return; }
+							this.imgUsing: Game.WINKLERS?4:1; return;
 						}
-						return {imgUsing: 0};
+						this.imgUsing = 0;
 					}, {id: i}
-				], [
-					function(o, p) {
-						const sw=100+2*Math.sin(Game.T*0.2+p.id*3);
-						const sh=200+5*Math.sin(Game.T*0.2-2+p.id*3);
-						return {
-							scaleX: sw / 100, scaleY: sh / 200,
-							x: Game.wrinklers[p.id].x,
-							offsetX: -sw/2,
-							y: Game.wrinklers[p.id].y,
-							offsetY: -10,
-							rotation: -(Game.wrinklers[p.id].r)*Math.PI/180,
-							alpha: Game.wrinklers[p.id].close
-						};
-					}, {id: i}
-				], [
-					function(o, p) {
-						let me = Game.wrinklers[p.id];
+				), new Crumbs.behaviorInstance(
+					function(p) {
+						const sw=100+2*Math.sin(Game.T*0.2+this.wId*3);
+						const sh=200+5*Math.sin(Game.T*0.2-2+this.wId*3);
+						const me = Game.wrinklers[this.wId];
+						this.scaleX = sw / 100;
+						this.scaleY = sh / 200;
+						this.x = me.x;
+						this.y = me.y;
+						this.offsetX = -sw/2;
+						this.rotation = -(me.r)*Math.PI/180;
+						this.alpha = me.close;
+					}
+				), new Crumbs.behaviorInstance(
+					function(p) {
+						const me = Game.wrinklers[this.wId];
 						if (Game.prefs.particles) {
 							if (me.phase==2 && Math.random()<0.03) {
 								Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*4-2, Math.random()*-2-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 2);
 							}
 							if (me.type == 1 && Math.random()<0.3) {
-								let s = Math.random()*30+5;
-								return {newChild: {
+								const s = Math.random()*30+5;
+								this.spawnChild({
 									imgs: 'glint',
 									anchor: 'top-left',
 									alpha: Math.random()*0.65+0.1,
@@ -1181,16 +1187,15 @@ const Crumbs_Init_On_Load = function() {
 									order: 5,
 									scaleX: s / 32, 
 									scaleY: s / 32,
-									behaviors: function(o, p) {
-										if (o.t > 0) { return 't'; }
+									behaviors: function(p) {
+										if (this.t > 0) { return 't'; }
 										return {};
 									}
-								}};
+								}); return;
 							}
 						}
-						return {};
-					}, {id: i}
-				]],
+					}
+				)],
 			}
 			Crumbs.spawn(w);
 		}
@@ -1203,8 +1208,8 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 2,
 			scaleY: 2,
 			components: new Crumbs.component.patternFill({ height: 1 }),
-			behaviors: function(o) {
-				if (!Game.prefs.milk) { return {imgs: [Crumbs.objectImgs.empty]}; }
+			behaviors: function() {
+				if (!Game.prefs.milk) { this.imgs = Crumbs.objectImgs.empty; return; }
 				let toReturn = {imgs: [Game.Milk.pic]};
 				if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
 				let a=1;
@@ -1223,7 +1228,7 @@ const Crumbs_Init_On_Load = function() {
 				toReturn.y = Crumbs.scopedCanvas.left.canvas.height - y;
 				o.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
 				o.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
-				return toReturn;
+				this.set(toReturn);
 			}
 		});
 	};
