@@ -1051,7 +1051,7 @@ const Crumbs_Init_On_Load = function() {
 		let i = [];
 		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { i=[17,5]; } else { i = choose(Crumbs.cookieIcons); }
 		return {
-			imgs: 'icons',
+			imgs: i[2]?i[2]:'icons',
 			width: 48,
 			height: 48,
 			sx: i[0] * 48,
@@ -1217,8 +1217,9 @@ const Crumbs_Init_On_Load = function() {
 					function(p) {
 						const me = Game.wrinklers[this.wId];
 						if (Game.prefs.particles) {
-							if (me.phase==2 && Math.random()<0.03) {
-								Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*4-2, Math.random()*-2-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 2);
+							if (me.phase == 2 && Math.random() < 0.03) {
+								console.log('what?');
+								Crumbs.spawn(Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*4-2, Math.random()*-2-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4));
 							}
 							if (me.type == 1 && Math.random()<0.3) {
 								const s = Math.random()*30+5;
