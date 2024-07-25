@@ -1327,6 +1327,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn({
 			anchor: 'center',
 			scope: 'left',
+			imgs: 'img/perfectCookie.png',
 			behaviors: [
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieWobble),
