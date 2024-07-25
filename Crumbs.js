@@ -1,6 +1,7 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
+var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
 	Crumbs.h = {};
 	Crumbs.h.CSSInjects = [];
@@ -2032,6 +2033,8 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.h.resolveInjects();
 	Game.registerHook('check', Crumbs.h.resolveInjects);
+
+	CrumbsEngineLoaded = true;
 };
 
 Game.registerMod('Crumbs engine', {
