@@ -1652,7 +1652,7 @@ const Crumbs_Init_On_Load = function() {
 						var y=Game.cookieOriginY-s/2;
 						if (Game.prefs.fancy) ctx.drawImage(Pic('cookieShadow.png'),x,y+20,s,s);
 						ctx.drawImage(Pic('perfectCookie.png'),x,y,s,s);
-					}
+					
 					}
 
 					Crumbs.drawObjects();
