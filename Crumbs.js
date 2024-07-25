@@ -60,7 +60,7 @@ const Crumbs_Init_On_Load = function() {
 			foreground: 1,
 			background: 1
 		},
-		anchorDisplay: 0
+		anchorDisplay: 1
 	}
 	Crumbs.objectImgs = {
 		none: 'img/empty.png',
