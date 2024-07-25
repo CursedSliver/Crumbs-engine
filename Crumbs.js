@@ -35,6 +35,23 @@ const Crumbs_Init_On_Load = function() {
 			x * s + y * c
 		];
 	}
+	Crumbs.h.rebuildBigCookieButton = function() {
+		l('bigCookie').remove();
+		var bigCookie = document.createElement('button');
+		bigCookie.id = 'bigCookie';
+		l('cookieAnchor').appendChild(bigCookie);
+		if (Game.touchEvents) {
+			AddEvent(bigCookie,'touchend',Game.ClickCookie);
+			AddEvent(bigCookie,'touchstart',function(event){if (decay.gameCan.click) { Game.BigCookieState=1; }if (event) event.preventDefault();});
+			AddEvent(bigCookie,'touchend',function(event){if (decay.gameCan.click) { Game.BigCookieState=0; }if (event) event.preventDefault();});
+		} else {
+			AddEvent(bigCookie,'click',Game.ClickCookie);
+			AddEvent(bigCookie,'mousedown',function(event){if (decay.gameCan.click) { Game.BigCookieState=1; }if (Game.prefs.cookiesound) {Game.playCookieClickSound();}if (event) event.preventDefault();});
+			AddEvent(bigCookie,'mouseup',function(event){if (decay.gameCan.click) { Game.BigCookieState=2; }if (event) event.preventDefault();});
+			AddEvent(bigCookie,'mouseout',function(event){if (decay.gameCan.click) { Game.BigCookieState=0; }});
+			AddEvent(bigCookie,'mouseover',function(event){if (decay.gameCan.click) { Game.BigCookieState=2; }});
+		}
+	}
 	
 	Crumbs.prefs = {
 		objects: {
@@ -721,14 +738,37 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.settings.prototype.disable = function() {
 		this.enabled = false;
 	};
-	Crumbs.component.settings.prototype.logic = function(m) {
-	};
+	Crumbs.component.settings.prototype.logic = function(m) { };
 	Crumbs.component.settings.prototype.preDraw = function(m, ctx) {
 		for (let i in this.obj) {
 			ctx[i] = this.obj[i];
 		}
 	};
-	Crumbs.component.settings.prototype.postDraw = function(m, ctx) {
+	Crumbs.component.settings.prototype.postDraw = function(m, ctx) { };
+
+	Crumbs.component.canvasManipulator = function(obj) {
+		//USE WITH CAUTION
+		for (let i in Crumbs.defaultComp.canvasManipulator) {
+			this[i] = Crumbs.defaultComp.canvasManipulator[i];
+		}
+		for (let i in obj) { this[i] = obj[i]; }
+
+		this.type = 'canvasManipulator';
+	};
+	Crumbs.defaultComp.canvasManipulator = {
+		enabled: true,
+		func: function(m, ctx) { }
+	};
+	Crumbs.component.canvasManipulator.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.canvasManipulator.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.canvasManipulator.prototype.logic = function(m) { };
+	Crumbs.component.canvasManipulator.prototype.preDraw = function(m, ctx) { };
+	Crumbs.component.canvasManipulator.prototype.postDraw = function(m, ctx) {
+		this.func(m, ctx);
 	};
 	
 	Crumbs.component.text = function(obj) {
@@ -1285,6 +1325,8 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
+
+	Crumbs.h.rebuildBigCookieButton();
 	
 	Game.DrawBackground = function() {
 		Timer.clean();
