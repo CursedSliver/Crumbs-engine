@@ -1105,7 +1105,7 @@ const Crumbs_Init_On_Load = function() {
 		if (!onMouse) {
 			c.x = x;
 			c.y = y;
-			if (noInit) { c.init = Crumbs.objectInits.topRandom; }
+			if (!noInit) { c.init = Crumbs.objectInits.topRandom; }
 		} else {
 			c.x = Game.mouseX;
 			c.y = Game.mouseY;
