@@ -1304,15 +1304,16 @@ const Crumbs_Init_On_Load = function() {
 		}
 		ctx.restore();
 	}
-	Crumbs.initCursor = function() {
+	Crumbs.initCursors = function() {
 		Crumbs.spawn({
 			init: Crumbs.objectInits.bigCookie,
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
-			})
+			}),
+			id: 'cursors'
 		})
 	}
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); }
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
