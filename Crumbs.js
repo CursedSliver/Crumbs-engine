@@ -467,7 +467,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectBehaviors.horizontal = new Crumbs.behavior(function(p) {
 		//a simplified version of particleBehaviors.fly that only supports having one value in params ('speed') that makes it go horizontal or vertical
 		//mainly used to support orteil old code
-		this.e += p.speed;
+		this.x += p.speed;
 	}, { speed: 0 });
 	Crumbs.objectBehaviors.expireAfter = new Crumbs.behavior(function(p) {
 		//parameters: 't', which is the amount of draw frames to do before it dies
