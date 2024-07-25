@@ -1344,8 +1344,28 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieWobble),
 			]
 		})
-	}
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); }
+	};
+	Crumbs.initCookieWall = function() {
+		Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'left',
+			id: 'cookieWall',
+			order: -4,
+			imgs: ['empty', 'img/cookieShower1.png', 'img/cookieShower2.png', 'img/cookieShower3.png'],
+			components: new Crumbs.component.patternFill({ height: 1 }),
+			behaviors: new Crumbs.behavior(function() {
+				if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
+				
+				if (Game.cookiesPs>1000) { this.imgUsing = 3; }
+				else if (Game.cookiesPs>500) { this.imgUsing = 2; }
+				else if (Game.cookiesPs>50) { this.imgUsing = 1; }
+				else { this.alpha = 0; }
+				
+				this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width;
+				this.getComponent('patternFill').offY = (Math.floor(Game.T*2)%512);
+			})
+	};
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
@@ -1544,21 +1564,6 @@ const Crumbs_Init_On_Load = function() {
 						//falling cookies
 						var pic='';
 						var opacity=1;
-						if (Game.elderWrathD<=1.5 || Game.prefs.notScary)
-						{
-							if (Game.cookiesPs>=1000) pic='cookieShower3.png';
-							else if (Game.cookiesPs>=500) pic='cookieShower2.png';
-							else if (Game.cookiesPs>=50) pic='cookieShower1.png';
-							else pic='';
-						}
-						if (pic!='')
-						{
-							if (Game.elderWrathD>=1 && !Game.prefs.notScary) opacity=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5);
-							ctx.globalAlpha=opacity;
-							var y=(Math.floor(Game.T*2)%512);
-							ctx.fillPattern(Pic(pic),0,0,ctx.canvas.width,ctx.canvas.height+512,512,512,0,y);
-							ctx.globalAlpha=1;
-						}
 						//snow
 						if (Game.season=='christmas')
 						{
