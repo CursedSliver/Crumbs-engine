@@ -1226,8 +1226,8 @@ const Crumbs_Init_On_Load = function() {
 				}
 				toReturn.alpha = a;
 				toReturn.y = Crumbs.scopedCanvas.left.canvas.height - y;
-				o.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
-				o.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
+				this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
+				this.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
 				this.set(toReturn);
 			})
 		});
