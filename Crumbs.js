@@ -1131,7 +1131,7 @@ const Crumbs_Init_On_Load = function() {
 
 	Game.registerHook('click', function() {
 		if (Game.prefs.particles) {
-			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie', true, 1, 0));
+			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie', false, 1, 0));
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75, 0));
 		}
 	});
