@@ -3,19 +3,18 @@ if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
 const Crumbs_Init_On_Load = function() {
 	Crumbs.h = {};
-	if (!Game.styleSheets) {
-		Game.styleSheets = null; 
-		for (let i in document.styleSheets) { 
-			try { if (document.styleSheets[i].cssRules.length > 500) { Game.styleSheets = document.styleSheets[i]; break; } } 
-			catch(error) { } 
-		} 	
-	}
-	if (Game.styleSheets === null) { Game.Notify('Unable to inject CSS!', 'Something went wrong. Please contact the mod developers. '); }
-	Crumbs.h.injectCSS = function(str, index) {
-		if (Game.styleSheets === null) { return false; }
-		if (typeof index === 'undefined') { index = Game.styleSheets.cssRules.length; }
-		Game.styleSheets.insertRule(str, index);
+	Crumbs.h.CSSInjects = [];
+	Crumbs.h.injectCSS = function(str) {
+		Crumbs.h.CSSInjects.push(str);
 	} //h stands for helper
+	Crumbs.h.resolveInjects = function() {
+		if (!Crumbs.h.CSSInjects.length) { return; }
+		let str = '';
+		for (let i in Crumbs.h.CSSInjects) { str += Crumbs.h.CSSInjects[i] + '\n'; }
+		let style = document.createElement('style');
+		style.textContent = str;
+		l('game').appendChild(style);
+	}
 	Crumbs.h.inRect = function(x, y, rect) {
 		var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
 		var h1 = Math.sqrt(dx*dx + dy*dy);
@@ -2013,6 +2012,8 @@ const Crumbs_Init_On_Load = function() {
 				}
 			}
 	};
+	Crumbs.h.resolveInjects();
+	Game.registerHook('check', Crumbs.h.resolveInjects);
 };
 
 Game.registerMod('Crumbs engine', {
