@@ -135,11 +135,11 @@ const Crumbs_Init_On_Load = function() {
 		if (typeof b === 'object') { 
 			console.log(b);
 			this.f = b.f;
-			const b = typeof b.init;
-			if (b === 'object') {
+			const bb = typeof b.init;
+			if (bb === 'object') {
 				for (let i in b.init) { this[i] = b.init[i]; }
 			} 
-			if (b === 'function') {
+			if (bb === 'function') {
 				b.init.call(this);
 			}
 		} else { this.f = b; }
@@ -1232,7 +1232,7 @@ const Crumbs_Init_On_Load = function() {
 			})
 		});
 	};
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); /*Crumbs.initMilk();*/ }
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
