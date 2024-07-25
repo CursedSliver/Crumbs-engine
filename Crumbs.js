@@ -1320,8 +1320,8 @@ const Crumbs_Init_On_Load = function() {
 		})
 	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
-		this.scaleX = Game.BigCookieSize;
-		this.scaleY = Game.BigCookieSize;
+		this.scaleX = 0.5*Game.BigCookieSize;
+		this.scaleY = 0.5*Game.BigCookieSize;
 	});
 	Crumbs.initCookie = function() {
 		Crumbs.spawn({
