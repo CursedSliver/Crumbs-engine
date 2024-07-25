@@ -382,12 +382,12 @@ const Crumbs_Init_On_Load = function() {
 		let toReturn = [];
 		for (let i in Crumbs.objects) {
 			for (let ii in Crumbs.objects[i]) {
-				if (Crumbs.objects[i][ii] !== null) {
-					if (Crumbs.objects[i][ii].id == id) {
-						toReturn.push(Crumbs.objects[i][ii]);
-					}
-					toReturn.concat(Crumbs.objects[i][ii].getChildren(id));
+				if (Crumbs.objects[i][ii] === null) { continue; }
+				
+				if (Crumbs.objects[i][ii].id == id) {
+					toReturn.push(Crumbs.objects[i][ii]);
 				}
+				toReturn.concat(Crumbs.objects[i][ii].getChildren(id));
 			}
 		}
 		return toReturn;
@@ -1150,11 +1150,11 @@ const Crumbs_Init_On_Load = function() {
 					function(p) {
 						if (Game.wrinklers[this.wId].phase > 0) {
 							if (Game.wrinklers[this.wId].type > 0) { this.imgUsing = Game.WINKLERS?5:2; return; }
-							if (Game.season == 'christmas') { this.imgUsing: Game.WINKLERS?6:3; return; }
-							this.imgUsing: Game.WINKLERS?4:1; return;
+							if (Game.season == 'christmas') { this.imgUsing = Game.WINKLERS?6:3; return; }
+							this.imgUsing = Game.WINKLERS?4:1; return;
 						}
 						this.imgUsing = 0;
-					}, {id: i}
+					}
 				), new Crumbs.behaviorInstance(
 					function(p) {
 						const sw=100+2*Math.sin(Game.T*0.2+this.wId*3);
