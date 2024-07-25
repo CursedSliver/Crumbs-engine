@@ -1089,7 +1089,7 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie'));
 		}
 	};
-	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order) {
+	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, offsetX, offsetY) {
 		let c = 0;
 		if (Game.season=='fools') { c = Crumbs.dollar(); } else { c = Crumbs.randomCookie(); }
 		c.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: yd}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: speed}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)})];
@@ -1105,6 +1105,8 @@ const Crumbs_Init_On_Load = function() {
 			c.scaleX = sc;
 			c.scaleY = sc;
 		}
+		if (offsetX) { c.offsetX = offsetX; }
+		if (offsetY) { c.offsetY = offsetY; }
 		if (typeof order === 'number') { c.order = order; }
 		c.id = id;
 		c.rotation = Math.random() * 2 * Math.PI;
@@ -1219,7 +1221,7 @@ const Crumbs_Init_On_Load = function() {
 						if (Game.prefs.particles) {
 							if (me.phase == 2 && Math.random() < 0.03) {
 								console.log('what?');
-								Crumbs.spawn(Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4));
+								Crumbs.spawn(Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, this.offsetX, this.offsetY));
 							}
 							if (me.type == 1 && Math.random()<0.3) {
 								const s = Math.random()*30+5;
