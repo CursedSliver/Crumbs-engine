@@ -42,14 +42,14 @@ const Crumbs_Init_On_Load = function() {
 		l('cookieAnchor').appendChild(bigCookie);
 		if (Game.touchEvents) {
 			AddEvent(bigCookie,'touchend',Game.ClickCookie);
-			AddEvent(bigCookie,'touchstart',function(event){if (decay.gameCan.click) { Game.BigCookieState=1; }if (event) event.preventDefault();});
-			AddEvent(bigCookie,'touchend',function(event){if (decay.gameCan.click) { Game.BigCookieState=0; }if (event) event.preventDefault();});
+			AddEvent(bigCookie,'touchstart',function(event){ Game.BigCookieState=1; if (event) event.preventDefault();});
+			AddEvent(bigCookie,'touchend',function(event){ Game.BigCookieState=0; if (event) event.preventDefault();});
 		} else {
 			AddEvent(bigCookie,'click',Game.ClickCookie);
-			AddEvent(bigCookie,'mousedown',function(event){if (decay.gameCan.click) { Game.BigCookieState=1; }if (Game.prefs.cookiesound) {Game.playCookieClickSound();}if (event) event.preventDefault();});
-			AddEvent(bigCookie,'mouseup',function(event){if (decay.gameCan.click) { Game.BigCookieState=2; }if (event) event.preventDefault();});
-			AddEvent(bigCookie,'mouseout',function(event){if (decay.gameCan.click) { Game.BigCookieState=0; }});
-			AddEvent(bigCookie,'mouseover',function(event){if (decay.gameCan.click) { Game.BigCookieState=2; }});
+			AddEvent(bigCookie,'mousedown',function(event){ Game.BigCookieState=1; if (Game.prefs.cookiesound) {Game.playCookieClickSound();}if (event) event.preventDefault();});
+			AddEvent(bigCookie,'mouseup',function(event){ Game.BigCookieState=2; if (event) event.preventDefault();});
+			AddEvent(bigCookie,'mouseout',function(event){ Game.BigCookieState=0; });
+			AddEvent(bigCookie,'mouseover',function(event){ Game.BigCookieState=2; });
 		}
 	}
 	
@@ -1275,6 +1275,43 @@ const Crumbs_Init_On_Load = function() {
 			})
 		});
 	};
+	Crumbs.cursorDraw = function(m, ctx) {
+		if (!Game.prefs.cursors) { return; }
+		ctx.save();
+		var pic=Pic('cursor.png');
+		var fancy=Game.prefs.fancy;
+		
+		if (showDragon) ctx.globalAlpha=0.25;
+		var amount=Game.Objects['Cursor'].amount;
+		for (var i=0;i<amount;i++)
+		{
+			var n=Math.floor(i/50);
+			var w=0;
+			if (fancy) w=(Math.sin(Game.T*0.025+(((i+n*12)%25)/25)*Math.PI*2));
+			if (w>0.997) w=1.5;
+			else if (w>0.994) w=0.5;
+			else w=0;
+			w*=-4;
+			if (fancy) w+=Math.sin((n+Game.T*0.01)*Math.PI/2)*4;
+			var x=0;
+			var y=(140+n*16+w)-16;
+			
+			var rot=7.2;//(1/50)*360
+			if (i==0 && fancy) rot-=Game.T*0.1;
+			if (i%50==0) rot+=7.2/2;
+			ctx.rotate((rot/360)*Math.PI*2);
+			ctx.drawImage(pic,0,0,32,32,x,y,32,32);
+		}
+		ctx.restore();
+	}
+	Crumbs.initCursor = function() {
+		Crumbs.spawn({
+			init: Crumbs.objectInits.bigCookie,
+			components: new Crumbs.component.canvasManipulator({
+				function: Crumbs.cursorDraw
+			})
+		})
+	}
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
@@ -1616,49 +1653,6 @@ const Crumbs_Init_On_Load = function() {
 						if (Game.prefs.fancy) ctx.drawImage(Pic('cookieShadow.png'),x,y+20,s,s);
 						ctx.drawImage(Pic('perfectCookie.png'),x,y,s,s);
 					}
-					
-					//cursors
-					if (Game.prefs.cursors)
-					{
-						ctx.save();
-						ctx.translate(Game.cookieOriginX,Game.cookieOriginY);
-						var pic=Pic('cursor.png');
-						var fancy=Game.prefs.fancy;
-						
-						if (showDragon) ctx.globalAlpha=0.25;
-						var amount=Game.Objects['Cursor'].amount;
-						//var spe=-1;
-						for (var i=0;i<amount;i++)
-						{
-							var n=Math.floor(i/50);
-							//var a=((i+0.5*n)%50)/50;
-							var w=0;
-							if (fancy) w=(Math.sin(Game.T*0.025+(((i+n*12)%25)/25)*Math.PI*2));
-							if (w>0.997) w=1.5;
-							else if (w>0.994) w=0.5;
-							else w=0;
-							w*=-4;
-							if (fancy) w+=Math.sin((n+Game.T*0.01)*Math.PI/2)*4;
-							var x=0;
-							var y=(140/* *Game.BigCookieSize*/+n*16+w)-16;
-							
-							var rot=7.2;//(1/50)*360
-							if (i==0 && fancy) rot-=Game.T*0.1;
-							if (i%50==0) rot+=7.2/2;
-							ctx.rotate((rot/360)*Math.PI*2);
-							ctx.drawImage(pic,0,0,32,32,x,y,32,32);
-							//ctx.drawImage(pic,32*(i==spe),0,32,32,x,y,32,32);
-							
-							/*if (i==spe)
-							{
-								y+=16;
-								x=Game.cookieOriginX+Math.sin(-((r-5)/360)*Math.PI*2)*y;
-								y=Game.cookieOriginY+Math.cos(-((r-5)/360)*Math.PI*2)*y;
-								if (Game.CanClick && ctx && Math.abs(Game.mouseX-x)<16 && Math.abs(Game.mouseY-y)<16) Game.mousePointer=1;
-							}*/
-						}
-						ctx.restore();
-						Timer.track('cursors');
 					}
 
 					Crumbs.drawObjects();
