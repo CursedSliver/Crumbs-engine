@@ -1249,6 +1249,7 @@ const Crumbs_Init_On_Load = function() {
 			id: 'milk',
 			scaleX: 2,
 			scaleY: 2,
+			order: 0.5,
 			components: new Crumbs.component.patternFill({ height: 1 }),
 			behaviors: new Crumbs.behavior(function() {
 				if (!Game.prefs.milk) { this.imgs = Crumbs.objectImgs.empty; return; }
@@ -1307,6 +1308,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn({
 			init: Crumbs.objectInits.bigCookie,
 			anchor: 'top-left',
+			scope: 'left',
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
 			}),
