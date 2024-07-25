@@ -1156,15 +1156,15 @@ const Crumbs_Init_On_Load = function() {
 			scaleY: 5,
 			order: 1,
 			wId: i,
-			imgs: [Crumbs.objectImgs.empty, 'img/wrinklerShadow.png'],
+			imgs: ['img/wrinklerShadow.png'],
 			scope: 'left',
 			behaviors: new Crumbs.behaviorInstance(function(p) {
 				if (Game.prefs.fancy && Game.wrinklers[this.wId].close > 0) {
-					this.imgUsing = 1;
+					this.noDraw = false;
 					this.alpha = Game.wrinklers[this.wId].close;
 					return;
 				} 
-				this.imgUsing = 0;
+				this.noDraw = true;
 			})
 		};
 		const eyes = {
