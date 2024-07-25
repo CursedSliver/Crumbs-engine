@@ -85,11 +85,6 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 		
-		if (typeof this.init === 'function') {
-			this.init.call(this, Crumbs.getCanvasByScope(this.scope));  
-		} else if (typeof this.init === 'object') {
-			this.set(this.init);
-		} else { throw 'Crumbs object init type not applicable. Applicable types include: function, object, undefined'; }
 		//rotation is clockwise
 		if (!Crumbs.validAnchors.includes(this.anchor)) { throw '"'+obj.anchor+'" is not a valid anchor!"'; }
 		
@@ -111,6 +106,12 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in this.children) {
 			this.spawnChild(this.children[i]);
 		}
+
+		if (typeof this.init === 'function') {
+			this.init.call(this, Crumbs.getCanvasByScope(this.scope));  
+		} else if (typeof this.init === 'object') {
+			this.set(this.init);
+		} else { throw 'Crumbs object init type not applicable. Applicable types include: function, object, undefined'; }
 		
 		if (this.parent === null) {
 			let pushed = false;
