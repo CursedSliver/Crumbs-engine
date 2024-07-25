@@ -1334,7 +1334,7 @@ const Crumbs_Init_On_Load = function() {
 			]
 		})
 	}
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); }
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
