@@ -1613,7 +1613,7 @@ const Crumbs_Init_On_Load = function() {
 						}
 						
 						//big cookie
-						if (true)
+						if (false)
 						{
 							ctx.globalAlpha=1;
 							var s=256*Game.BigCookieSize;
