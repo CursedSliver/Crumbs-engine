@@ -73,6 +73,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in obj) {
 			this[i] = obj[i];
 		}
+		if (parent) { this.parent = parent; }
 		
 		this.imgs = [].concat(this.imgs);
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
