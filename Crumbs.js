@@ -1351,7 +1351,7 @@ const Crumbs_Init_On_Load = function() {
 			id: 'cookieWall',
 			order: -4,
 			imgs: ['empty', 'img/cookieShower1.png', 'img/cookieShower2.png', 'img/cookieShower3.png'],
-			components: new Crumbs.component.patternFill({ height: 1 }),
+			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behavior(function() {
 				if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
 				
@@ -1361,6 +1361,7 @@ const Crumbs_Init_On_Load = function() {
 				else { this.alpha = 0; }
 				
 				this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width;
+				this.getComponent('patternFill').height = Crumbs.scopedCanvas.left.canvas.height;
 				this.getComponent('patternFill').offY = (Math.floor(Game.T*2)%512);
 			})
 		});
