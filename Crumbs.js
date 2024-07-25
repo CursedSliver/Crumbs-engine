@@ -1029,6 +1029,7 @@ const Crumbs_Init_On_Load = function() {
 			c.scaleX = sc;
 			c.scaleY = sc;
 		}
+		if (typeof order === 'number') { c.order = order; }
 		c.id = id;
 		c.rotation = Math.random() * 2 * Math.PI;
 		return c;
