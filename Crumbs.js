@@ -1117,6 +1117,7 @@ const Crumbs_Init_On_Load = function() {
 						order: 1,
 						wId: i,
 						imgs: [Crumbs.objectImgs.empty, 'img/wrinklerShadow.png'],
+						scope: 'left',
 						behaviors: new Crumbs.behaviorInstance(function(p) {
 							if (Game.prefs.fancy && Game.wrinklers[this.wId].close > 0) {
 								this.imgUsing = 1;
@@ -1132,6 +1133,7 @@ const Crumbs_Init_On_Load = function() {
 						offsetY: -10+Math.sin(Game.T*0.2+i*3+1.2),
 						order: 3,
 						wId: i,
+						scope: 'left',
 						behaviors: new Crumbs.behaviorInstance(function(p) {
 							if (Game.prefs.notScary && Game.wrinklers[this.wId].close > 0) {
 								this.offsetY = -10+Math.sin(Game.T*0.2+this.wId*3+1.2);
