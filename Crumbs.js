@@ -1341,8 +1341,8 @@ const Crumbs_Init_On_Load = function() {
 		const shine1 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
 			order: -2,
-			scaleX: 4,
-			scaleY: 4,
+			scaleX: 8,
+			scaleY: 8,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
 				if (Game.prefs.fancy) {
@@ -1366,8 +1366,8 @@ const Crumbs_Init_On_Load = function() {
 		const shine2 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
 			order: -2.1,
-			scaleX: 4,
-			scaleY: 4,
+			scaleX: 8,
+			scaleY: 8,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
 				if (!Game.prefs.fancy) { this.noDraw = true; return; } else { this.noDraw = false; }
