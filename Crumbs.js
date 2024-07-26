@@ -1412,6 +1412,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 		this.spawnChild(shine1);
 		this.spawnChild(shine2);
+		this.spawnChild(veilMain);
 	}
 	Crumbs.initCookie = function() {
 		if (Crumbs.findObject('bigCookie')) { Crumbs.findObject('bigCookie').die(); }
