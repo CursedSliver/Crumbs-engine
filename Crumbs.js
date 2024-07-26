@@ -1385,6 +1385,19 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleX = scale;
 		this.scaleY = scale;
 	});
+	Crumbs.veilGlintGenerator = function() {
+		if (!Game.prefs.particles) { return; }
+		for (i=0;i<6;i++)
+		{
+			var t=Game.T+i*15;
+			var r=(t%30)/30;
+			var a=(Math.floor(t/30)*30*6-i*30)*0.01;
+			var size=32*(1-Math.pow(r*2-1,2));
+			var xx=Math.sin(a)*(110+r*16);
+			var yy=Math.cos(a)*(110+r*16);
+			ctx.drawImage(Pic('glint.png'),xx-size/2,yy-size/2,size,size);
+		}	
+	}
 	Crumbs.objectInits.cookieInit = function() {
 		const shine1 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
@@ -1411,19 +1424,7 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.veilMain)
 		}
 		const glintGen = {
-			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
-				if (!Game.prefs.particles) { return; }
-				for (i=0;i<6;i++)
-				{
-					var t=Game.T+i*15;
-					var r=(t%30)/30;
-					var a=(Math.floor(t/30)*30*6-i*30)*0.01;
-					var size=32*(1-Math.pow(r*2-1,2));
-					var xx=x+Math.sin(a)*(110+r*16);
-					var yy=y+Math.cos(a)*(110+r*16);
-					ctx.drawImage(Pic('glint.png'),xx-size/2,yy-size/2,size,size);
-				}	
-			} })]
+			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: Crumbs.veilGlintGenerator })]
 		}
 		this.spawnChild(shine1);
 		this.spawnChild(shine2);
@@ -2075,7 +2076,6 @@ const Crumbs_Init_On_Load = function() {
 						ctx.rotate(-Game.T*0.01);
 						ctx.drawImage(Pic('shimmeringVeil.png'),-s/2,-s/2,s,s);
 						ctx.restore();
-	  					*/
 						if (Game.prefs.particles)//sparkles
 						{
 							for (i=0;i<6;i++)
@@ -2088,7 +2088,7 @@ const Crumbs_Init_On_Load = function() {
 								var yy=y+Math.cos(a)*(110+r*16);
 								ctx.drawImage(Pic('glint.png'),xx-size/2,yy-size/2,size,size);
 							}
-						}
+						}*/
 						ctx.globalCompositeOperation='source-over';
 					}
 					
