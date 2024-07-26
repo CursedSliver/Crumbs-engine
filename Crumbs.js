@@ -1157,7 +1157,6 @@ const Crumbs_Init_On_Load = function() {
 			order: 1,
 			wId: i,
 			imgs: ['img/wrinklerShadow.png'],
-			scope: 'left',
 			behaviors: new Crumbs.behaviorInstance(function(p) {
 				if (Game.prefs.fancy && Game.wrinklers[this.wId].close > 0) {
 					this.noDraw = false;
