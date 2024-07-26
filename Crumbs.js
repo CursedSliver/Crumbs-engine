@@ -1334,6 +1334,8 @@ const Crumbs_Init_On_Load = function() {
 		this.spawnChild({
 			imgs: 'img/cookieShadow.png',
 			order: -1.5,
+			scaleX: 8,
+			scaleY: 8,
 			y: 20
 		});
 		const shine1 = {
@@ -1343,8 +1345,10 @@ const Crumbs_Init_On_Load = function() {
 			scaleY: 4,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
-				var r=Math.floor((Game.T*0.5)%360);
-				this.rotation = ((r/360)*Math.PI*2);
+				if (Game.prefs.fancy) {
+					var r=Math.floor((Game.T*0.5)%360);
+					this.rotation = ((r/360)*Math.PI*2);
+				} else { this.rotation = 0; }
 				var goodBuff=0;
 				var badBuff=0;
 				for (var i in Game.buffs)
@@ -1650,30 +1654,6 @@ const Crumbs_Init_On_Load = function() {
 						Game.particlesDraw(0);
 						ctx.globalAlpha=1;
 						Timer.track('particles');
-						
-						//big cookie shine
-						var s=512;
-						
-						var x=Game.cookieOriginX;
-						var y=Game.cookieOriginY;
-						
-						var r=Math.floor((Game.T*0.5)%360);
-						ctx.save();
-						ctx.translate(x,y);
-						ctx.rotate((r/360)*Math.PI*2);
-						var alphaMult=1;
-						if (Game.bgType==2 || Game.bgType==4) alphaMult=0.5;
-						var pic='shine.png';
-						if (goodBuff) {pic='shineGold.png';alphaMult=1;}
-						else if (badBuff) {pic='shineRed.png';alphaMult=1;}
-						if (goodBuff && Game.prefs.fancy) ctx.globalCompositeOperation='lighter';
-						ctx.globalAlpha=0.5*alphaMult;
-						ctx.drawImage(Pic(pic),-s/2,-s/2,s,s);
-						ctx.rotate((-r*2/360)*Math.PI*2);
-						ctx.globalAlpha=0.25*alphaMult;
-						ctx.drawImage(Pic(pic),-s/2,-s/2,s,s);
-						ctx.restore();
-						Timer.track('shine');
 				
 						if (Game.ReincarnateTimer>0)
 						{
@@ -1730,12 +1710,6 @@ const Crumbs_Init_On_Load = function() {
 					}
 					else//no particles
 					{
-						//big cookie shine
-						var s=512;
-						var x=Game.cookieOriginX-s/2;
-						var y=Game.cookieOriginY-s/2;
-						ctx.globalAlpha=0.5;
-						ctx.drawImage(Pic('shine.png'),x,y,s,s);
 						
 						if (showDragon)
 						{
