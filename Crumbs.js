@@ -1344,7 +1344,7 @@ const Crumbs_Init_On_Load = function() {
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
 				var r=Math.floor((Game.T*0.5)%360);
-				this.rotation = (((r/360)*Math.PI*2);
+				this.rotation = ((r/360)*Math.PI*2);
 				var goodBuff=0;
 				var badBuff=0;
 				for (var i in Game.buffs)
