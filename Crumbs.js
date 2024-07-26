@@ -1385,7 +1385,7 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleX = scale;
 		this.scaleY = scale;
 	});
-	Crumbs.veilGlintGenerator = function() {
+	Crumbs.veilGlintGenerator = function(m, ctx) {
 		if (!Game.prefs.particles) { return; }
 		for (i=0;i<6;i++)
 		{
