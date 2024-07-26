@@ -1330,16 +1330,73 @@ const Crumbs_Init_On_Load = function() {
 			id: 'cursors'
 		})
 	}
+	Crumbs.objectInits.cookieWidgets = function() {
+		this.spawnChild({
+			imgs: 'img/cookieShadow.png',
+			order: -2,
+			y: 20
+		});
+		const shine1 = {
+			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
+			order: -3,
+			scaleX: 4,
+			scaleY: 4,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
+			behaviors: new Crumbs.behaviorInstance(function() {
+				this.rotation = ((-Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
+				var goodBuff=0;
+				var badBuff=0;
+				for (var i in Game.buffs)
+				{
+					if (Game.buffs[i].aura==1) goodBuff=1;
+					if (Game.buffs[i].aura==2) badBuff=1;
+				}
+				let alphaMult = 1;
+				if (Game.bgType == 2 || Game.bgType == 4) { alphaMult = 0.5; }
+				if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; } else { this.imgUsing = 0; }
+				if (goodBuff && Game.prefs.fancy) { this.getComponent('settings').obj.globalCompositeOperation = 'lighter'; } else { this.getComponent('settings').obj.globalCompositeOperation = 'source-over'; }
+				this.alpha = 0.5 * alphaMult;
+			})
+		}
+		const shine2 = {
+			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
+			order: -3.1,
+			scaleX: 4,
+			scaleY: 4,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
+			behaviors: new Crumbs.behaviorInstance(function() {
+				if (!Game.prefs.fancy) { this.noDraw = true; return; } else { this.noDraw = false; }
+				this.rotation = ((Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
+				var goodBuff=0;
+				var badBuff=0;
+				for (var i in Game.buffs)
+				{
+					if (Game.buffs[i].aura==1) goodBuff=1;
+					if (Game.buffs[i].aura==2) badBuff=1;
+				}
+				let alphaMult = 1;
+				if (Game.bgType == 2 || Game.bgType == 4) { alphaMult = 0.5; }
+				if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; } else { this.imgUsing = 0; }
+				if (goodBuff && Game.prefs.fancy) { this.getComponent('settings').obj.globalCompositeOperation = 'lighter'; } else { this.getComponent('settings').obj.globalCompositeOperation = 'source-over'; }
+				this.alpha = 0.25 * alphaMult;
+			})
+		}
+		this.spawnChild(shine1);
+		this.spawnChild(shine2);
+	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
 		this.scaleX = 0.5*Game.BigCookieSize;
 		this.scaleY = 0.5*Game.BigCookieSize;
 	});
 	Crumbs.initCookie = function() {
+		if (Crumbs.findObject('bigCookie')) { Crumbs.findObject('bigCookie').die(); }
 		Crumbs.spawn({
 			anchor: 'center',
 			scope: 'left',
 			imgs: 'img/perfectCookie.png',
+			id: 'bigCookie',
 			order: -1,
+			init: Crumbs.objectInits.cookieWidgets,
 			behaviors: [
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieWobble),
@@ -1598,7 +1655,7 @@ const Crumbs_Init_On_Load = function() {
 						var x=Game.cookieOriginX;
 						var y=Game.cookieOriginY;
 						
-						var r=Math.floor((Game.T*0.5)%360);
+						var r=((-Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
 						ctx.save();
 						ctx.translate(x,y);
 						ctx.rotate((r/360)*Math.PI*2);
