@@ -1377,25 +1377,38 @@ const Crumbs_Init_On_Load = function() {
 		if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; } else { this.imgUsing = 0; }
 		if (goodBuff && Game.prefs.fancy) { this.getComponent('settings').obj.globalCompositeOperation = 'lighter'; } else { this.getComponent('settings').obj.globalCompositeOperation = 'source-over'; }
 		this.alpha = 0.25 * alphaMult;
-	})
+	});
+	Crumbs.objectBehaviors.veilMain = new Crumbs.behavior(function() {
+		if (!Game.Has('Shimmering veil [off]')) { this.noDraw = true; return; } else { this.noDraw = false; }
+		this.rotation = -Game.T*0.01;
+		const scale = (300+Math.sin(Game.T*0.037)*20)/128;
+		this.scaleX = scale;
+		this.scaleY = scale;
+	});
 	Crumbs.objectInits.cookieInit = function() {
 		const shine1 = {
-			scope: 'left',
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
 			order: -2,
-			scaleX: 8,
-			scaleY: 8,
+			scaleX: 4,
+			scaleY: 4,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shine1)]
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shine1)
 		}
 		const shine2 = {
-			scope: 'left',
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
 			order: -2.1,
-			scaleX: 8,
-			scaleY: 8,
+			scaleX: 4,
+			scaleY: 4,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shine2)]
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shine2)
+		}
+		const veilMain = {
+			imgs: 'img/shimmeringVeil.png',
+			order: 0,
+			scaleX: 2.5,
+			scaleY: 2.5,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.veilMain)
 		}
 		this.spawnChild(shine1);
 		this.spawnChild(shine2);
@@ -2035,6 +2048,7 @@ const Crumbs_Init_On_Load = function() {
 					//shimmering veil
 					if (Game.Has('Shimmering veil [off]'))
 					{
+						/*
 						ctx.globalAlpha=1;
 						ctx.globalCompositeOperation='lighter';
 						var s=300+Math.sin(Game.T*0.037)*20;
@@ -2045,6 +2059,7 @@ const Crumbs_Init_On_Load = function() {
 						ctx.rotate(-Game.T*0.01);
 						ctx.drawImage(Pic('shimmeringVeil.png'),-s/2,-s/2,s,s);
 						ctx.restore();
+	  					*/
 						if (Game.prefs.particles)//sparkles
 						{
 							for (i=0;i<6;i++)
