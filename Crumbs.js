@@ -1333,17 +1333,18 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectInits.cookieWidgets = function() {
 		this.spawnChild({
 			imgs: 'img/cookieShadow.png',
-			order: -2,
+			order: -1.5,
 			y: 20
 		});
 		const shine1 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
-			order: -3,
+			order: -2,
 			scaleX: 4,
 			scaleY: 4,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
-				this.rotation = ((-Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
+				var r=Math.floor((Game.T*0.5)%360);
+				this.rotation = (((r/360)*Math.PI*2);
 				var goodBuff=0;
 				var badBuff=0;
 				for (var i in Game.buffs)
@@ -1360,13 +1361,14 @@ const Crumbs_Init_On_Load = function() {
 		}
 		const shine2 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
-			order: -3.1,
+			order: -2.1,
 			scaleX: 4,
 			scaleY: 4,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }),
 			behaviors: new Crumbs.behaviorInstance(function() {
 				if (!Game.prefs.fancy) { this.noDraw = true; return; } else { this.noDraw = false; }
-				this.rotation = ((Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
+				var r=Math.floor((Game.T*0.5)%360);
+				this.rotation = (-(r/360)*Math.PI*2);
 				var goodBuff=0;
 				var badBuff=0;
 				for (var i in Game.buffs)
@@ -1655,7 +1657,7 @@ const Crumbs_Init_On_Load = function() {
 						var x=Game.cookieOriginX;
 						var y=Game.cookieOriginY;
 						
-						var r=((-Math.floor((Game.T*0.5)%360)*2/360)*Math.PI*2);
+						var r=Math.floor((Game.T*0.5)%360);
 						ctx.save();
 						ctx.translate(x,y);
 						ctx.rotate((r/360)*Math.PI*2);
