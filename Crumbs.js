@@ -1006,7 +1006,7 @@ const Crumbs_Init_On_Load = function() {
 				const pWidth = Crumbs.getPWidth(o);
 				const pHeight = Crumbs.getPHeight(o);
 				ctx.save();
-				for (let ii in o.components) {
+				for (let ii = 0; ii < o.components.length; ii++) {
 					if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
 				}
 				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
@@ -1019,7 +1019,7 @@ const Crumbs_Init_On_Load = function() {
 				
 				if (!o.noDraw) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
 
-				for (let ii in o.components) {
+				for (let ii = o.components.length - 1; ii >= 0; ii--) {
 					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx, pWidth, pHeight); }
 				}
 
@@ -1409,6 +1409,21 @@ const Crumbs_Init_On_Load = function() {
 			scaleY: 2.5,
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.veilMain)
+		}
+		const glintGen = {
+			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
+				if (!Game.prefs.particles) { return; }
+				for (i=0;i<6;i++)
+				{
+					var t=Game.T+i*15;
+					var r=(t%30)/30;
+					var a=(Math.floor(t/30)*30*6-i*30)*0.01;
+					var size=32*(1-Math.pow(r*2-1,2));
+					var xx=x+Math.sin(a)*(110+r*16);
+					var yy=y+Math.cos(a)*(110+r*16);
+					ctx.drawImage(Pic('glint.png'),xx-size/2,yy-size/2,size,size);
+				}	
+			} })]
 		}
 		this.spawnChild(shine1);
 		this.spawnChild(shine2);
