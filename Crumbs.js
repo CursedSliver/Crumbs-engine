@@ -1386,7 +1386,7 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleY = scale;
 	});
 	Crumbs.veilGlintGenerator = function(m, ctx) {
-		if (!Game.prefs.particles) { return; }
+		if (!Game.prefs.particles || !Game.Has('Shimmering veil [off]')) { return; }
 		for (i=0;i<6;i++)
 		{
 			var t=Game.T+i*15;
