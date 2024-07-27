@@ -885,6 +885,7 @@ const Crumbs_Init_On_Load = function() {
 		this.type = 'pointerInteractive';
 	}
 	Crumbs.defaultComp.pointerInteractive = {
+		enabled: true,
 		onClick: function() { },
 		onRelease: function() { },
 		onMouseover: function() { },
