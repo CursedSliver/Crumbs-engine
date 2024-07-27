@@ -911,8 +911,10 @@ const Crumbs_Init_On_Load = function() {
 		});
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
-		if (!this.click && Crumbs.pointerHold) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
-		if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
+		if (this.hovered) { 
+			if (!this.click && Crumbs.pointerHold) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
+			if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
+		}
 	};
 	
 	Game.registerHook('draw', Crumbs.updateObjects);
