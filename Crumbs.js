@@ -16,12 +16,8 @@ const Crumbs_Init_On_Load = function() {
 		style.textContent = str;
 		l('game').appendChild(style);
 	}
-	Crumbs.h.inRect = function(x, y, rect) {
-		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
-		const c = Crumbs.h.rv(rect.r, x, y);
-		if (c[0] > -rect.x && c[0] < rect.w - rect.x && c[1] > -rect.y && c[1] < rect.h - rect.y) return true;
-		return false;
-	}
+	//t is object representing rect, where w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin (by default rect has (0, 0) as its top left corner)
+	Crumbs.h.inRect = function(x,y,t) {let c=Math.cos(-t.r);let s=Math.sin(-t.r);let a=x*c-y*s;let b=x*s+y*c;if(a>-t.x&&a<t.w-t.x&&b>-t.y&&b<t.h-t.y)return true;return false;}
 	Crumbs.h.rv = function(r, x, y) {
 		//rotates the given vector by "r"
 		const c = Math.cos(-r);
