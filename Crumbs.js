@@ -898,6 +898,9 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.component.pointerInteractive.prototype.logic = function(m) { };
 	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
+	Crumbs.pointerHold = false;
+	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
+	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
 		const b = Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
 			w: pWidth,
@@ -908,8 +911,8 @@ const Crumbs_Init_On_Load = function() {
 		});
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
-		if (!this.click && Game.Click) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
-		if (this.click && !Game.Click) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
+		if (!this.click && Crumbs.pointerHold) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
+		if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
 	};
 	
 	Game.registerHook('draw', Crumbs.updateObjects);
