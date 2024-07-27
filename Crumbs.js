@@ -18,7 +18,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.inRect = function(x, y, rect) {
 		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
-		const c = Crumbs.h.rv(-rect.r, x, y);
+		const c = Crumbs.h.rv(rect.r, x, y);
 		if (c[0] > -rect.x && c[0] < rect.w - rect.x && c[1] > -rect.y && c[1] < rect.h - rect.y) return true;
 		return false;
 	}
