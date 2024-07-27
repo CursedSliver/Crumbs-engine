@@ -17,7 +17,8 @@ const Crumbs_Init_On_Load = function() {
 		l('game').appendChild(style);
 	}
 	Crumbs.h.inRect = function(x, y, rect) {
-		var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
+		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
+		var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.x)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.y));
 		var h1 = Math.sqrt(dx*dx + dy*dy);
 		var currA = Math.atan2(dy,dx);
 		var newA = currA - rect.r;
@@ -867,6 +868,47 @@ const Crumbs_Init_On_Load = function() {
 		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.width, this.height, pWidth, pHeight, this.offX, this.offY); }
 
 		m.noDraw = this.noDrawStatus;
+	};
+
+	Crumbs.component.pointerInteractive = function(obj) {
+		obj = obj||{};
+		for (let i in Crumbs.defaultComp.pointerInteractive) {
+			this[i] = Crumbs.defaultComp.pointerInteractive[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
+
+		this.hovered = false;
+		this.click = false;
+		this.type = 'pointerInteractive';
+	}
+	Crumbs.defaultComp.pointerInteractive = {
+		onClick: function() { },
+		onRelease: function() { },
+		onMouseover: function() { },
+		onMouseout: function() { }
+	}
+	Crumbs.component.pointerInteractive.prototype.enable = function() {
+		this.enabled = true;
+	};
+	Crumbs.component.pointerInteractive.prototype.disable = function() {
+		this.enabled = false;
+	};
+	Crumbs.component.pointerInteractive.prototype.logic = function(m) { };
+	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
+	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+		const b = Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
+			w: pWidth,
+			h: pHeight,
+			r: m.rotation + (m.noRotate?0:m.rotationAdd),
+			x: Crumbs.getOffsetX(m.anchor, pWidth),
+			y: Crumbs.getOffsetY(m.anchor, pHeight)
+		});
+		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
+		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
+		if (!this.click && Game.Click) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
+		if (this.click && !Game.Click) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
 	};
 	
 	Game.registerHook('draw', Crumbs.updateObjects);
