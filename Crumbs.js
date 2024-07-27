@@ -1385,7 +1385,7 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleY = 0.5*Game.BigCookieSize;
 	});
 	Crumbs.objectBehaviors.shine1 = new Crumbs.behavior(function() {
-		if (Game.prefs.fancy) {
+		if (Game.prefs.particles) {
 			var r=Math.floor((Game.T*0.5)%360);
 			this.rotation = ((r/360)*Math.PI*2);
 		} else { this.rotation = 0; }
@@ -1403,7 +1403,7 @@ const Crumbs_Init_On_Load = function() {
 		this.alpha = 0.5 * alphaMult;
 	});
 	Crumbs.objectBehaviors.shine2 = new Crumbs.behavior(function() {
-		if (!Game.prefs.fancy) { this.noDraw = true; return; } else { this.noDraw = false; }
+		if (!Game.prefs.particles) { this.noDraw = true; return; } else { this.noDraw = false; }
 		var r=Math.floor((Game.T*0.5)%360);
 		this.rotation = (-(r/360)*Math.PI*2);
 		var goodBuff=0;
@@ -1494,6 +1494,7 @@ const Crumbs_Init_On_Load = function() {
 		})
 	};
 	Crumbs.objectBehaviors.cookieShowerBackground = function() {
+		if (!Game.prefs.particles) { this.noDraw = true; return; } else { this.noDraw = false; }
 		if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
 		
 		if (Game.cookiesPs>1000) { this.imgUsing = 3; }
