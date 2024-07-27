@@ -18,14 +18,13 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.inRect = function(x, y, rect) {
 		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
-		const dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.y));
+		const dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.y)); //input x coord transformed (no clue how this does it tbh tbh tbh), it is also bugged but can be patched with some skull
 		const dy = y+Math.cos(-rect.r)*(-(rect.w/2-rect.x));
-		const h1 = Math.sqrt(dx*dx + dy*dy);
-		const currA = Math.atan2(dy,dx);
-		const newA = currA - rect.r;
+		const h1 = Math.sqrt(dx*dx + dy*dy); //dist
+		const newA = Math.atan2(dy,dx) - rect.r; //angle of inputcoords pre transformation if against pre rotation rect
 		const x2 = Math.cos(newA) * h1;
 		const y2 = Math.sin(newA) * h1;
-		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
+		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -1 * rect.h && y2 < 0) return true;
 		return false;
 	}
 	Crumbs.h.rv = function(r, x, y) {
