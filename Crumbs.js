@@ -18,12 +18,13 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.inRect = function(x, y, rect) {
 		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
-		var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.x)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.y));
-		var h1 = Math.sqrt(dx*dx + dy*dy);
-		var currA = Math.atan2(dy,dx);
-		var newA = currA - rect.r;
-		var x2 = Math.cos(newA) * h1;
-		var y2 = Math.sin(newA) * h1;
+		const dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.x));
+		const dy = y+Math.cos(-rect.r)*(-(rect.h/2-rect.y));
+		const h1 = Math.sqrt(dx*dx + dy*dy);
+		const currA = Math.atan2(dy,dx);
+		const newA = currA - rect.r;
+		const x2 = Math.cos(newA) * h1;
+		const y2 = Math.sin(newA) * h1;
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
@@ -902,8 +903,8 @@ const Crumbs_Init_On_Load = function() {
 			w: pWidth,
 			h: pHeight,
 			r: m.rotation + (m.noRotate?0:m.rotationAdd),
-			x: Crumbs.getOffsetX(m.anchor, pWidth),
-			y: Crumbs.getOffsetY(m.anchor, pHeight)
+			x: -pWidth / 2 + Crumbs.getOffsetX(m.anchor, pWidth),
+			y: -pHeight / 2 + Crumbs.getOffsetY(m.anchor, pHeight)
 		});
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
