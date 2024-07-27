@@ -906,6 +906,7 @@ const Crumbs_Init_On_Load = function() {
 			x: -pWidth / 2 + Crumbs.getOffsetX(m.anchor, pWidth),
 			y: -pHeight / 2 + Crumbs.getOffsetY(m.anchor, pHeight)
 		});
+		console.log(b);
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
 		if (!this.click && Game.Click) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
