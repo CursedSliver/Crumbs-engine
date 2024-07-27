@@ -901,8 +901,8 @@ const Crumbs_Init_On_Load = function() {
 			w: pWidth,
 			h: pHeight,
 			r: m.rotation + (m.noRotate?0:m.rotationAdd),
-			x: -pWidth / 2 + Crumbs.getOffsetX(m.anchor, pWidth),
-			y: -pHeight / 2 + Crumbs.getOffsetY(m.anchor, pHeight)
+			x: Crumbs.getOffsetX(m.anchor, pWidth),
+			y: Crumbs.getOffsetY(m.anchor, pHeight)
 		});
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
