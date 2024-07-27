@@ -18,8 +18,8 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.h.inRect = function(x, y, rect) {
 		//w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin
-		const dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.x));
-		const dy = y+Math.cos(-rect.r)*(-(rect.h/2-rect.y));
+		const dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.y));
+		const dy = y+Math.cos(-rect.r)*(-(rect.w/2-rect.x));
 		const h1 = Math.sqrt(dx*dx + dy*dy);
 		const currA = Math.atan2(dy,dx);
 		const newA = currA - rect.r;
