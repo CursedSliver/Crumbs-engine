@@ -1331,7 +1331,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.objectBehaviors.milkBehavior = function() {
-		if (!Game.prefs.milk) { this.imgs = Crumbs.objectImgs.empty; return; }
+		if (!Game.prefs.milk) { this.getComponent('patternFill').disable(); this.noDraw = true; return; } else { this.getComponent('patternFill').enable(); this.noDraw = false; }
 		let toReturn = {imgs: [Game.Milk.pic]};
 		if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
 		let a=1;
