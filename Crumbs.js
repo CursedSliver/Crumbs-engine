@@ -54,6 +54,9 @@ const Crumbs_Init_On_Load = function() {
 			AddEvent(bigCookie,'mouseover',function(event){ Game.BigCookieState=2; });
 		}
 	}
+
+	Crumbs.t = 0; //saved
+	Game.registerHook('logic', function() { Crumbs.t++; });
 	
 	Crumbs.prefs = {
 		objects: {
@@ -108,7 +111,9 @@ const Crumbs_Init_On_Load = function() {
 		//rotation is clockwise
 		if (!Crumbs.validAnchors.includes(this.anchor)) { throw '"'+obj.anchor+'" is not a valid anchor!"'; }
 		
-		this.components = [].concat(this.components);
+		this.components = [];
+		obj.components = [].concat(obj.components);
+		for (let i of obj.components) { this.addComponent(i); }
 		this.behaviors = [].concat(this.behaviors);
 		for (let i in this.behaviors) {
 			if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
@@ -117,7 +122,7 @@ const Crumbs_Init_On_Load = function() {
 			else { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		}
 		
-		this.t = 0; //amount of draw ticks since its creation
+		this.t = Crumbs.t; //the time when it was created
 		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
@@ -243,11 +248,13 @@ const Crumbs_Init_On_Load = function() {
 		this.children[index] = null; //unlike with root level particles, children arrays are not cleaned every 3600 draw ticks, so please use them wisely.
 	};
 	Crumbs.object.prototype.addComponent = function(comp) {
+		if (!comp) { return; }
 		for (let i in this.components) {
 			if (this.components[i].type == comp.type) {
-				throw 'One object cannot have two components of the type "'+comp.type+'"!';
+				console.warn('An object has two components of the same type "'+comp.type+'"!');
 			}
 		}
+		if (comp.init) { comp.init(this); }
 		this.components.push(comp);
 	};
 	Crumbs.object.prototype.removeComponent = function(type) {
@@ -462,7 +469,7 @@ const Crumbs_Init_On_Load = function() {
 		//parameters: 'cooldown', which is the amount of draw ticks to wait for between each frame switch; can be a function, in which case it tries to pass through o
 		//'back' (default false), which is boolean telling it to cycle forwards or backwards
 		let frame = this.imgUsing;
-		if (this.t % p.cooldown == 0) { if (p.back) { frame--; if (frame < 0) { frame = this.imgs.length; } } else { frame++; if (frame >= this.imgs.length) { frame = 0; } } }
+		if ((Crumbs.t - this.t) % p.cooldown == 0) { if (p.back) { frame--; if (frame < 0) { frame = this.imgs.length; } } else { frame++; if (frame >= this.imgs.length) { frame = 0; } } }
 		this.imgUsing = frame;
 	}, { cooldown: 1 });
 	Crumbs.objectBehaviors.fade = new Crumbs.behavior(function(p) {
@@ -492,7 +499,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectBehaviors.expireAfter = new Crumbs.behavior(function(p) {
 		//parameters: 't', which is the amount of draw frames to do before it dies
 		//if p.time is undefined, it essentially never expires
-		if (this.t >= p.t) { return 't'; } else { return {}; }
+		if ((Crumbs.t - this.t) >= p.t) { return 't'; } else { return {}; }
 	}, { t: 1e21 });
 	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / 2; this.y = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight * 0.4; });
 
@@ -805,8 +812,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.disable = function() {
 		this.enabled = false;
 	};
-	Crumbs.component.text.prototype.logic = function(m) {
-	};
+	Crumbs.component.text.prototype.logic = function(m) { };
 	Crumbs.component.text.prototype.preDraw = function(m, ctx) {
 		ctx.font = this.size+'px '+this.font;
 		ctx.textAlign = this.align;
@@ -870,6 +876,28 @@ const Crumbs_Init_On_Load = function() {
 
 		m.noDraw = this.noDrawStatus;
 	};
+
+	Crumbs.component.tCounter = function() {
+		obj = obj||{};
+		for (let i in Crumbs.defaultComp.tCounter) {
+			this[i] = Crumbs.defaultComp.tCounter[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
+
+		this.type = 'tCounter';
+	}
+	Crumbs.defaultComp.tCounter = {
+		enabled: true,
+		function: null,
+	}
+	Crumbs.component.tCounter.prototype.enable = function() { this.enabled = true; };
+	Crumbs.component.tCounter.prototype.disable = function() { this.enabled = false; };
+	Crumbs.component.tCounter.prototype.init = function(m) { m.tCount = 0; };
+	Crumbs.component.tCounter.prototype.logic = function(m) { if (this.function) { m.tCount += this.function.call(m, m); } else { m.tCount++; } };
+	Crumbs.component.tCounter.prototype.preDraw = function() { };
+	Crumbs.component.tCounter.prototype.postDraw = function() { };
 
 	Crumbs.component.pointerInteractive = function(obj) {
 		obj = obj||{};
@@ -1274,7 +1302,7 @@ const Crumbs_Init_On_Load = function() {
 					scaleX: s / 32, 
 					scaleY: s / 32,
 					behaviors: function(p) {
-						if (this.t > 0) { return 't'; }
+						if ((Crumbs.t - this.t) > 0) { return 't'; }
 						return {};
 					}
 				}); return;
