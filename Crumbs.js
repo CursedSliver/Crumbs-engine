@@ -56,7 +56,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 
 	Crumbs.t = 0; //saved
-	Game.registerHook('logic', function() { Crumbs.t++; });
+	Game.registerHook('draw', function() { Crumbs.t++; });
 	
 	Crumbs.prefs = {
 		objects: {
