@@ -271,7 +271,7 @@ const Crumbs_Init_On_Load = function() {
 				return this.components[i];
 			}
 		}
-		return false;
+		return null;
 	};
 	Crumbs.object.prototype.reorder = function(at) {
 		Crumbs.objects[this.scope][this.index] = null;
@@ -916,7 +916,8 @@ const Crumbs_Init_On_Load = function() {
 		onClick: function() { },
 		onRelease: function() { },
 		onMouseover: function() { },
-		onMouseout: function() { }
+		onMouseout: function() { },
+		alwaysInteractable: false
 	}
 	Crumbs.component.pointerInteractive.prototype.enable = function() {
 		this.enabled = true;
@@ -929,14 +930,28 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.pointerHold = false;
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
 	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
-	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
-		const b = Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
+	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
+		return Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
 			w: pWidth,
 			h: pHeight,
 			r: m.rotation + (m.noRotate?0:m.rotationAdd),
 			x: Crumbs.getOffsetX(m.anchor, pWidth),
 			y: Crumbs.getOffsetY(m.anchor, pHeight)
 		});
+	}
+	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+		const b = this.getHoverStatus(m, pWidth, pHeight);
+		if (b && !this.alwaysInteractable) {
+			const scope = Crumbs.objects[m.scope];
+			for (let i of scope) {
+				if (i.order <= m.order) { continue; }
+				const comp = i.getComponent('pointerInteractive');
+				if (!comp) { continue; }
+				if (!comp.getHoverStatus(i, Crumbs.getPWidth(i), Crumbs.getPHeight(i))) { continue; }
+				b = false;
+				break;
+			}
+		}
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
 		if (this.hovered) { 
