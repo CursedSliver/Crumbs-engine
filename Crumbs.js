@@ -56,7 +56,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 
 	Crumbs.t = 0; //saved
-	Game.registerHook('draw', function() { Crumbs.t++; });
+	Game.registerHook('logic', function() { Crumbs.t++; });
 	
 	Crumbs.prefs = {
 		objects: {
@@ -358,7 +358,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 		} 
 		Crumbs.lastUpdate = Date.now();
-		if (Game.drawT % 3600 == 0) { Crumbs.reorderAllObjects(); } 
+		if (Game.T % 3600 == 0) { Crumbs.reorderAllObjects(); } 
 	};
 
 	Crumbs.spawn = function(obj) {
@@ -945,7 +945,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	
-	Game.registerHook('draw', Crumbs.updateObjects);
+	Game.registerHook('logic', Crumbs.updateObjects);
 
 	//below for the actual drawing
 	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
