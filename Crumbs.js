@@ -1004,8 +1004,8 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.compileObjects = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
-		for (let i in Crumbs.objects[s]) {
-			if (Crumbs.objects[s][i] !== null) { arr = Crumbs.merge(arr, Crumbs.objects[s][i].compile()); }
+		for (let i of Crumbs.objects[s]) {
+			if (i) { arr = Crumbs.merge(arr, i.compile()); }
 		}
 		return arr;
 	};
@@ -1018,7 +1018,7 @@ const Crumbs_Init_On_Load = function() {
 		return arr;
 	};
 	Crumbs.merge = function(arr1, arr2) {
-		//merges two particles arrays together sorting based on order
+		//merges two object arrays together sorting based on order
 		let mergedArray = [];
     	let i = 0;
     	let j = 0;	
