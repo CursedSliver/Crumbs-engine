@@ -1543,13 +1543,12 @@ const Crumbs_Init_On_Load = function() {
 		})
 	};
 	Crumbs.objectBehaviors.cookieShowerBackground = function() {
-		if (!Game.prefs.particles) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable() }
+		if (!Game.prefs.particles) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
 		if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
 		
 		if (Game.cookiesPs>1000) { this.imgUsing = 3; }
 		else if (Game.cookiesPs>500) { this.imgUsing = 2; }
 		else if (Game.cookiesPs>50) { this.imgUsing = 1; }
-		else { this.alpha = 0; }
 		
 		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width;
 		this.getComponent('patternFill').height = Crumbs.scopedCanvas.left.canvas.height;
