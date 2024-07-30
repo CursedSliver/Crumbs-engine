@@ -944,6 +944,7 @@ const Crumbs_Init_On_Load = function() {
 		if (b && !this.alwaysInteractable) {
 			const scope = Crumbs.objects[m.scope];
 			for (let i of scope) {
+				if (!i) { continue; }
 				if (i.order <= m.order) { continue; }
 				const comp = i.getComponent('pointerInteractive');
 				if (!comp) { continue; }
