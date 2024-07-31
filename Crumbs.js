@@ -941,13 +941,13 @@ const Crumbs_Init_On_Load = function() {
 		});
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
-		const b = this.getHoverStatus(m, pWidth, pHeight);
+		let b = this.getHoverStatus(m, pWidth, pHeight);
 		if (b && !this.alwaysInteractable) {
 			const scope = Crumbs.objects[m.scope];
 			for (let i of scope) {
 				if (!i) { continue; }
 				if (i.order <= m.order) { continue; }
-				var comp = i.getComponent('pointerInteractive');
+				const comp = i.getComponent('pointerInteractive');
 				if (!comp) { continue; }
 				if (!comp.getHoverStatus(i, Crumbs.getPWidth(i), Crumbs.getPHeight(i))) { continue; }
 				b = false;
