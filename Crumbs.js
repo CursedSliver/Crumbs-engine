@@ -947,7 +947,7 @@ const Crumbs_Init_On_Load = function() {
 			for (let i of scope) {
 				if (!i) { continue; }
 				if (i.order <= m.order) { continue; }
-				const comp = i.getComponent('pointerInteractive');
+				var comp = i.getComponent('pointerInteractive');
 				if (!comp) { continue; }
 				if (!comp.getHoverStatus(i, Crumbs.getPWidth(i), Crumbs.getPHeight(i))) { continue; }
 				b = false;
