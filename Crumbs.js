@@ -331,7 +331,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.reorderAllObjects = function() {
 		for (let i in Crumbs.objects) {
 			let counter = 0;
-			if (let ii = 0; ii < Crumbs.objects[i].length; ii++) {
+			for (let ii = 0; ii < Crumbs.objects[i].length; ii++) {
 				if (Crumbs.objects[i][ii]) {
 					Crumbs.objects[i][ii].reorder(counter);
 					counter++;
