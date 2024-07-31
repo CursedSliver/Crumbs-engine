@@ -277,7 +277,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.object.prototype.reorder = function(at) {
 		Crumbs.objects[this.scope][this.index] = null;
 		Crumbs.objects[this.scope][at] = this;
-		Crumbs.index = at;
+		this.index = at;
 	};
 	Crumbs.object.prototype.triggerBehavior = function() {
 		for (let i in this.components) {
@@ -331,8 +331,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.reorderAllObjects = function() {
 		for (let i in Crumbs.objects) {
 			let counter = 0;
-			for (let ii in Crumbs.objects[i]) {
-				if (Crumbs.objects[i][ii] !== null) {
+			if (let ii = 0; ii < Crumbs.objects[i].length; ii++) {
+				if (Crumbs.objects[i][ii]) {
 					Crumbs.objects[i][ii].reorder(counter);
 					counter++;
 				}
