@@ -55,6 +55,120 @@ const Crumbs_Init_On_Load = function() {
 			AddEvent(bigCookie,'mouseover',function(event){ Game.BigCookieState=2; });
 		}
 	}
+	Crumbs.h.gaussian = function(arr, factor, abyss) {
+		if (!Array.isArray(arr)) { throw 'Argument "arr" is not an array!'; }
+		if (typeof factor !== 'number') { throw 'Argument "factor" should be a number, when it is in fact '+(typeof factor)+'!'; }
+		return Crumbs.h.matrixApply(arr, Crumbs.h.gaussianMatrix(factor), Math.floor(factor * 3) - 1, abyss);
+	}
+	Crumbs.h.gaussianMatrix = function(factor) {
+		//precompute matrix
+		let m = [];
+		for (let i = 0; i < factor * 3; i++) {
+			m.push(Math.exp(-(i ** 2) / (2 * factor)) / Math.sqrt(2 * Math.PI * factor));
+		}
+		for (let i = 1; i < m.length; i += 2) { 
+			m.unshift(m[i]);
+		}
+		return m;
+	}
+	Crumbs.h.matrixApply = function(arr, m, center, abyss) {
+		let arr2 = [];
+		for (let i = 0; i < arr.length; i++) {
+			let val = 0;
+			for (let ii = center + 1; ii < m.length; ii++) {
+				const a = i + ii - center;
+				if (a < arr.length) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
+			}
+			for (let ii = center; ii >= 0; ii--) {
+				const a = i + ii - center;
+				if (a >= 0) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
+			}
+			arr2.push(val);
+		}
+		return arr2;
+	}
+	Crumbs.h.matrixApplyUint8 = function(arr, m, center, abyss) {
+		let arr2 = new Uint8ClampedArray(arr.length);
+		for (let i = 0; i < arr.length; i++) {
+			let val = 0;
+			for (let ii = center + 1; ii < m.length; ii++) {
+				const a = i + ii - center;
+				if (a < arr.length) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
+			}
+			for (let ii = center; ii >= 0; ii--) {
+				const a = i + ii - center;
+				if (a >= 0) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
+			}
+			arr2[i] = val;
+		}
+		return arr2;
+	}
+	Crumbs.h.gaussianBlur = function(Uint8, width, length, factor, abyss) {
+		const m = Crumbs.h.gaussianMatrix(factor);
+		const c = Math.floor(factor * 3 - 1);
+
+		let a = [];
+		for (let i = 0; i < length; i++) {
+			a.push(new Uint8ClampedArray(width));
+		}
+		for (let i = 0; i < length; i++) {
+			for (let ii = 0; ii < width; ii++) {
+				a[i][ii] = Uint8[i * width + ii];
+			}
+		}
+		for (let i = 0; i < length; i++) {
+			a[i] = Crumbs.h.matrixApplyUint8(a[i], m, c, abyss);
+		}
+		Uint8 = new Uint8ClampedArray(Uint8.length);
+		for (let i = 0; i < length; i++) {
+			for (let ii = 0; ii < width; ii++) {
+				Uint8[i * width + ii] = a[i][ii];
+			}
+		}
+
+		a = [];
+		for (let i = 0; i < width; i++) {
+			a.push(new Uint8ClampedArray(length));
+		}
+		for (let i = 0; i < width; i++) {
+			for (let ii = 0; ii < length; ii++) {
+				a[i][ii] = Uint8[i * length + ii];
+			}
+		}
+		for (let i = 0; i < width; i++) {
+			a[i] = Crumbs.h.matrixApplyUint8(a[i], m, c, abyss);
+		}
+		let toReturn = new Uint8ClampedArray(Uint8.length);
+		for (let i = 0; i < width; i++) {
+			for (let ii = 0; ii < length; ii++) {
+				toReturn[i * length + ii] = a[i][ii];
+			}
+		}
+		return toReturn;
+	}
+	Crumbs.h.gaussianBlurColor = function(imageData, width, length, factor, abyss) {
+		let r = new Uint8ClampedArray(imageData.length / 4), g = new Uint8ClampedArray(imageData.length / 4), b = new Uint8ClampedArray(imageData.length / 4), a = new Uint8ClampedArray(imageData.length / 4);
+		for (let i = 0; i < imageData.length / 4; i++) {
+			const p = i * 4;
+			r[i] = imageData[p];
+			g[i] = imageData[p + 1];
+			b[i] = imageData[p + 2];
+			a[i] = imageData[p + 3];
+		}
+		r = Crumbs.h.gaussianBlur(r, width, length, factor, abyss);
+		g = Crumbs.h.gaussianBlur(g, width, length, factor, abyss);
+		b = Crumbs.h.gaussianBlur(b, width, length, factor, abyss);
+		a = Crumbs.h.gaussianBlur(a, width, length, factor, abyss);
+		let newData = new Uint8ClampedArray(imageData.length);
+		for (let i = 0; i < r.length; i++) {
+			const p = i * 4;
+			newData[p] = r[i];
+			newData[p + 1] = g[i];
+			newData[p + 2] = b[i];
+			newData[p + 3] = a[i];
+		}
+		return newData;
+	}
 
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
