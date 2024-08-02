@@ -1130,11 +1130,11 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.bloom.prototype.disable = function() { this.enabled = false; }
 	Crumbs.component.bloom.prototype.update = function(m) {
 		let c = document.createElement('canvas');
-		c.length = Crumbs.getCanvasByScope(m.scope).canvas.length;
 		c.width = Crumbs.getCanvasByScope(m.scope).canvas.width;
+		c.height = Crumbs.getCanvasByScope(m.scope).canvas.height;
 		let ctx = c.getContext('2d');
 		Crumbs.drawObject(m, ctx);
-		let data = ctx.getImageData(0, 0, c.width, c.length);
+		let data = ctx.getImageData(0, 0, c.width, c.height);
 		const passed = Crumbs.h.grayscaleMap(data);
 		for (let i = 0; i < passed.length; i++) {
 			if (passed[i] < this.threshold) {
