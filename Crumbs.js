@@ -213,7 +213,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.canvas = function(parentEle, key, id, css) {
 		this.l = Crumbs.createCanvas(id, parentEle, css);
 		this.c = this.l.getContext('2d');
-		this.filters = [];
+		this.shaders = [];
 
 		Crumbs.scopedCanvas[key] = this;
 	}
@@ -1198,10 +1198,26 @@ const Crumbs_Init_On_Load = function() {
 	};
 	
 	Game.registerHook('logic', Crumbs.updateObjects);
+	
+	Crumbs.shader = {};
+	Crumbs.shaderDefaults = {};
+	
+	Crumbs.shader.gaussianBlur = function(obj) {
+		for (let i in Crumbs.shaderDefaults.gaussianBlur) {
+			this[i] = Crumbs.shaderDefaults.gaussianBlur[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
 
-	Crumbs.filter = {};
-	Crumbs.filter.gaussianBlur = function(factor) {
-		
+		this.type = 'gaussianBlur';
+	}
+	Crumbs.shaderDefaults.gaussianBlur = {
+		enabled: true,
+		factor: 1
+	}
+	Crumbs.shader.gaussianBlur.prototype.update = function(data) {
+		return Crumbs.h.gaussianBlurColor(data);
 	}
 
 	//below for the actual drawing
@@ -1337,6 +1353,12 @@ const Crumbs_Init_On_Load = function() {
 			for (let i in settingObj) {
 				ctx[i] = settingObj[i];
 			}
+			if (!Crumbs.scopedCanvas[c].shaders.length) { continue; }
+			let data = ctx.getImageData(0, 0, Crumbs.scopedCanvas[c].l.offsetWidth, Crumbs.scopedCanvas[c].l.offsetHeight);
+			for (let i of Crumbs.scopedCanvas[c].shaders) {
+				data.data = i.update(data.data);
+			}
+			ctx.putImageData(0, 0, data);
 		}
 	};
 
