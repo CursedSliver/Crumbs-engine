@@ -1849,9 +1849,9 @@ const Crumbs_Init_On_Load = function() {
 	Game.DrawBackground = function() {
 		Timer.clean();
 			//background
+		Crumbs.updateCanvas();
 			if (!Game.Background)//init some stuff
 			{
-				Crumbs.updateCanvas();
 					//preload ascend animation bits so they show up instantly
 					Game.LeftBackground.globalAlpha=0;
 					Game.LeftBackground.drawImage(Pic('brokenCookie.png'),0,0);
