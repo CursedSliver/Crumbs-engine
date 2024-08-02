@@ -1306,7 +1306,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.drawObjects = function() {
 		for (let c in Crumbs.scopedCanvas) {
 			let list = Crumbs.compileObjects(c);
-			let ctx = Crumbs.scopedCanvas[c];
+			let ctx = Crumbs.scopedCanvas[c].c;
 			ctx.globalAlpha = 1;
 			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 			const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
