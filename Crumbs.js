@@ -55,6 +55,19 @@ const Crumbs_Init_On_Load = function() {
 			AddEvent(bigCookie,'mouseover',function(event){ Game.BigCookieState=2; });
 		}
 	}
+	Crumbs.h.blend = function(type, data1, data2) {
+		if (data1.width != data2.width || data1.height != data2.height) { throw 'Width and height not matching!'; }
+		let newData = new ImageData(new Uint8ClampedArray(data1.data.length), data1.width, data1.height);
+		let d1 = data1.data;
+		let d2 = data2.data;
+		if (type == 'additive') {
+			for (let i = 0; i < d1.length; i++) {
+				newData.data[i] = d1[i] + d2[i];
+			}
+			return newData;
+		}
+		throw 'Type '+type+'does not match any valid type!';
+	}
 	Crumbs.h.gaussian = function(arr, factor, abyss) {
 		if (!Array.isArray(arr)) { throw 'Argument "arr" is not an array!'; }
 		if (typeof factor !== 'number') { throw 'Argument "factor" should be a number, when it is in fact '+(typeof factor)+'!'; }
@@ -146,26 +159,39 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return toReturn;
 	}
-	Crumbs.h.gaussianBlurColor = function(imageData, width, length, factor, abyss) {
-		let r = new Uint8ClampedArray(imageData.length / 4), g = new Uint8ClampedArray(imageData.length / 4), b = new Uint8ClampedArray(imageData.length / 4), a = new Uint8ClampedArray(imageData.length / 4);
+	Crumbs.h.gaussianBlurColor = function(imageData, factor, abyss) {
+		const data = imageData.data;
+		let r = new Uint8ClampedArray(data.length / 4), g = new Uint8ClampedArray(data.length / 4), b = new Uint8ClampedArray(data.length / 4), a = new Uint8ClampedArray(data.length / 4);
+		const w = imageData.width;
+		const h = imageData.height
 		for (let i = 0; i < imageData.length / 4; i++) {
 			const p = i * 4;
-			r[i] = imageData[p];
-			g[i] = imageData[p + 1];
-			b[i] = imageData[p + 2];
-			a[i] = imageData[p + 3];
+			r[i] = data[p];
+			g[i] = data[p + 1];
+			b[i] = data[p + 2];
+			a[i] = data[p + 3];
 		}
-		r = Crumbs.h.gaussianBlur(r, width, length, factor, abyss);
-		g = Crumbs.h.gaussianBlur(g, width, length, factor, abyss);
-		b = Crumbs.h.gaussianBlur(b, width, length, factor, abyss);
-		a = Crumbs.h.gaussianBlur(a, width, length, factor, abyss);
-		let newData = new Uint8ClampedArray(imageData.length);
+		r = Crumbs.h.gaussianBlur(r, w, h, factor, abyss);
+		g = Crumbs.h.gaussianBlur(g, w, h, factor, abyss);
+		b = Crumbs.h.gaussianBlur(b, w, h, factor, abyss);
+		a = Crumbs.h.gaussianBlur(a, w, h, factor, abyss);
+		let newData = new Uint8ClampedArray(data.length);
 		for (let i = 0; i < r.length; i++) {
 			const p = i * 4;
 			newData[p] = r[i];
 			newData[p + 1] = g[i];
 			newData[p + 2] = b[i];
 			newData[p + 3] = a[i];
+		}
+		imageData.data = newData;
+		return imageData;
+	}
+	Crumbs.h.grayscaleMap = function(imageData) {
+		const data = imageData.data;
+		let newData = new Uint8ClampedArray(data.length / 4);
+		for (let i = 0; i < data.length / 4; i++) {
+			const p = i * 4;
+			newData[i] = 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
 		}
 		return newData;
 	}
@@ -1075,6 +1101,53 @@ const Crumbs_Init_On_Load = function() {
 			if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
 		}
 	};
+
+	Crumbs.component.bloom = function(obj) {
+		obj = obj||{};
+		for (let i in Crumbs.defaultComp.bloom) {
+			this[i] = Crumbs.defaultComp.bloom[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
+
+		this.data = null;
+		this.lastUpdate = 0;
+		this.type = 'bloom';
+	}
+	Crumbs.defaultComp.bloom = {
+		enabled: true,
+		threshold: 128, //minimum brightness to pass filter
+		factor: 5, //gaussian blur factor
+		updateRate: 0 //minimum amount of ticks to wait before each update
+	}
+	Crumbs.component.bloom.prototype.enable = function() { this.enabled = true; } 
+	Crumbs.component.bloom.prototype.disable = function() { this.enabled = false; }
+	Crumbs.component.bloom.prototype.update = function(m) {
+		let c = document.createElement('canvas');
+		c.length = Crumbs.getCanvasByScope(m.scope).canvas.length;
+		c.width = Crumbs.getCanvasByScope(m.scope).canvas.width;
+		let ctx = c.getContext('2d');
+		Crumbs.drawObject(m, ctx);
+		let data = ctx.getImageData(0, 0, c.width, c.length);
+		const passed = Crumbs.h.grayscaleMap(data);
+		for (let i = 0; i < passed.length; i++) {
+			if (passed[i] < this.threshold) {
+				const p = i * 4;
+				data.data[p] = 0;
+				data.data[p + 1] = 0;
+				data.data[p + 2] = 0;
+				data.data[p + 3] = 0;
+			}
+		}
+		data = Crumbs.h.gaussianBlurColor(data, this.factor, 0);
+		this.data = data;
+	};
+	Crumbs.component.bloom.prototype.logic = function(m) { };
+	Crumbs.component.bloom.prototype.preDraw = function(m) { if (Crumbs.t - this.lastUpdate > this.updateRate) { this.update(m); } };
+	Crumbs.component.bloom.prototype.postDraw = function(m, ctx) {
+		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, c.width, c.length), this.data), 0, 0);
+	};
 	
 	Game.registerHook('logic', Crumbs.updateObjects);
 
@@ -1195,6 +1268,28 @@ const Crumbs_Init_On_Load = function() {
 		if (o.height) { return o.height; } else { return Pic(o.imgs[o.imgUsing]).height * o.scaleY * o.scaleFactor[1]; }
 	};
 
+	Crumbs.drawObject = function(o, ctx, fromCore) {
+		if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
+		const p = Pic(o.imgs[o.imgUsing]);
+		const pWidth = Crumbs.getPWidth(o);
+		const pHeight = Crumbs.getPHeight(o);
+		ctx.save();
+		if (fromCore) { for (let ii = 0; ii < o.components.length; ii++) {
+			if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
+		} }
+		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
+		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
+		const r = o.rotation + (o.noRotate?0:o.rotationAdd);
+		ctx.translate(o.x + o.canvaCenter[0], o.y + o.canvaCenter[1]);
+		if (o.rotation + o.rotationAdd) {
+			ctx.rotate(r);
+		} 
+		
+		if (!o.noDraw) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
+
+		if (!fromCore) { ctx.restore(); }
+	}
+
 	Crumbs.drawObjects = function() {
 		for (let c in Crumbs.scopedCanvas) {
 			let list = Crumbs.compileObjects(c);
@@ -1208,23 +1303,7 @@ const Crumbs_Init_On_Load = function() {
 			for (let i in list) {
 				let o = list[i];
 				if (!o.enabled) { continue; }
-				if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
-				const p = Pic(o.imgs[o.imgUsing]);
-				const pWidth = Crumbs.getPWidth(o);
-				const pHeight = Crumbs.getPHeight(o);
-				ctx.save();
-				for (let ii = 0; ii < o.components.length; ii++) {
-					if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
-				}
-				const ox = Crumbs.getOffsetX(o.anchor, pWidth);
-				const oy = Crumbs.getOffsetY(o.anchor, pHeight);
-				const r = o.rotation + (o.noRotate?0:o.rotationAdd);
-				ctx.translate(o.x + o.canvaCenter[0], o.y + o.canvaCenter[1]);
-				if (o.rotation + o.rotationAdd) {
-					ctx.rotate(r);
-				} 
-				
-				if (!o.noDraw) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
+				Crumbs.drawObject(o, ctx, true);
 
 				for (let ii = o.components.length - 1; ii >= 0; ii--) {
 					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx, pWidth, pHeight); }
