@@ -223,7 +223,8 @@ const Crumbs_Init_On_Load = function() {
 	new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
 	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'position: absolute; top: 0; left: 0;');
 	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'position: absolute; top: 0; left: 0;');
-	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;');
+	l('backgroundCanvas').remove();
+	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;'); 
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
@@ -1750,18 +1751,19 @@ const Crumbs_Init_On_Load = function() {
 			]
 		})
 	};
-	Crumbs.objectBehaviors.cookieShowerBackground = function() {
+	Crumbs.objectBehaviors.cookieShowerBackground = new Crumbs.behavior(function() {
 		if (!Game.prefs.particles) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
 		if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
 		
 		if (Game.cookiesPs>1000) { this.imgUsing = 3; }
 		else if (Game.cookiesPs>500) { this.imgUsing = 2; }
 		else if (Game.cookiesPs>50) { this.imgUsing = 1; }
-		
-		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.l.width;
-		this.getComponent('patternFill').height = Crumbs.scopedCanvas.left.l.height;
-		this.getComponent('patternFill').offY = (Math.floor(Game.T*2)%512);
-	}
+
+		const p = this.getComponent('patternFill');
+		p.width = Crumbs.scopedCanvas.left.l.width;
+		p.height = Crumbs.scopedCanvas.left.l.height;
+		p.offY = (Math.floor(Game.T*2)%512);
+	});
 	Crumbs.initCookieWall = function() {
 		Crumbs.spawn({
 			anchor: 'top-left',
@@ -1773,6 +1775,22 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieShowerBackground)
 		});
 	};
+	Crumbs.objectBehaviors.background = new Crumbs.behavior(function() {
+		this.imgs = Game.bg;
+		
+		const p = this.getComponent('patternFill');
+		p.width = Crumbs.scopedCanvas.background.l.width;
+		p.height = Crumbs.scopedCanvas.background.l.height;
+	});
+	Crumbs.initBackground = function() {
+		let background = Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'background',
+			imgs: Game.bg,
+			component: new Crumbs.component.patternFill(),
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
+		});
+	}
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
@@ -1942,7 +1960,7 @@ const Crumbs_Init_On_Load = function() {
 							Game.bgFade=Game.bg;
 						}
 						
-						Game.Background.fillPattern(Pic(Game.bg+'.jpg'),0,0,Game.Background.canvas.width,Game.Background.canvas.height,512,512,0,0);
+						//Game.Background.fillPattern(Pic(Game.bg+'.jpg'),0,0,Game.Background.canvas.width,Game.Background.canvas.height,512,512,0,0);
 						if (Game.bgR>0)
 						{
 							Game.Background.globalAlpha=Game.bgR;
