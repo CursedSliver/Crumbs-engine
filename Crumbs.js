@@ -223,7 +223,7 @@ const Crumbs_Init_On_Load = function() {
 	new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
 	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'position: absolute; top: 0; left: 0;');
 	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'position: absolute; top: 0; left: 0;');
-	l('backgroundCanvas').remove();
+	l('backgroundCanvas').remove(); Game.Background = true;
 	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;'); 
 
 	Crumbs.updateCanvas = function() {
