@@ -382,7 +382,6 @@ const Crumbs_Init_On_Load = function() {
 		behaviors: null, //Crumbs.objectBehaviors.idle, set after it is initialized
 		id: null,
 		order: 0,
-		behaviorParams: {},
 		width: null,
 		height: null,
 		offsetX: 0,
@@ -1278,10 +1277,10 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.OYFA[anchor] * height;
 	};
 	Crumbs.getPWidth = function(o) {
-		if (o.width) { return o.width; } else { return Pic(o.imgs[o.imgUsing]).width * o.scaleX * o.scaleFactor[0]; }
+		return Pic(o.imgs[o.imgUsing]).width * o.scaleX * o.scaleFactor[0]; 
 	};
 	Crumbs.getPHeight = function(o) {
-		if (o.height) { return o.height; } else { return Pic(o.imgs[o.imgUsing]).height * o.scaleY * o.scaleFactor[1]; }
+		return Pic(o.imgs[o.imgUsing]).height * o.scaleY * o.scaleFactor[1]; 
 	};
 
 	Crumbs.drawObject = function(o, ctx, fromCore) {
@@ -1794,15 +1793,13 @@ const Crumbs_Init_On_Load = function() {
 		});
 	}
 	Crumbs.objectBehaviors.fillWhole = function() {
-		this.width = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth;
-		this.height = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight;
+		this.scaleX = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / Pic(this.imgs[this.imgUsing]).width;
+		this.scaleY = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight / Pic(this.imgs[this.imgUsing]).height;
 	}
 	Crumbs.initShadedBorders = function() {
 		let border = Crumbs.spawn({
 			anchor: 'top-left',
 			scope: 'background',
-			width: 100,
-			height: 100,
 			order: 1,
 			imgs: 'img/shadedBordersSoft.png',
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
