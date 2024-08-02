@@ -198,6 +198,47 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
+
+	Crumbs.createCanvas = function(id, parentElement, css) {
+		let div = document.createElement('canvas');
+		div.id = id; div.style = 'background: none;';
+		let cont = document.createElement('div');
+		cont.classList.add('CrumbsCanvaContainer');
+		if (css) { cont.style = css; }
+		cont.appendChild(div);
+		parentElement.appendChild(cont);
+		return l(id);
+	}
+	Crumbs.scopedCanvas = { };
+	Crumbs.canvas = function(parentEle, key, id, css) {
+		this.l = Crumbs.createCanvas(id, parentEle, css);
+		this.c = this.l.getContext('2d');
+		this.filters = [];
+
+		Crumbs.scopedCanvas[id] = this;
+	}
+	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
+
+	new Crumbs.canvas(l('game'), 'foreground', 'foregroundCanvas');
+	new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
+	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'position: absolute; top: 0; left: 0;');
+	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'position: absolute; top: 0; left: 0;');
+	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;');
+
+	Crumbs.updateCanvas = function() {
+		for (let i in Crumbs.scopedCanvas) {
+			Crumbs.scopedCanvas[i].l.width = Crumbs.scopedCanvas[i].canvas.parentNode.offsetWidth;
+			Crumbs.scopedCanvas[i].l.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
+		}
+	};
+	Crumbs.updateCanvas();
+	window.addEventListener('resize',function(event) {
+		Crumbs.updateCanvas();
+	});
+	
+	Crumbs.getCanvasByScope = function(s) {
+		return Crumbs.scopedCanvas[s].c;
+	};
 	
 	Crumbs.prefs = {
 		objects: {
@@ -1156,45 +1197,12 @@ const Crumbs_Init_On_Load = function() {
 	
 	Game.registerHook('logic', Crumbs.updateObjects);
 
-	//below for the actual drawing
-	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
-	
-	Crumbs.createCanvas = function(id, parentElement, css) {
-		let div = document.createElement('canvas');
-		div.id = id; div.style = 'background: none;';
-		let cont = document.createElement('div');
-		cont.classList.add('CrumbsCanvaContainer');
-		if (css) { cont.style = css; }
-		cont.appendChild(div);
-		parentElement.appendChild(cont);
-		return l(id).getContext('2d');
+	Crumbs.filter = {};
+	Crumbs.filter.gaussianBlur = function(factor) {
+		
 	}
-	Crumbs.foregroundCanvas = Crumbs.createCanvas('foregroundCanvas', l('game'));
-	Crumbs.middleCanvas = Crumbs.createCanvas('middleCanvas', l('rows'), 'position: absolute; top: 0; left: 0;');
-	Crumbs.rightCanvas = Crumbs.createCanvas('rightCanvas', l('store'), 'position: absolute; top: 0; left: 0;');
 
-	Crumbs.updateCanvas = function() {
-		for (let i in Crumbs.scopedCanvas) {
-			Crumbs.scopedCanvas[i].canvas.width = Crumbs.scopedCanvas[i].canvas.parentNode.offsetWidth;
-			Crumbs.scopedCanvas[i].canvas.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
-		}
-	};
-	Crumbs.updateCanvas();
-	window.addEventListener('resize',function(event) {
-		Crumbs.updateCanvas();
-	});
-
-	Crumbs.scopedCanvas = {
-		left: Game.LeftBackground,
-		foreground: Crumbs.foregroundCanvas,
-		background: Game.Background,
-		middle: Crumbs.middleCanvas,
-		right: Crumbs.rightCanvas
-	};
-	Crumbs.getCanvasByScope = function(s) {
-		return Crumbs.scopedCanvas[s];
-	};
-
+	//below for the actual drawing
 	Crumbs.compileObjects = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i of Crumbs.objects[s]) {
