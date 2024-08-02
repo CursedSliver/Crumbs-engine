@@ -1151,7 +1151,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.bloom.prototype.logic = function(m) { };
 	Crumbs.component.bloom.prototype.preDraw = function(m) { if (Crumbs.t - this.lastUpdate > this.updateRate) { this.update(m); } };
 	Crumbs.component.bloom.prototype.postDraw = function(m, ctx) {
-		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, c.width, c.length), this.data), 0, 0);
+		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, Crumbs.getCanvasByScope(m.scope).canvas.width, Crumbs.getCanvasByScope(m.scope).canvas.length), this.data), 0, 0);
 	};
 	
 	Game.registerHook('logic', Crumbs.updateObjects);
