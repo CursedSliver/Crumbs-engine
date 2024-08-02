@@ -1758,8 +1758,8 @@ const Crumbs_Init_On_Load = function() {
 		else if (Game.cookiesPs>500) { this.imgUsing = 2; }
 		else if (Game.cookiesPs>50) { this.imgUsing = 1; }
 		
-		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width;
-		this.getComponent('patternFill').height = Crumbs.scopedCanvas.left.canvas.height;
+		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.l.width;
+		this.getComponent('patternFill').height = Crumbs.scopedCanvas.left.l.height;
 		this.getComponent('patternFill').offY = (Math.floor(Game.T*2)%512);
 	}
 	Crumbs.initCookieWall = function() {
