@@ -1793,7 +1793,22 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
 		});
 	}
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); }
+	Crumbs.objectBehaviors.fillWhole = function() {
+		this.width = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth;
+		this.height = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight;
+	}
+	Crumbs.initShadedBorders = function() {
+		let border = Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'background',
+			width: 100,
+			height: 100,
+			order: 1,
+			imgs: 'img/softShadedBorder.png',
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
+		});
+	}
+	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
