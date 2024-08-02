@@ -1277,10 +1277,10 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.OYFA[anchor] * height;
 	};
 	Crumbs.getPWidth = function(o) {
-		return Pic(o.imgs[o.imgUsing]).width * o.scaleX * o.scaleFactor[0]; 
+		return (o.width?o.width:Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactor[0]; 
 	};
 	Crumbs.getPHeight = function(o) {
-		return Pic(o.imgs[o.imgUsing]).height * o.scaleY * o.scaleFactor[1]; 
+		return (o.height?o.height:Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactor[1]; 
 	};
 
 	Crumbs.drawObject = function(o, ctx, fromCore) {
