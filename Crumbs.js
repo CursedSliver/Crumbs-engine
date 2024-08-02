@@ -1804,7 +1804,7 @@ const Crumbs_Init_On_Load = function() {
 			width: 100,
 			height: 100,
 			order: 1,
-			imgs: 'img/softShadedBorder.png',
+			imgs: 'img/shadedBordersSoft.png',
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
 		});
 	}
