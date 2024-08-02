@@ -1558,7 +1558,7 @@ const Crumbs_Init_On_Load = function() {
 		let toReturn = {imgs: [Game.Milk.pic]};
 		if (Game.milkType!=0 && Game.ascensionMode!=1) { toReturn.imgs = [Game.AllMilks[Game.milkType].pic]; }
 		let a=1;
-		let y = Crumbs.scopedCanvas.left.canvas.height * Game.milkHd;
+		let y = Crumbs.scopedCanvas.left.l.height * Game.milkHd;
 		if (Game.AscendTimer>0)
 		{
 			y*=1-Math.pow((Game.AscendTimer/Game.AscendBreakpoint),2)*2;
@@ -1570,8 +1570,8 @@ const Crumbs_Init_On_Load = function() {
 			a*=1-Math.pow(1-(Game.ReincarnateTimer/Game.ReincarnateDuration),2)*2;
 		}
 		toReturn.alpha = a;
-		toReturn.y = Crumbs.scopedCanvas.left.canvas.height - y;
-		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.canvas.width + 480;
+		toReturn.y = Crumbs.scopedCanvas.left.l.height - y;
+		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.l.width + 480;
 		this.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
 		this.set(toReturn);
 	}
