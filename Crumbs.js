@@ -217,6 +217,24 @@ const Crumbs_Init_On_Load = function() {
 
 		Crumbs.scopedCanvas[key] = this;
 	}
+	Crumbs.canvas.prototype.getShader = function(type) {
+		for (let i of this.shaders) {
+			if (i.type == type) { return i; }
+		}
+	}
+	Crumbs.canvas.prototype.getAllShaders = function(type) {
+		let arr = [];
+		for (let i of this.shaders) {
+			if (i.type == type) { arr.push(i); }
+		}
+		return arr;
+	}
+	Crumbs.canvas.prototype.addShader = function(shader, index) {
+		if (index < 0) { throw 'Index must be 0 or a positive number.'; }
+		if (typeof index === 'undefined') { index = this.shaders.length; }
+		if (typeof index !== 'number') { throw 'Index must be a number.'; }
+		this.shaders.splice(index, 0, shader);
+	}
 	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
 
 	new Crumbs.canvas(l('game'), 'foreground', 'foregroundCanvas');
@@ -1217,7 +1235,7 @@ const Crumbs_Init_On_Load = function() {
 		factor: 1
 	}
 	Crumbs.shader.gaussianBlur.prototype.update = function(data) {
-		return Crumbs.h.gaussianBlurColor(data);
+		return Crumbs.h.gaussianBlurColor(data, this.factor, 0);
 	}
 
 	//below for the actual drawing
