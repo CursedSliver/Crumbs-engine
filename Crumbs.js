@@ -1308,7 +1308,7 @@ const Crumbs_Init_On_Load = function() {
 			let list = Crumbs.compileObjects(c);
 			let ctx = Crumbs.scopedCanvas[c].c;
 			ctx.globalAlpha = 1;
-			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
+			if (c != 'left' && c != 'background') { ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); }
 			const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
 			for (let i in Crumbs.settings) {
 				ctx[i] = Crumbs.settings[i];
