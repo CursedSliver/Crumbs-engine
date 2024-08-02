@@ -675,9 +675,9 @@ const Crumbs_Init_On_Load = function() {
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
 	};
-	Crumbs.component.rect.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
-		pWidth *= m.width / Pic(m.imgs[m.imgUsing]).width;
-		pHeight *= m.height / Pic(m.imgs[m.imgUsing]).height;
+	Crumbs.component.rect.prototype.postDraw = function(m, ctx) {
+		const pWidth = Crumbs.getPWidth(m) * m.width / Pic(m.imgs[m.imgUsing]).width;
+		const pHeight = Crumbs.getPHeight(m) * m.height / Pic(m.imgs[m.imgUsing]).height;
 		ctx.fillRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
 		if (this.outline) {
 			ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, pWidth, pHeight);
@@ -961,10 +961,11 @@ const Crumbs_Init_On_Load = function() {
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
 	};
-	Crumbs.component.text.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+	Crumbs.component.text.prototype.postDraw = function(m, ctx) {
+		const pWidth = Crumbs.getPWidth(o) * dims.width / Pic(m.imgs[m.imgUsing]).width;
+		const pHeight = Crumbs.getPHeight(o) * (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		const dims = ctx.measureText(this.content);
 		pWidth *= dims.width / Pic(m.imgs[m.imgUsing]).width;
-		pHeight *= (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		
 		if (this.maxWidth) {
 			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
@@ -1011,7 +1012,9 @@ const Crumbs_Init_On_Load = function() {
 		this.noDrawStatus = m.noDraw;
 		m.noDraw = true;
 	};
-	Crumbs.component.patternFill.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+	Crumbs.component.patternFill.prototype.postDraw = function(m, ctx) {
+		const pWidth = Crumbs.getPWidth(m);
+		const pHeight = Crumbs.getPHeight(m);
 		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.width, this.height, pWidth, pHeight, this.offX, this.offY); }
 
 		m.noDraw = this.noDrawStatus;
@@ -1080,7 +1083,9 @@ const Crumbs_Init_On_Load = function() {
 			y: Crumbs.getOffsetY(m.anchor, pHeight)
 		});
 	}
-	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx, pWidth, pHeight) {
+	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
+		const pWidth = Crumbs.getPWidth(m);
+		const pHeight = Crumbs.getPHeight(m);
 		let b = this.getHoverStatus(m, pWidth, pHeight);
 		if (b && !this.alwaysInteractable) {
 			const scope = Crumbs.objects[m.scope];
@@ -1306,7 +1311,7 @@ const Crumbs_Init_On_Load = function() {
 				Crumbs.drawObject(o, ctx, true);
 
 				for (let ii = o.components.length - 1; ii >= 0; ii--) {
-					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx, pWidth, pHeight); }
+					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx); }
 				}
 
 				if (Crumbs.prefs.anchorDisplay) {
