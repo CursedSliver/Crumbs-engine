@@ -215,7 +215,7 @@ const Crumbs_Init_On_Load = function() {
 		this.c = this.l.getContext('2d');
 		this.filters = [];
 
-		Crumbs.scopedCanvas[id] = this;
+		Crumbs.scopedCanvas[key] = this;
 	}
 	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
 
