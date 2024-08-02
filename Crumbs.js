@@ -220,11 +220,11 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.h.injectCSS(`.CrumbsCanvaContainer { width: 100%; height: 100%; position: absolute; pointer-events: none; z-index: `+(Math.pow(2, 31) - 1)+` }`);
 
 	new Crumbs.canvas(l('game'), 'foreground', 'foregroundCanvas');
-	new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
+	Game.LeftBackground = new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
 	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'position: absolute; top: 0; left: 0;');
 	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'position: absolute; top: 0; left: 0;');
-	l('backgroundCanvas').remove(); Game.Background = true;
-	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;'); 
+	l('backgroundCanvas').remove(); 
+	Game.Background = new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none;'); 
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
