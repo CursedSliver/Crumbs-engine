@@ -1778,7 +1778,7 @@ const Crumbs_Init_On_Load = function() {
 		});
 	};
 	Crumbs.objectBehaviors.background = new Crumbs.behavior(function() {
-		this.imgs[0] = 'imgs/'+Game.bg+'.jpg';
+		this.imgs[0] = 'img/'+Game.bg+'.jpg';
 		
 		const p = this.getComponent('patternFill');
 		p.width = Crumbs.scopedCanvas.background.l.width;
