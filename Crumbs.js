@@ -1372,11 +1372,11 @@ const Crumbs_Init_On_Load = function() {
 				ctx[i] = settingObj[i];
 			}
 			if (!Crumbs.scopedCanvas[c].shaders.length) { continue; }
-			let data = ctx.getImageData(0, 0, Crumbs.scopedCanvas[c].l.offsetWidth, Crumbs.scopedCanvas[c].l.offsetHeight);
+			let data = ctx.getImageData(0, 0, c.width, c.height);
 			for (let i of Crumbs.scopedCanvas[c].shaders) {
-				data.data = i.update(data.data);
+				data = i.update(data);
 			}
-			ctx.putImageData(0, 0, data);
+			ctx.putImageData(data, 0, 0);
 		}
 	};
 
