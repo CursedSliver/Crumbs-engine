@@ -1789,7 +1789,7 @@ const Crumbs_Init_On_Load = function() {
 			anchor: 'top-left',
 			scope: 'background',
 			imgs: Game.bg,
-			component: new Crumbs.component.patternFill(),
+			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
 		});
 	}
