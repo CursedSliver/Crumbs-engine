@@ -227,8 +227,8 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
-			Crumbs.scopedCanvas[i].l.width = Crumbs.scopedCanvas[i].canvas.parentNode.offsetWidth;
-			Crumbs.scopedCanvas[i].l.height = Crumbs.scopedCanvas[i].canvas.parentNode.offsetHeight;
+			Crumbs.scopedCanvas[i].l.width = Crumbs.scopedCanvas[i].l.parentNode.offsetWidth;
+			Crumbs.scopedCanvas[i].l.height = Crumbs.scopedCanvas[i].l.parentNode.offsetHeight;
 		}
 	};
 	Crumbs.updateCanvas();
