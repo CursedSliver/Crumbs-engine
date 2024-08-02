@@ -1195,7 +1195,7 @@ const Crumbs_Init_On_Load = function() {
 		c.height = Crumbs.getCanvasByScope(m.scope).canvas.height;
 		let ctx = c.getContext('2d');
 		Crumbs.drawObject(m, ctx);
-		let data = ctx.getImageData(0, 0, c.canvas.width, c.canvas.height);
+		let data = ctx.getImageData(0, 0, c.width, c.height);
 		const passed = Crumbs.h.grayscaleMap(data);
 		for (let i = 0; i < passed.length; i++) {
 			if (passed[i] < this.threshold) {
@@ -1372,7 +1372,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx[i] = settingObj[i];
 			}
 			if (!Crumbs.scopedCanvas[c].shaders.length) { continue; }
-			let data = ctx.getImageData(0, 0, c.canvas.width, c.canvas.height);
+			let data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
 			for (let i of Crumbs.scopedCanvas[c].shaders) {
 				data = i.update(data);
 			}
