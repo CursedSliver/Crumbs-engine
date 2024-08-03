@@ -1221,6 +1221,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.shaderDefaults = {};
 	
 	Crumbs.shader.gaussianBlur = function(obj) {
+		obj = obj||{};
 		for (let i in Crumbs.shaderDefaults.gaussianBlur) {
 			this[i] = Crumbs.shaderDefaults.gaussianBlur[i];
 		}
@@ -1236,6 +1237,21 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.shader.gaussianBlur.prototype.update = function(data) {
 		return Crumbs.h.gaussianBlurColor(data, this.factor, 0);
+	}
+
+	Crumbs.shader.allWhite = function(obj) {
+		for (let i in Crumbs.shaderDefaults.allWhite) {
+			this[i] = Crumbs.shaderDefaults.allWhite[i];
+		}
+		
+		this.type = 'allWhite';
+	}
+	Crumbs.shaderDefaults.allWhite = { enabled: true }
+	Crumbs.shader.allWhite.prototype.update = function(data) {
+		for (let i = 0; i < data.data.length; i++) {
+			data.data[i] = 255;
+		}
+		return data;
 	}
 
 	//below for the actual drawing
