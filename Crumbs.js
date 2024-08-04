@@ -490,6 +490,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.object.prototype.updateChildren = function() {
+		if (!this.enabled) { return; }
 		if (this.parent !== null) {
 			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
 			let m = Crumbs.h.rv(this.rotationAdd, this.parent.offsetX, this.parent.offsetY);
@@ -1367,7 +1368,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 			for (let i in list) {
 				let o = list[i];
-				if (!o.enabled) { continue; }
+				if (!o.enabled) { console.log('not drawn!'); continue; }
 				Crumbs.drawObject(o, ctx, true);
 
 				for (let ii = o.components.length - 1; ii >= 0; ii--) {
@@ -1865,8 +1866,8 @@ const Crumbs_Init_On_Load = function() {
 		if (!p.enableCondition()) { this.enabled = false; return; } else { this.enabled = true; }
 	}, { pet: '', enableCondition: function() { } });
 	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
-		this.offsetX = ((Game.specialTab==p.tab)?24:Math.sin(Game.T*0.2+this.parent.placement)*3) + 24;
-		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6) + 24;
+		this.offsetX = ((Game.specialTab==p.tab)?24:Math.sin(Game.T*0.2+this.parent.placement)*3);
+		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6);
 	}, { tab: '' });
 	Crumbs.objectBehaviors.santaSkin = new Crumbs.behavior(function() {
 		this.sx = 96 * Game.santaLevel;
@@ -1904,7 +1905,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'santa' })
 			]
 		});
-		h.spawnChild(Crumbs.shine(0.5));
+		h.spawnChild(Crumbs.shine(1));
 	}
 	Crumbs.objectBehaviors.dragonSkin = new Crumbs.behavior(function() {
 		this.sx = Game.dragonLevels[Game.dragonLevel].pic;
@@ -1933,7 +1934,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'dragon' })
 			]
 		});
-		h.spawnChild(Crumbs.shine(0.5));
+		h.spawnChild(Crumbs.shine(1));
 	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
 		const height = Crumbs.getCanvasByScope(this.scope).canvas.offsetHeight;
