@@ -1888,14 +1888,14 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 0.5,
 			scaleY: 0.5,
 			order: 100,
-			x: 48,
+			x: 24,
 			width: 96,
 			height: 96,
 			placement: 0,
 			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'santa') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'santa'; Game.ToggleSpecialMenu(true); } } }),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'santa', enableCondition: function() { return (Game.Has('A festive hat')); } })]
 		});
-		h.spawnChild({
+		let d = h.spawnChild({
 			id: 'santaDisplay',
 			imgs: 'santa.png?v='+Game.version,
 			order: 100,
@@ -1906,7 +1906,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'santa' })
 			]
 		});
-		h.spawnChild(Crumbs.shine(1));
+		d.spawnChild(Crumbs.shine(1));
 	}
 	Crumbs.objectBehaviors.dragonSkin = new Crumbs.behavior(function() {
 		this.sx = Game.dragonLevels[Game.dragonLevel].pic;
@@ -1917,14 +1917,14 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 0.5,
 			scaleY: 0.5,
 			order: 100,
-			x: 48,
+			x: 24,
 			width: 96,
 			height: 96,
 			placement: 0,
 			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'dragon') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'dragon'; Game.ToggleSpecialMenu(true); } } }),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'dragon', enableCondition: function() { return (Game.Has('A crumbly egg')); } })]
 		});
-		h.spawnChild({
+		let d = h.spawnChild({
 			id: 'dragonDisplay',
 			imgs: 'dragon.png?v='+Game.version,
 			order: 100,
@@ -1935,7 +1935,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'dragon' })
 			]
 		});
-		h.spawnChild(Crumbs.shine(1));
+		d.spawnChild(Crumbs.shine(1));
 	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
 		const height = Crumbs.getCanvasByScope(this.scope).canvas.offsetHeight;
