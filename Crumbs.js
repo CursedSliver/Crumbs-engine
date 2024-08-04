@@ -1944,12 +1944,12 @@ const Crumbs_Init_On_Load = function() {
 		h.spawnChild(Crumbs.shine(1, h, d));
 	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
-		const height = Crumbs.getCanvasByScope(this.scope).canvas.offsetHeight;
+		const height = Crumbs.getCanvasByScope(this.scope).canvas.height;
 
 		let count = 0;
 		for (let i in this.children) {
 			if (!this.children[i].enabled) { continue; }
-			this.children[i].y = height - 48 - 48 * count;
+			this.children[i].y = height - 72 - 48 * count;
 			this.children[i].placement = count;
 			count++;
 		}
@@ -1962,8 +1962,8 @@ const Crumbs_Init_On_Load = function() {
 			order: 100,
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petManager)
 		});
-		Crumbs.initSanta(anchor);
 		Crumbs.initDragon(anchor);
+		Crumbs.initSanta(anchor);
 	}
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
