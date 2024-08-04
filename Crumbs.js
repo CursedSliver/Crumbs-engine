@@ -1873,13 +1873,14 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectBehaviors.santaSkin = new Crumbs.behavior(function() {
 		this.sx = 96 * Game.santaLevel;
 	});
-	Crumbs.shine = function(scaleMult) {
+	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target.getComponent('pointerInteractive').hovered) { this.enabled = true; } else { this.enabled = false; } }, { target: null });
+	Crumbs.shine = function(scaleMult, target) {
 		return {
 			order: 10, 
 			imgs: 'img/shine.png',
 			scaleX: scaleMult,
 			scaleY: scaleMult,
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), new Crumbs.behaviorInstance(function() { if (this.parent.getComponent('pointerInteractive').hovered) { this.enabled = true; } else { this.enabled = false; } })]
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.enableOnHover, { target: target })]
 		};
 	}
 	Crumbs.initSanta = function(anchor) {
@@ -1906,7 +1907,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'santa' })
 			]
 		});
-		d.spawnChild(Crumbs.shine(1));
+		d.spawnChild(Crumbs.shine(1, h));
 	}
 	Crumbs.objectBehaviors.dragonSkin = new Crumbs.behavior(function() {
 		this.sx = Game.dragonLevels[Game.dragonLevel].pic;
@@ -1935,7 +1936,7 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'dragon' })
 			]
 		});
-		d.spawnChild(Crumbs.shine(1));
+		d.spawnChild(Crumbs.shine(1, h));
 	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
 		const height = Crumbs.getCanvasByScope(this.scope).canvas.offsetHeight;
