@@ -1264,6 +1264,7 @@ const Crumbs_Init_On_Load = function() {
 		return arr;
 	};
 	Crumbs.object.prototype.compile = function() {
+		if (!this.enabled) { return []; }
 		let arr = [];
 		arr.push(this);
 		for (let i in this.children) {
