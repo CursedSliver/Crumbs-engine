@@ -1861,6 +1861,102 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
 		});
 	}
+	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
+		if (!p.enableCondition()) { this.enabled = false; return; } else { this.enabled = true; }
+	}, { pet: '', enableCondition: function() { } });
+	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
+		this.offsetX = ((Game.specialTab==p.tab)?24:Math.sin(Game.T*0.2+this.parent.placement)*3) + 24;
+		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6) + 24;
+	}, { tab: '' });
+	Crumbs.objectBehaviors.santaSkin = new Crumbs.behavior(function() {
+		this.sx = 96 * Game.santaLevel;
+	});
+	Crumbs.shine = function(scaleMult) {
+		return {
+			order: 10, 
+			imgs: 'img/shine.png',
+			scaleX: scaleMult,
+			scaleY: scaleMult,
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), new Crumbs.behaviorInstance(function() { if (this.parent.getComponent('pointerInteractive').hovered) { this.enabled = true; } else { this.enabled = false; } })]
+		};
+	}
+	Crumbs.initSanta = function(anchor) {
+		let h = anchor.spawnChild({
+			id: 'santa',
+			scaleX: 0.5,
+			scaleY: 0.5,
+			order: 100,
+			x: 48,
+			width: 96,
+			height: 96,
+			placement: 0,
+			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'santa') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'santa'; Game.ToggleSpecialMenu(true); } } }),
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'santa', enableCondition: function() { return (Game.Has('A festive hat')); } })]
+		});
+		h.spawnChild({
+			id: 'santaDisplay',
+			imgs: 'santa.png?v='+Game.version,
+			order: 100,
+			width: 96,
+			height: 96,
+			behaviors: [
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.santaSkin),
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'santa' })
+			]
+		});
+		h.spawnChild(Crumbs.shine(0.5));
+	}
+	Crumbs.objectBehaviors.dragonSkin = new Crumbs.behavior(function() {
+		this.sx = Game.dragonLevels[Game.dragonLevel].pic;
+	});
+	Crumbs.initDragon = function(anchor) {
+		let h = anchor.spawnChild({
+			id: 'dragon',
+			scaleX: 0.5,
+			scaleY: 0.5,
+			order: 100,
+			x: 48,
+			width: 96,
+			height: 96,
+			placement: 0,
+			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'dragon') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'dragon'; Game.ToggleSpecialMenu(true); } } }),
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'dragon', enableCondition: function() { return (Game.Has('A crumbly egg')); } })]
+		});
+		h.spawnChild({
+			id: 'dragonDisplay',
+			imgs: 'dragon.png?v='+Game.version,
+			order: 100,
+			width: 96,
+			height: 96,
+			behaviors: [
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.dragonSkin),
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'dragon' })
+			]
+		});
+		h.spawnChild(Crumbs.shine(0.5));
+	}
+	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
+		const height = Crumbs.getCanvasByScope(this.scope).canvas.offsetHeight;
+
+		let count = 0;
+		for (let i in this.children) {
+			if (!this.children[i].enabled) { continue; }
+			this.children[i].y = height - 48 - 48 * count;
+			this.children[i].placement = count;
+			count++;
+		}
+	});
+	Crumbs.initPets = function() {
+		let anchor = Crumbs.spawn({
+			id: 'petAnchor',
+			noDraw: true,
+			scope: 'left',
+			order: 100,
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petManager)
+		});
+		Crumbs.initSanta(anchor);
+		Crumbs.initDragon(anchor);
+	}
 	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
@@ -1913,6 +2009,8 @@ const Crumbs_Init_On_Load = function() {
 	}
 
 	Crumbs.h.rebuildBigCookieButton();
+
+	Game.DrawSpecial = function() { };
 	
 	Game.DrawBackground = function() {
 		Timer.clean();
