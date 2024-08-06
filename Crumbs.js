@@ -288,6 +288,7 @@ const Crumbs_Init_On_Load = function() {
 		imageSmoothingEnabled: true,
 		imageSmoothingQuality: 'low'
 	};
+	Crumbs.unfocusedSpawn = true;
 	Crumbs.object = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
@@ -565,7 +566,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.spawn = function(obj) {
-		if (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) { return false; } 
+		if ((Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
 		return new Crumbs.object(obj);
 	};
 	Crumbs.sleepDetectionBuffer = 1000 * (30 / Game.fps); //equal to 30 draw frames
@@ -1965,7 +1966,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.initDragon(anchor);
 		Crumbs.initSanta(anchor);
 	}
-	Crumbs.initAll = function() { Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); }
+	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
@@ -2603,6 +2604,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.h.resolveInjects();
 	Game.registerHook('check', Crumbs.h.resolveInjects);
 
+	Crumbs.unfocusedSpawn = false;
+	
 	CrumbsEngineLoaded = true;
 };
 
