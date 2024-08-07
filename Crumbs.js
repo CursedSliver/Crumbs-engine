@@ -971,7 +971,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.defaultComp.canvasManipulator = {
 		enabled: true,
-		funcion: function(m, ctx) { }
+		function: function(m, ctx) { }
 	};
 	Crumbs.component.canvasManipulator.prototype.enable = function() {
 		this.enabled = true;
