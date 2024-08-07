@@ -216,6 +216,7 @@ const Crumbs_Init_On_Load = function() {
 		this.shaders = [];
 
 		Crumbs.scopedCanvas[key] = this;
+		Crumbs.objects[key] = [];
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
