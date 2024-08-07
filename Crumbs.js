@@ -199,6 +199,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
 
+	Crumbs.objects = {};
+
 	Crumbs.createCanvas = function(id, parentElement, css) {
 		let div = document.createElement('canvas');
 		div.id = id; div.style = 'background: none;';
@@ -425,13 +427,6 @@ const Crumbs_Init_On_Load = function() {
 				this.spawnChild(childsToSpawn[i]);
 			}
 		}
-	};
-	Crumbs.objects = {
-		left: [],
-		middle: [],
-		right: [],
-		foreground: [],
-		background: []
 	};
 	Crumbs.object.prototype.getInfo = function() {
 		return this; 
