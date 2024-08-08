@@ -200,6 +200,7 @@ const Crumbs_Init_On_Load = function() {
 	Game.registerHook('logic', function() { Crumbs.t++; });
 
 	Crumbs.objects = {};
+	Crumbs.sortedObjectList = {};
 
 	Crumbs.createCanvas = function(id, parentElement, css) {
 		let div = document.createElement('canvas');
@@ -219,6 +220,7 @@ const Crumbs_Init_On_Load = function() {
 
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
+		Crumbs.sortedObjectList[key] = [];
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
@@ -1147,10 +1149,9 @@ const Crumbs_Init_On_Load = function() {
 		const pHeight = Crumbs.getPHeight(m);
 		let b = this.getHoverStatus(m, pWidth, pHeight);
 		if (b && !this.alwaysInteractable) {
-			const scope = Crumbs.objects[m.scope];
-			for (let i of scope) {
+			const scope = Crumbs.sortedObjectList[m.scope];
+			for (let i = scope.indexOf(m) + 1; i < scope.length; i++) {
 				if (!i) { continue; }
-				if (i.order <= m.order) { continue; }
 				const comp = i.getComponent('pointerInteractive');
 				if (!comp) { continue; }
 				if (!comp.getHoverStatus(i, Crumbs.getPWidth(i), Crumbs.getPHeight(i))) { continue; }
@@ -1262,6 +1263,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.compile = function() {
 		if (!this.enabled) { return []; }
+		if (!this.children.length) { return [this]; }
 		let arr = [];
 		arr.push(this);
 		for (let i in this.children) {
@@ -1357,6 +1359,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.drawObjects = function() {
 		for (let c in Crumbs.scopedCanvas) {
 			let list = Crumbs.compileObjects(c);
+			Crumbs.sortedObjectList[c] = list;
 			let ctx = Crumbs.scopedCanvas[c].c;
 			ctx.globalAlpha = 1;
 			ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); 
@@ -1364,9 +1367,9 @@ const Crumbs_Init_On_Load = function() {
 			for (let i in Crumbs.settings) {
 				ctx[i] = Crumbs.settings[i];
 			}
-			for (let i in list) {
+			for (let i = 0; i < list.length; i++) {
 				let o = list[i];
-				if (!o.enabled) { console.log('not drawn!'); continue; }
+				if (!o.enabled) { continue; }
 				Crumbs.drawObject(o, ctx, true);
 
 				for (let ii = o.components.length - 1; ii >= 0; ii--) {
