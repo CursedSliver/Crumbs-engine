@@ -1151,10 +1151,11 @@ const Crumbs_Init_On_Load = function() {
 		if (b && !this.alwaysInteractable) {
 			const scope = Crumbs.sortedObjectList[m.scope];
 			for (let i = scope.indexOf(m) + 1; i < scope.length; i++) {
-				if (!i) { continue; }
-				const comp = i.getComponent('pointerInteractive');
+				const o = scope[i];
+				if (!o) { continue; }
+				const comp = o.getComponent('pointerInteractive');
 				if (!comp) { continue; }
-				if (!comp.getHoverStatus(i, Crumbs.getPWidth(i), Crumbs.getPHeight(i))) { continue; }
+				if (!comp.getHoverStatus(o, Crumbs.getPWidth(o), Crumbs.getPHeight(o))) { continue; }
 				b = false;
 				break;
 			}
