@@ -2139,53 +2139,7 @@ const Crumbs_Init_On_Load = function() {
 			
 			var ctx=Game.LeftBackground;
 			
-			if (Game.OnAscend)
-			{
-				Timer.clean();
-				//starry background on ascend screen
-				/*
-				var w=Game.Background.canvas.width;
-				var h=Game.Background.canvas.height;
-				var b=Game.ascendl.getBounds();
-				var x=(b.left+b.right)/2;
-				var y=(b.top+b.bottom)/2;
-				//Game.Background.globalAlpha=0.5;
-				var s=1*Game.AscendZoom*(1+Math.cos(Game.T*0.0027)*0.05);
-				//Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
-				//Timer.track('star layer 1');
-	*/
-				if (Game.prefs.fancy)
-				{
-					//additional star layer
-					//Game.Background.globalAlpha=0.5*(0.5+Math.sin(Game.T*0.02)*0.3);
-					//var s=2*Game.AscendZoom*(1+Math.sin(Game.T*0.002)*0.07);
-					//Game.Background.globalCompositeOperation='lighter';
-					//Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
-					//Game.Background.globalCompositeOperation='source-over';
-					//Timer.track('star layer 2');
-					/*
-					x=x+Game.AscendOffX*Game.AscendZoom;
-					y=y+Game.AscendOffY*Game.AscendZoom;
-					//wispy nebula around the center
-					Game.Background.save();
-					Game.Background.globalAlpha=0.5;
-					Game.Background.translate(x,y);
-					Game.Background.globalCompositeOperation='lighter';
-					Game.Background.rotate(Game.T*0.001);
-					s=(600+150*Math.sin(Game.T*0.007))*Game.AscendZoom;
-					Game.Background.drawImage(Pic('heavenRing1.jpg'),-s/2,-s/2,s,s);
-					Game.Background.rotate(-Game.T*0.0017);
-					s=(600+150*Math.sin(Game.T*0.0037))*Game.AscendZoom;
-					Game.Background.drawImage(Pic('heavenRing2.jpg'),-s/2,-s/2,s,s);
-					Game.Background.restore();
-					Timer.track('nebula');
-	 */
-					
-					//Game.Background.drawImage(Pic('shadedBorders.png'),0,0,w,h);
-					//Timer.track('border');
-				}
-			}
-			else
+			if (!Game.OnAscend)
 			{
 				//let list = Crumbs.compileObjects('left');
 				
