@@ -1839,9 +1839,9 @@ const Crumbs_Init_On_Load = function() {
 		if (!Game.prefs.particles || Game.cookiesPs<=50) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
 		if (Game.elderWrathD>=1 && !Game.prefs.notScary) { this.alpha=1-((Math.min(Game.elderWrathD,1.5)-1)/0.5); } else { this.alpha = 1; }
 		
-		if (Game.cookiesPs>1000) { this.imgUsing = 3; }
-		else if (Game.cookiesPs>500) { this.imgUsing = 2; }
-		else if (Game.cookiesPs>50) { this.imgUsing = 1; }
+		if (Game.cookiesPs>1000) { this.imgUsing = 2; }
+		else if (Game.cookiesPs>500) { this.imgUsing = 1; }
+		else if (Game.cookiesPs>50) { this.imgUsing = 0; }
 
 		const p = this.getComponent('patternFill');
 		p.width = Crumbs.scopedCanvas.left.l.width;
@@ -1854,7 +1854,7 @@ const Crumbs_Init_On_Load = function() {
 			scope: 'left',
 			id: 'cookieWall',
 			order: -4,
-			imgs: ['empty', 'img/cookieShower1.png', 'img/cookieShower2.png', 'img/cookieShower3.png'],
+			imgs: ['img/cookieShower1.png', 'img/cookieShower2.png', 'img/cookieShower3.png'],
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieShowerBackground)
 		});
