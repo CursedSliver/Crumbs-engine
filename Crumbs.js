@@ -1732,12 +1732,6 @@ const Crumbs_Init_On_Load = function() {
 			scaleY: 8,
 			y: 20
 		});
-		this.spawnChild({
-			imgs: 'dragonBG.png',
-			order: -1.8,
-			anchor: 'top',
-			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.dragonDisplayBehavior)
-		});
 	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
 		this.scaleX = 0.5*Game.BigCookieSize;
@@ -1826,10 +1820,17 @@ const Crumbs_Init_On_Load = function() {
 		const glintGen = {
 			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: Crumbs.veilGlintGenerator })]
 		}
+		const dragon = {
+			imgs: 'dragonBG.png',
+			order: -1.8,
+			anchor: 'top',
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.dragonDisplayBehavior)
+		};
 		this.spawnChild(shine1);
 		this.spawnChild(shine2);
 		this.spawnChild(veilMain);
 		this.spawnChild(glintGen);
+		this.spawnChild(dragon);
 	}
 	Crumbs.initCookie = function() {
 		if (Crumbs.findObject('bigCookie')) { Crumbs.findObject('bigCookie').die(); }
