@@ -2034,15 +2034,15 @@ const Crumbs_Init_On_Load = function() {
 	});
 	Crumbs.objectBehaviors.nebulaSpin1 = new Crumbs.behavior(function() {
 		this.rotation = Game.T*0.001;
-		let s = (600+150*Math.sin(Game.T*0.007))*Game.AscendZoom;
-		this.width = s;
-		this.height = s;
+		let s = (600+150*Math.sin(Game.T*0.007))*Game.AscendZoom / 128;
+		this.scaleX = s;
+		this.scaleY = s;
 	});
 	Crumbs.objectBehaviors.nebulaSpin2 = new Crumbs.behavior(function() {
-		this.rotation = -Game.T*0.0017;
-		let s = (600+150*Math.sin(Game.T*0.0037))*Game.AscendZoom;
-		this.width = s;
-		this.height = s;
+		this.rotation = -Game.T*0.0007;
+		let s = (600+150*Math.sin(Game.T*0.0037))*Game.AscendZoom / 128;
+		this.scaleX = s;
+		this.scaleY = s;
 	});
 	Crumbs.initNebula = function() {
 		let nebulaAnchor = Crumbs.spawn({
@@ -2055,13 +2055,17 @@ const Crumbs_Init_On_Load = function() {
 		nebulaAnchor.spawnChild({
 			id: 'nebula1',
 			imgs: 'heavenRing1.jpg',
+			alpha: 0.5,
 			order: 2,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin1)
 		});
 		nebulaAnchor.spawnChild({
 			id: 'nebula1',
 			imgs: 'heavenRing2.jpg',
+			alpha: 0.5,
 			order: 3,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin2)
 		});
 	}
