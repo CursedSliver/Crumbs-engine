@@ -1860,12 +1860,28 @@ const Crumbs_Init_On_Load = function() {
 		});
 	};
 	Crumbs.objectBehaviors.background = new Crumbs.behavior(function() {
+		if (Game.OnAscend) { this.enabled = false; } else { this.enabled = true; }
 		this.imgs[0] = 'img/'+Game.bg+'.jpg';
 		
 		const p = this.getComponent('patternFill');
 		p.width = Crumbs.scopedCanvas.background.l.width;
 		p.height = Crumbs.scopedCanvas.background.l.height;
 	});
+	Crumbs.objectBehaviors.ascendBackground = new Crumbs.behavior(function(p) {
+		if ((p.fancyRequire && !Game.prefs.fancy) || !Game.OnAscend) { this.enabled = false; return; } else { this.enabled = true; }
+		if (p.alphaFluctuation) { this.alpha = 0.5*(0.5+Math.sin(Game.T*0.02)*0.3); }
+		let b = Game.ascendl.getBounds();
+		var x = (b.left+b.right)/2;
+		var y = (b.top+b.bottom)/2;
+		var s = Game.AscendZoom*p.sMult();
+		let c = this.getComponent('patternFill');
+		c.width = Game.Background.canvas.width;
+		c.height = Game.Background.canvas.height;
+		c.offX = Game.ascendOffX * 0.25 * s + x;
+		c.offY = Game.ascendOffY * 0.25 * s + y;
+		this.width = s * 1024;
+		this.height = s * 1024;
+	}, { fancyRequire: false, alphaFluctuation: false, sMult: function() { return (1+Math.cos(Game.T*0.0027)*0.05); } });
 	Crumbs.initBackground = function() {
 		let background = Crumbs.spawn({
 			anchor: 'top-left',
@@ -1873,6 +1889,23 @@ const Crumbs_Init_On_Load = function() {
 			imgs: Game.bg,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
+		});
+		Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'background',
+			imgs: 'starbg.jpg',
+			alpha: 0.5,
+			components: new Crumbs.component.patternFill(),
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground)
+		});
+		Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'background',
+			imgs: 'starbg.jpg',
+			order: 1,
+			alpha: 0.5,
+			components: new Crumbs.component.patternFill(),
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground, { fancyRequire: true, alphaFluctuation: true, sMult: function() { return 2*(1+Math.sin(Game.T*0.002)*0.07); } })
 		});
 	}
 	Crumbs.objectBehaviors.fillWhole = function() {
