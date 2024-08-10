@@ -1724,6 +1724,9 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleX = s;
 		this.scaleY = s;
 	});
+	Crumbs.objectBehaviors.drawOnEaster = new Crumbs.behavior(function() {
+		if (Game.season == 'easter') { this.noDraw = false; } else { this.noDraw = true; }
+	});
 	Crumbs.objectInits.cookieWidgets = function() {
 		this.spawnChild({
 			imgs: 'img/cookieShadow.png',
@@ -1731,6 +1734,14 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 8,
 			scaleY: 8,
 			y: 20
+		});
+		this.spawnChild({
+			imgs: 'nest.png',
+			order: -1.2,
+			y: 130,
+			scaleX: (0.98)*2,
+			scaleY: (0.98*161/151)*2,
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.drawOnEaster)
 		});
 	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
