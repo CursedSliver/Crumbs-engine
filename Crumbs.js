@@ -1259,7 +1259,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.compileObjects = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i of Crumbs.objects[s]) {
-			if (i) { arr = Crumbs.merge(arr, i.compile(arr)); }
+			if (i) { i.compile(arr); }
 		}
 		return Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
