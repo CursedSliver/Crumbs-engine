@@ -1880,13 +1880,16 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleY = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight / Pic(this.imgs[this.imgUsing]).height;
 	}
 	Crumbs.initShadedBorders = function() {
-		let border = Crumbs.spawn({
+		let obj = {
 			anchor: 'top-left',
 			scope: 'background',
 			order: 1,
 			imgs: 'img/shadedBordersSoft.png',
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
-		});
+		}
+		Crumbs.spawn(obj);
+		obj.scope = 'left';
+		Crumbs.spawn(obj);
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
 		if (!p.enableCondition()) { this.enabled = false; return; } else { this.enabled = true; }
