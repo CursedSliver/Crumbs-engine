@@ -1259,19 +1259,18 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.compileObjects = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i of Crumbs.objects[s]) {
-			if (i) { arr = Crumbs.merge(arr, i.compile()); }
+			if (i) { arr = Crumbs.merge(arr, i.compile(arr)); }
 		}
-		return arr;
+		return Crumbs.mergeSort(arr);
 	};
-	Crumbs.object.prototype.compile = function() {
-		if (!this.enabled) { return []; }
-		if (!this.children.length) { return [this]; }
-		let arr = [];
+	Crumbs.object.prototype.compile = function(arr) {
+		if (!this.enabled) { return; }
 		arr.push(this);
+		if (!this.children.length) { return; }
 		for (let i in this.children) {
-			if (this.children[i] !== null) { arr = Crumbs.merge(arr, this.children[i].compile()); }
+			if (this.children[i] !== null) { arr.push(this.children[i].compile(arr)); }
 		}
-		return arr;
+		arr = Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
 	Crumbs.merge = function(arr1, arr2) {
 		//merges two object arrays together sorting based on order
@@ -1299,6 +1298,22 @@ const Crumbs_Init_On_Load = function() {
 	
 	    return mergedArray;
 	};
+
+	//I love stealing code
+	Crumbs.mergeSort(arr, left, right) {
+	    if (left >= right) {
+	        return;
+	    }
+	    
+	    let middle = left + parseInt((right - left) / 2);
+	    
+	    Crumbs.mergeSort(arr, left, middle);
+	    Crumbs.mergeSort(arr, middle + 1, right);
+	    
+	    Crumbs.merge(arr, left, middle, right);
+
+		return arr;
+	}
 
 	
 	Crumbs.OXFA = {
