@@ -2054,13 +2054,13 @@ const Crumbs_Init_On_Load = function() {
 		});
 		nebulaAnchor.spawnChild({
 			id: 'nebula1',
-			imgs: 'heavenRings1.jpg',
+			imgs: 'heavenRing1.jpg',
 			order: 2,
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin1)
 		});
 		nebulaAnchor.spawnChild({
 			id: 'nebula1',
-			imgs: 'heavenRings2.jpg',
+			imgs: 'heavenRing2.jpg',
 			order: 3,
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin2)
 		});
