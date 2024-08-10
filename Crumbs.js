@@ -1902,7 +1902,7 @@ const Crumbs_Init_On_Load = function() {
 			anchor: 'top-left',
 			scope: 'background',
 			imgs: 'starbg.jpg',
-			order: 1,
+			order: 0.5,
 			alpha: 0.5,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground, { fancyRequire: true, alphaFluctuation: true, sMult: function() { return 2*(1+Math.sin(Game.T*0.002)*0.07); } })
