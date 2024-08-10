@@ -481,6 +481,7 @@ const Crumbs_Init_On_Load = function() {
 		this.index = at;
 	};
 	Crumbs.object.prototype.triggerBehavior = function() {
+		if (!this.enabled) { return; }
 		for (let i in this.components) {
 			if (this.components[i].enabled) { this.components[i].logic(this); }
 		}
@@ -1701,6 +1702,9 @@ const Crumbs_Init_On_Load = function() {
 		}
 		ctx.restore();
 	}
+	Crumbs.objectBehaviors.fadeWithDragon = new Crumbs.behavior(function() {
+		if (Game.hasBuff('Dragonflight') || Game.hasBuff('Dragon Harvest')) { this.alpha = 0.25; } else { this.alpha = 1; }
+	});
 	Crumbs.initCursors = function() {
 		Crumbs.spawn({
 			init: Crumbs.objectInits.bigCookie,
@@ -1709,10 +1713,17 @@ const Crumbs_Init_On_Load = function() {
 			components: new Crumbs.component.canvasManipulator({
 				function: Crumbs.cursorDraw
 			}),
-			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeWithDragon)],
 			id: 'cursors'
 		})
-	}
+	};
+	Crumbs.objectBehaviors.dragonDisplayBehavior = new Crumbs.behavior(function() {
+		if (Game.hasBuff('Dragonflight') || Game.hasBuff('Dragon Harvest')) { this.noDraw = false; } else { this.noDraw = true; return; }
+		let s=2*(1+Math.sin(Game.T*0.013)*0.1);
+		this.y = -(s*300)/(1.4+0.2*Math.sin(Game.T*0.01));
+		this.scaleX = s;
+		this.scaleY = s;
+	});
 	Crumbs.objectInits.cookieWidgets = function() {
 		this.spawnChild({
 			imgs: 'img/cookieShadow.png',
@@ -1720,6 +1731,12 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: 8,
 			scaleY: 8,
 			y: 20
+		});
+		this.spawnChild({
+			imgs: 'dragonBG.png',
+			order: -1.8,
+			anchor: 'top',
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.dragonDisplayBehavior)
 		});
 	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
@@ -1860,7 +1877,7 @@ const Crumbs_Init_On_Load = function() {
 		});
 	};
 	Crumbs.objectBehaviors.background = new Crumbs.behavior(function() {
-		if (Game.OnAscend) { this.enabled = false; } else { this.enabled = true; }
+		if (Game.OnAscend) { this.noDraw = true; return; } else { this.noDraw = false; }
 		this.imgs[0] = 'img/'+Game.bg+'.jpg';
 		
 		const p = this.getComponent('patternFill');
@@ -1868,7 +1885,7 @@ const Crumbs_Init_On_Load = function() {
 		p.height = Crumbs.scopedCanvas.background.l.height;
 	});
 	Crumbs.objectBehaviors.ascendBackground = new Crumbs.behavior(function(p) {
-		if ((p.fancyRequire && !Game.prefs.fancy) || !Game.OnAscend) { this.enabled = false; return; } else { this.enabled = true; }
+		if ((p.fancyRequire && !Game.prefs.fancy) || !Game.OnAscend) { this.noDraw = true; return; } else { this.noDraw = false; }
 		if (p.alphaFluctuation) { this.alpha = 0.5*(0.5+Math.sin(Game.T*0.02)*0.3); }
 		let b = Game.ascendl.getBounds();
 		let x = (b.left+b.right)/2;
@@ -1925,7 +1942,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn(obj);
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
-		if (!p.enableCondition()) { this.enabled = false; return; } else { this.enabled = true; }
+		if (!p.enableCondition()) { this.findChild(pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(pet+'Display').enabled = true; this.active = true; }
 	}, { pet: '', enableCondition: function() { } });
 	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
 		this.offsetX = ((Game.specialTab==p.tab)?0:Math.sin(Game.T*0.2+this.parent.placement)*3);
@@ -1959,6 +1976,7 @@ const Crumbs_Init_On_Load = function() {
 			width: 96,
 			height: 96,
 			placement: 0,
+			active: false,
 			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'santa') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'santa'; Game.ToggleSpecialMenu(true); } } }),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'santa', enableCondition: function() { return (Game.Has('A festive hat')); } })]
 		});
@@ -1988,6 +2006,7 @@ const Crumbs_Init_On_Load = function() {
 			width: 96,
 			height: 96,
 			placement: 0,
+			active: false,
 			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'dragon') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'dragon'; Game.ToggleSpecialMenu(true); } } }),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'dragon', enableCondition: function() { return (Game.Has('A crumbly egg')); } })]
 		});
@@ -2009,7 +2028,7 @@ const Crumbs_Init_On_Load = function() {
 
 		let count = 0;
 		for (let i in this.children) {
-			if (!this.children[i].enabled) { continue; }
+			if (!this.children[i].active) { continue; }
 			this.children[i].y = height - 72 - 48 * count;
 			this.children[i].placement = count;
 			count++;
