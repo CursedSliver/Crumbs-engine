@@ -213,6 +213,7 @@ const Crumbs_Init_On_Load = function() {
 		return l(id);
 	}
 	Crumbs.scopedCanvas = { };
+	Crumbs.validScopes = [];
 	Crumbs.canvas = function(parentEle, key, id, css) {
 		this.l = Crumbs.createCanvas(id, parentEle, css);
 		this.c = this.l.getContext('2d');
@@ -287,7 +288,6 @@ const Crumbs_Init_On_Load = function() {
 		wrinklerBits: 'img/wrinklerBits.png',
 		shinyWrinklerBits: 'img/shinyWrinklerBits.png'
 	};
-	Crumbs.validScopes = [];
 	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
