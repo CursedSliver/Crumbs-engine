@@ -1261,7 +1261,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let i of Crumbs.objects[s]) {
 			if (i) { arr = Crumbs.merge(arr, i.compile(arr)); }
 		}
-		return Crumbs.mergeSort(arr);
+		return Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
 	Crumbs.object.prototype.compile = function(arr) {
 		if (!this.enabled) { return; }
@@ -1270,33 +1270,41 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in this.children) {
 			if (this.children[i] !== null) { arr.push(this.children[i].compile(arr)); }
 		}
-		arr = Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
-	Crumbs.merge = function(arr1, arr2) {
+	Crumbs.merge = function(arr, left, middle, right) {
 		//merges two object arrays together sorting based on order
-		let m = [];
-    	let i = 0;
+		let a1 = new Array(middle - left + 1);
+		let a2 = new Array(right - middle);
+
+		for (let i = 0; i < a1.length; i++) {
+			a1[i] = arr[left + i];
+		}
+		for (let i = 0; i < a2.length; i++) {
+			a2[i] = arr[middle + 1 + i];
+		}
+
+		let i = 0;
     	let j = 0;	
+		let k = left;
 	
-	    while (i < arr1.length && j < arr2.length) {
-	        if (arr1[i].order < arr2[j].order) {
-	            m.push(arr1[i]);
+	    while (i < a1.length && j < a2.length) {
+	        if (a1[i].order < a2[j].order) {
+	            arr[k] = a1[i];
 	            i++;
 	        } else {
-	            m.push(arr2[j]);
+	            arr[k] = a2[j];
 	            j++;
 	        }
+			k++;
 	    }
-	    while (i < arr1.length) {
-	        m.push(arr1[i]);
-	        i++;
+	    while (i < a1.length) {
+	        arr[k] = a1[i]; i++; k++;
 	    }
-	    while (j < arr2.length) {
-	        m.push(arr2[j]);
-	        j++;
+	    while (j < a2.length) {
+	        arr[k] = a2[j]; j++; k++;
 	    }
 	
-	    return m;
+	    return arr;
 	};
 
 	//I love stealing code
@@ -1305,7 +1313,7 @@ const Crumbs_Init_On_Load = function() {
 	        return;
 	    }
 	    
-	    let middle = left + parseInt((right - left) / 2);
+		const middle = left + parseInt((right - left) / 2);
 	    
 	    arr = Crumbs.mergeSort(arr, left, middle);
 	    arr = Crumbs.mergeSort(arr, middle + 1, right);
