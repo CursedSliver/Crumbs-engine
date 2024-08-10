@@ -2036,8 +2036,6 @@ const Crumbs_Init_On_Load = function() {
 			}
 			
 			var ctx=Game.LeftBackground;
-
-			Crumbs.drawObjects();
 			
 			if (Game.OnAscend)
 			{
@@ -2212,40 +2210,6 @@ const Crumbs_Init_On_Load = function() {
 						}
 						
 						//big cookie
-						if (false)
-						{
-							ctx.globalAlpha=1;
-							var s=256*Game.BigCookieSize;
-							var x=Game.cookieOriginX;
-							var y=Game.cookieOriginY;
-							ctx.save();
-							if (Game.prefs.fancy) ctx.drawImage(Pic('cookieShadow.png'),x-s/2,y-s/2+20,s,s);
-							ctx.translate(x,y);
-							if (Game.season=='easter')
-							{
-								var nestW=304*0.98*Game.BigCookieSize;
-								var nestH=161*0.98*Game.BigCookieSize;
-								ctx.drawImage(Pic('nest.png'),-nestW/2,-nestH/2+130,nestW,nestH);
-							}
-							//ctx.rotate(((Game.startDate%360)/360)*Math.PI*2);
-							ctx.drawImage(Pic('perfectCookie.png'),-s/2,-s/2,s,s);
-							
-							if (goodBuff && Game.prefs.particles)//sparkle
-							{
-								ctx.globalCompositeOperation='lighter';
-								for (var i=0;i<1;i++)
-								{
-									ctx.globalAlpha=Math.random()*0.65+0.1;
-									var size=Math.random()*30+5;
-									var a=Math.random()*Math.PI*2;
-									var d=s*0.9*Math.random()/2;
-									ctx.drawImage(Pic('glint.png'),-size/2+Math.sin(a)*d,-size/2+Math.cos(a)*d,size,size);
-								}
-							}
-							
-							ctx.restore();
-							Timer.track('big cookie');
-						}
 					}
 					else//no particles
 					{
@@ -2601,6 +2565,7 @@ const Crumbs_Init_On_Load = function() {
 					if (goodBuff && Game.prefs.fancy) ctx.globalCompositeOperation='source-over';
 				}
 			}
+		Crumbs.drawObjects();
 	};
 	Crumbs.h.resolveInjects();
 	Game.registerHook('check', Crumbs.h.resolveInjects);
