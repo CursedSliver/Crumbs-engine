@@ -1942,7 +1942,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn(obj);
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
-		if (!p.enableCondition()) { this.findChild(pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(pet+'Display').enabled = true; this.active = true; }
+		if (!p.enableCondition()) { this.findChild(p.pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(p.pet+'Display').enabled = true; this.active = true; }
 	}, { pet: '', enableCondition: function() { } });
 	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
 		this.offsetX = ((Game.specialTab==p.tab)?0:Math.sin(Game.T*0.2+this.parent.placement)*3);
