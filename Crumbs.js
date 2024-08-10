@@ -221,6 +221,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
 		Crumbs.sortedObjectList[key] = [];
+		Crumbs.validScopes.push(key);
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
@@ -286,7 +287,7 @@ const Crumbs_Init_On_Load = function() {
 		wrinklerBits: 'img/wrinklerBits.png',
 		shinyWrinklerBits: 'img/shinyWrinklerBits.png'
 	};
-	Crumbs.validScopes = ['left', 'middle', 'right', 'foreground', 'background'];
+	Crumbs.validScopes = [];
 	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
@@ -2035,6 +2036,8 @@ const Crumbs_Init_On_Load = function() {
 			}
 			
 			var ctx=Game.LeftBackground;
+
+			Crumbs.drawObjects();
 			
 			if (Game.OnAscend)
 			{
@@ -2265,8 +2268,6 @@ const Crumbs_Init_On_Load = function() {
 						ctx.drawImage(Pic('perfectCookie.png'),x,y,s,s);
 					
 					}
-
-					Crumbs.drawObjects();
 				}
 				else
 				{
