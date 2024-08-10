@@ -1871,14 +1871,14 @@ const Crumbs_Init_On_Load = function() {
 		if ((p.fancyRequire && !Game.prefs.fancy) || !Game.OnAscend) { this.enabled = false; return; } else { this.enabled = true; }
 		if (p.alphaFluctuation) { this.alpha = 0.5*(0.5+Math.sin(Game.T*0.02)*0.3); }
 		let b = Game.ascendl.getBounds();
-		var x = (b.left+b.right)/2;
-		var y = (b.top+b.bottom)/2;
-		var s = Game.AscendZoom*p.sMult();
+		let x = (b.left+b.right)/2;
+		let y = (b.top+b.bottom)/2;
+		let s = Game.AscendZoom*p.sMult();
 		let c = this.getComponent('patternFill');
 		c.width = Game.Background.canvas.width;
 		c.height = Game.Background.canvas.height;
-		c.offX = Game.ascendOffX * 0.25 * s + x;
-		c.offY = Game.ascendOffY * 0.25 * s + y;
+		c.offX = Game.AscendOffX * 0.25 * s + x;
+		c.offY = Game.AscendOffY * 0.25 * s + y;
 		this.width = s * 1024;
 		this.height = s * 1024;
 	}, { fancyRequire: false, alphaFluctuation: false, sMult: function() { return (1+Math.cos(Game.T*0.0027)*0.05); } });
