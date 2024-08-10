@@ -1274,43 +1274,43 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.merge = function(arr1, arr2) {
 		//merges two object arrays together sorting based on order
-		let mergedArray = [];
+		let m = [];
     	let i = 0;
     	let j = 0;	
 	
 	    while (i < arr1.length && j < arr2.length) {
 	        if (arr1[i].order < arr2[j].order) {
-	            mergedArray.push(arr1[i]);
+	            m.push(arr1[i]);
 	            i++;
 	        } else {
-	            mergedArray.push(arr2[j]);
+	            m.push(arr2[j]);
 	            j++;
 	        }
 	    }
 	    while (i < arr1.length) {
-	        mergedArray.push(arr1[i]);
+	        m.push(arr1[i]);
 	        i++;
 	    }
 	    while (j < arr2.length) {
-	        mergedArray.push(arr2[j]);
+	        m.push(arr2[j]);
 	        j++;
 	    }
 	
-	    return mergedArray;
+	    return m;
 	};
 
 	//I love stealing code
-	Crumbs.mergeSort(arr, left, right) {
+	Crumbs.mergeSort = function(arr, left, right) {
 	    if (left >= right) {
 	        return;
 	    }
 	    
 	    let middle = left + parseInt((right - left) / 2);
 	    
-	    Crumbs.mergeSort(arr, left, middle);
-	    Crumbs.mergeSort(arr, middle + 1, right);
+	    arr = Crumbs.mergeSort(arr, left, middle);
+	    arr = Crumbs.mergeSort(arr, middle + 1, right);
 	    
-	    Crumbs.merge(arr, left, middle, right);
+	    arr = Crumbs.merge(arr, left, middle, right);
 
 		return arr;
 	}
