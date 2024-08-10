@@ -2026,7 +2026,46 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.initDragon(anchor);
 		Crumbs.initSanta(anchor);
 	}
-	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.unfocusedSpawn = false; }
+	Crumbs.objectBehaviors.nebulaTrack = new Crumbs.behavior(function() {
+		if (!Game.OnAscend) { this.enabled = false; return; } else { this.enabled = true; }
+		let b=Game.ascendl.getBounds();
+		this.x = (b.left+b.right)/2 + Game.AscendOffX * Game.AscendZoom;
+		this.y = (b.top+b.bottom)/2 + Game.AscendOffY * Game.AscendZoom;
+	});
+	Crumbs.objectBehaviors.nebulaSpin1 = new Crumbs.behavior(function() {
+		this.rotation = Game.T*0.001;
+		let s = (600+150*Math.sin(Game.T*0.007))*Game.AscendZoom;
+		this.width = s;
+		this.height = s;
+	});
+	Crumbs.objectBehaviors.nebulaSpin2 = new Crumbs.behavior(function() {
+		this.rotation = -Game.T*0.0017;
+		let s = (600+150*Math.sin(Game.T*0.0037))*Game.AscendZoom;
+		this.width = s;
+		this.height = s;
+	});
+	Crumbs.initNebula = function() {
+		let nebulaAnchor = Crumbs.spawn({
+			id: 'nebulaAnchor',
+			noDraw: true,
+			scope: 'background',
+			order: 2,
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaTrack)
+		});
+		nebulaAnchor.spawnChild({
+			id: 'nebula1',
+			imgs: 'heavenRings1.jpg',
+			order: 2,
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin1)
+		});
+		nebulaAnchor.spawnChild({
+			id: 'nebula1',
+			imgs: 'heavenRings2.jpg',
+			order: 3,
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin2)
+		});
+	}
+	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
@@ -2100,25 +2139,27 @@ const Crumbs_Init_On_Load = function() {
 			{
 				Timer.clean();
 				//starry background on ascend screen
+				/*
 				var w=Game.Background.canvas.width;
 				var h=Game.Background.canvas.height;
 				var b=Game.ascendl.getBounds();
 				var x=(b.left+b.right)/2;
 				var y=(b.top+b.bottom)/2;
-				Game.Background.globalAlpha=0.5;
+				//Game.Background.globalAlpha=0.5;
 				var s=1*Game.AscendZoom*(1+Math.cos(Game.T*0.0027)*0.05);
-				Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
-				Timer.track('star layer 1');
+				//Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
+				//Timer.track('star layer 1');
+	*/
 				if (Game.prefs.fancy)
 				{
 					//additional star layer
-					Game.Background.globalAlpha=0.5*(0.5+Math.sin(Game.T*0.02)*0.3);
-					var s=2*Game.AscendZoom*(1+Math.sin(Game.T*0.002)*0.07);
+					//Game.Background.globalAlpha=0.5*(0.5+Math.sin(Game.T*0.02)*0.3);
+					//var s=2*Game.AscendZoom*(1+Math.sin(Game.T*0.002)*0.07);
 					//Game.Background.globalCompositeOperation='lighter';
-					Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
+					//Game.Background.fillPattern(Pic('starbg.jpg'),0,0,w,h,1024*s,1024*s,x+Game.AscendOffX*0.25*s,y+Game.AscendOffY*0.25*s);
 					//Game.Background.globalCompositeOperation='source-over';
-					Timer.track('star layer 2');
-					
+					//Timer.track('star layer 2');
+					/*
 					x=x+Game.AscendOffX*Game.AscendZoom;
 					y=y+Game.AscendOffY*Game.AscendZoom;
 					//wispy nebula around the center
@@ -2134,6 +2175,7 @@ const Crumbs_Init_On_Load = function() {
 					Game.Background.drawImage(Pic('heavenRing2.jpg'),-s/2,-s/2,s,s);
 					Game.Background.restore();
 					Timer.track('nebula');
+	 */
 					
 					//Game.Background.drawImage(Pic('shadedBorders.png'),0,0,w,h);
 					//Timer.track('border');
