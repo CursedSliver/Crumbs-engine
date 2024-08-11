@@ -281,7 +281,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectImgs = {
 		none: 'img/empty.png',
 		empty: 'img/empty.png',
-		rect: 'https://rawcdn.githack.com/CursedSliver/Crumbs-engine/0be326d47cad9241c0d073c8468c18ae464c4563/imgs/White_Pixel_1x1.jpg',
+		rect: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2P4DwQACfsD/Z8fLAAAAAAASUVORK5CYII=',
 		glint: 'img/glint.png',
 		icons: 'img/icons.png',
 		dollar: 'img/smallDollars.png',
