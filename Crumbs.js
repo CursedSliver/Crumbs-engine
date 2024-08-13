@@ -1937,20 +1937,34 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground, { fancyRequire: true, alphaFluctuation: true, sMult: function() { return 2*(1+Math.sin(Game.T*0.002)*0.07); } })
 		});
 	}
-	Crumbs.objectBehaviors.fillWhole = function() {
+	Crumbs.objectBehaviors.fillWhole = new Crumbs.behavior(function() {
 		this.scaleX = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetWidth / Pic(this.imgs[this.imgUsing]).width;
 		this.scaleY = Crumbs.getCanvasByScope(this.scope).canvas.parentNode.offsetHeight / Pic(this.imgs[this.imgUsing]).height;
-	}
+	});
+	Crumbs.objectBehaviors.shadedBorderAura = new Crumbs.behavior(function() {
+		var goodBuff=0;
+		var badBuff=0;
+		for (var i in Game.buffs)
+		{
+			if (Game.buffs[i].aura==1) goodBuff=1;
+			if (Game.buffs[i].aura==2) badBuff=1;
+		}
+		this.imgUsing = 0;
+		if (badBuff) { this.imgUsing = 2; }
+		if (goodBuff) { this.imgUsing = 1; if (Game.prefs.fancy) { this.getComponent('settings').obj.globalCompositeOperation = 'lighter'; } } else { this.getComponent('settings').obj.globalCompositeOperation = 'source-over'; }
+	});
 	Crumbs.initShadedBorders = function() {
 		let obj = {
 			anchor: 'top-left',
 			scope: 'background',
 			order: 1,
-			imgs: 'img/shadedBordersSoft.png',
-			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)
+			imgs: ['shadedBordersSoft.png', 'shadedBordersGold.png', 'shadedBordersRed.png'],
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)]
 		}
 		Crumbs.spawn(obj);
 		obj.scope = 'left';
+		obj.components = new Crumbs.component.settings({ globalCompositeOperation: 'source-over' });
+		obj.behaviors.push(new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shadedBorderAura));
 		Crumbs.spawn(obj);
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
@@ -2644,15 +2658,6 @@ const Crumbs_Init_On_Load = function() {
 					Game.DrawSpecial();Timer.track('evolvables');
 					
 					Game.particlesDraw(2);Timer.track('text particles');
-					
-					//shiny border during frenzies etc
-					ctx.globalAlpha=1;
-					var borders='shadedBordersSoft.png';
-					if (goodBuff) borders='shadedBordersGold.png';
-					else if (badBuff) borders='shadedBordersRed.png';
-					if (goodBuff && Game.prefs.fancy) ctx.globalCompositeOperation='lighter';
-					ctx.drawImage(Pic(borders),0,0,ctx.canvas.width,ctx.canvas.height);
-					if (goodBuff && Game.prefs.fancy) ctx.globalCompositeOperation='source-over';
 				}
 			}
 		Crumbs.drawObjects();
