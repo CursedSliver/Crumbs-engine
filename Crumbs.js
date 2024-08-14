@@ -223,6 +223,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.objects[key] = [];
 		Crumbs.sortedObjectList[key] = [];
 		Crumbs.validScopes.push(key);
+		Crumbs.prefs.objects[key] = 1;
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
@@ -269,13 +270,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	
 	Crumbs.prefs = {
-		objects: {
-			left: 1,
-			middle: 1,
-			right: 1,
-			foreground: 1,
-			background: 1
-		},
+		objects: { },
 		anchorDisplay: 0
 	}
 	Crumbs.objectImgs = {
