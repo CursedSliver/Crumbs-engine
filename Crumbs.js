@@ -2667,6 +2667,6 @@ const Crumbs_Init_On_Load = function() {
 
 Game.registerMod('Crumbs engine', {
 	init: Crumbs_Init_On_Load,
-	save: function() { return Crumbs.t; },
+	save: function() { return Crumbs.t + ''; },
 	load: function(str) { Crumbs.t = parseInt(str); }
 });
