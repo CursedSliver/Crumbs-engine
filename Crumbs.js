@@ -14,6 +14,7 @@ const Crumbs_Init_On_Load = function() {
 		let str = '';
 		for (let i in Crumbs.h.CSSInjects) { str += Crumbs.h.CSSInjects[i] + '\n'; }
 		let style = document.createElement('style');
+		Crumbs.h.CSSInjects = [];
 		style.textContent = str;
 		l('game').appendChild(style);
 	}
