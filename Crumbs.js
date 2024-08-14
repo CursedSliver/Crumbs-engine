@@ -201,6 +201,10 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.objects = {};
 	Crumbs.sortedObjectList = {};
+	Crumbs.prefs = {
+		objects: { },
+		anchorDisplay: 0
+	}
 
 	Crumbs.createCanvas = function(id, parentElement, css) {
 		let div = document.createElement('canvas');
@@ -269,10 +273,6 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.scopedCanvas[s].c;
 	};
 	
-	Crumbs.prefs = {
-		objects: { },
-		anchorDisplay: 0
-	}
 	Crumbs.objectImgs = {
 		none: 'img/empty.png',
 		empty: 'img/empty.png',
