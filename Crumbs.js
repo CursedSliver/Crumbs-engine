@@ -1266,8 +1266,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in Crumbs.particleDefaults) { this[i] = Crumbs.particleDefaults[i]; }
 		for (let i in obj) { this[i] = obj[i]; }
 
-		if (this.init) { this.init.call(this); }
-
 		this.obj = obj;
 
 		this.x = x;
@@ -1276,6 +1274,8 @@ const Crumbs_Init_On_Load = function() {
 
 		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
+
+		if (this.init) { this.init.call(this); }
 	}
 	Crumbs.particleDefaults = {
 		width: 1,
@@ -1286,6 +1286,13 @@ const Crumbs_Init_On_Load = function() {
 		behavior: null,
 		reusePool: null
 	};
+	Crumbs.spawnParticle = function(what, x, y, r, scope) {
+		if (what instanceof Crumbs.particle) { 
+			return Crumbs.reuseParticle.call(what, x, y, r, scope);
+		} else {
+			return new Crumbs.particle(what, x, y, r, scope);
+		}
+	}
 	Crumbs.particle.prototype.die = function() {
 		this.scope.splice(this.scope.indexOf(this), 1);
 		if (this.reusePool) { this.reusePool.push(this); }
@@ -1304,13 +1311,16 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
-	Crumbs.reuseParticle = function(me, x, y, r, scope) {
-		for (let i in me.obj) { this[i] = me.obj[i]; }
+	Crumbs.reuseParticle = function(x, y, r, scope) {
+		for (let i in this.obj) { this[i] = this.obj[i]; }
 		this.x = x;
 		this.y = y;
 		this.rotation = r;
 		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
+
+		if (this.init) { this.init.call(this); }
+		return this;
 	}
 
 	//below for the actual drawing
