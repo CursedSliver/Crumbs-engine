@@ -357,7 +357,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
 		}
-		this.updateChildren();
+		if (this.parent === null) { this.updateChildren(); }
 	};
 	Crumbs.behavior = function(func, init) {
 		this.f = func;
