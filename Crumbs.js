@@ -2208,7 +2208,7 @@ const Crumbs_Init_On_Load = function() {
 			this.alpha -= 1 / (4 * Game.fps);
 			if (this.alpha <= 0) { return 't'; }
 			this.y -= 2;
-		});
+		})
 	}
 	Crumbs.spawnCookieClickPopup = function(x, y, text) {
 		if (!Game.prefs.numbers) { return; }
