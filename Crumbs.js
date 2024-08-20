@@ -333,9 +333,10 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
 		this.rotationAdd = 0; //for if it is a child
 		
-		this.children = [].concat(this.children);
-		for (let i in this.children) {
-			this.spawnChild(this.children[i]);
+		const childrenToSpawn = [].concat(this.children);
+		this.children = [];
+		for (let i in childrenToSpawn) {
+			this.spawnChild(childrenToSpawn[i]);
 		}
 
 		if (typeof this.init === 'function') {
