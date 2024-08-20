@@ -2186,7 +2186,7 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin1)
 		});
 		nebulaAnchor.spawnChild({
-			id: 'nebula1',
+			id: 'nebula2',
 			imgs: 'heavenRing2.jpg',
 			alpha: 0.5,
 			order: 3,
