@@ -2147,6 +2147,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.initSanta(anchor);
 	}
 	Crumbs.objectBehaviors.nebulaTrack = new Crumbs.behavior(function() {
+		if (!this.children.length) { return; }
 		if (!Game.OnAscend) { 
 			this.findChild('nebula1').enabled = false; this.findChild('nebula2').enabled = false; return; 
 		} else { 
