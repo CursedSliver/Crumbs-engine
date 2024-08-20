@@ -2053,7 +2053,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectBehaviors.santaSkin = new Crumbs.behavior(function() {
 		this.sx = 96 * Game.santaLevel;
 	});
-	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target.getComponent('pointerInteractive').hovered) { this.enabled = true; } else { this.enabled = false; } }, { target: null });
+	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target.getComponent('pointerInteractive').hovered) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
 	Crumbs.objectBehaviors.follow = new Crumbs.behavior(function(p) { this.x = p.target.x + (p.offset?p.target.offsetX:0); this.y = p.target.y + (p.offset?p.target.offsetY:0); }, { target: null, offset: false });
 	Crumbs.shine = function(scaleMult, target1, target2) {
 		return {
@@ -2147,7 +2147,11 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.initSanta(anchor);
 	}
 	Crumbs.objectBehaviors.nebulaTrack = new Crumbs.behavior(function() {
-		if (!Game.OnAscend) { this.enabled = false; return; } else { this.enabled = true; }
+		if (!Game.OnAscend) { 
+			this.findChild('nebula1').enabled = false; this.findChild('nebula2').enabled = false; return; 
+		} else { 
+			this.findChild('nebula1').enabled = true; this.findChild('nebula2').enabled = true; 
+		}
 		let b=Game.ascendl.getBounds();
 		this.x = (b.left+b.right)/2 + Game.AscendOffX * Game.AscendZoom;
 		this.y = (b.top+b.bottom)/2 + Game.AscendOffY * Game.AscendZoom;
