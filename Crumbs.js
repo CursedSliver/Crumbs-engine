@@ -1257,7 +1257,7 @@ const Crumbs_Init_On_Load = function() {
 		return data;
 	}
 	
-	Crumbs.particle = function(obj, scope) {
+	Crumbs.particle = function(obj, x, y, r, scope) {
 		//a super-lightweight variant of Crumbs.object
 		//is always drawn on top of other objects and has no sense of order
 		//behavior is simply a function
@@ -1268,23 +1268,27 @@ const Crumbs_Init_On_Load = function() {
 
 		if (this.init) { this.init.call(this); }
 
-		this.scope = Crumbs.particles[scope];
+		this.obj = obj;
 
+		this.x = x;
+		this.y = y;
+		this.rotation = r;
+
+		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
 	}
 	Crumbs.particleDefaults = {
-		x: 0,
-		y: 0,
 		width: 1,
 		height: 1,
-		rotation: 0,
 		img: '',
 		life: 2 * Game.fps,
 		init: null,
-		behavior: null
+		behavior: null,
+		reusePool: null
 	};
 	Crumbs.particle.prototype.die = function() {
 		this.scope.splice(this.scope.indexOf(this), 1);
+		if (this.reusePool) { this.reusePool.push(this); }
 	}
 	Crumbs.particle.prototype.update = function() {
 		this.life--;
@@ -1299,6 +1303,14 @@ const Crumbs_Init_On_Load = function() {
 				Crumbs.particles[i][ii].update();
 			}
 		}
+	}
+	Crumbs.reuseParticle = function(me, x, y, r, scope) {
+		for (let i in me.obj) { this[i] = me.obj[i]; }
+		this.x = x;
+		this.y = y;
+		this.rotation = r;
+		this.scope = Crumbs.particles[scope];
+		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
 	}
 
 	//below for the actual drawing
