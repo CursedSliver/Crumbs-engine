@@ -1582,7 +1582,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Game.registerHook('logic', Crumbs.spawnCookieShower);
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
-	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', ''));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Game.mouseX+Math.random()*8-4, Game.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
 		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
@@ -2192,6 +2192,30 @@ const Crumbs_Init_On_Load = function() {
 			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin2)
 		});
+	}
+
+	Crumbs.cookieClickPopup = {
+		order: 8,
+		id: 'cookieClickText',
+		scope: 'left',
+		anchor: 'bottom',
+		components: new Crumbs.component.text({
+			size: 20,
+			color: '#fff',
+			align: 'center'
+		}),
+		behaviors: new Crumbs.behaviorInstance(function() {
+			this.alpha -= 1 / (4 * Game.fps);
+			if (this.alpha <= 0) { return 't'; }
+			this.y -= 2;
+		});
+	}
+	Crumbs.spawnCookieClickPopup = function(x, y, text) {
+		if (!Game.prefs.numbers) { return; }
+		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
+		s.x = x;
+		s.y = y;
+		s.getComponent('text').content = text;
 	}
 	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
