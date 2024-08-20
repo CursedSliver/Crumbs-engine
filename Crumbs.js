@@ -488,6 +488,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.updateChildren = function() {
 		if (!this.enabled) { return; }
+		this.triggerBehavior();
 		if (this.parent !== null) {
 			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
 			let m = Crumbs.h.rv(this.rotationAdd, this.parent.offsetX, this.parent.offsetY);
@@ -497,7 +498,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in this.children) {
 			if (this.children[i] !== null) {
 				this.children[i].updateChildren();
-				this.children[i].triggerBehavior();
 			}
 		}
 	};
@@ -553,7 +553,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in Crumbs.objects) { 
 			if (Crumbs.objectsEnabled(i)) {
 				for (let ii in Crumbs.objects[i]) {
-					if (Crumbs.objects[i][ii] !== null) { Crumbs.objects[i][ii].triggerBehavior(); Crumbs.objects[i][ii].updateChildren(); }
+					if (Crumbs.objects[i][ii] !== null) { Crumbs.objects[i][ii].updateChildren(); }
 				} 
 			}
 		} 
