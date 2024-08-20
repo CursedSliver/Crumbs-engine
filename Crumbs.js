@@ -1027,7 +1027,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.component.text.prototype.postDraw = function(m, ctx) {
 		const dims = ctx.measureText(this.content);
-		const pWidth = Crumbs.getPWidth(m) * dims.width / Pic(m.imgs[m.imgUsing]).width;
+		const pWidth = dims.width;
 		const pHeight = Crumbs.getPHeight(m) * (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		
 		if (this.maxWidth) {
