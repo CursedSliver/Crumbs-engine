@@ -2199,11 +2199,7 @@ const Crumbs_Init_On_Load = function() {
 		id: 'cookieClickText',
 		scope: 'left',
 		anchor: 'bottom',
-		components: new Crumbs.component.text({
-			size: 20,
-			color: '#fff',
-			align: 'center'
-		}),
+		components: [],
 		behaviors: new Crumbs.behaviorInstance(function() {
 			this.alpha -= 1 / (4 * Game.fps);
 			if (this.alpha <= 0) { return 't'; }
@@ -2215,7 +2211,12 @@ const Crumbs_Init_On_Load = function() {
 		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
 		s.x = x;
 		s.y = y;
-		s.getComponent('text').content = text;
+		s.components.push(new Crumbs.component.text({
+			size: 20,
+			color: '#fff',
+			align: 'center',
+			content: text
+		}));
 	}
 	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
