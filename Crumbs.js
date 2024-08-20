@@ -553,7 +553,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in Crumbs.objects) { 
 			if (Crumbs.objectsEnabled(i)) {
 				for (let ii in Crumbs.objects[i]) {
-					if (Crumbs.objects[i][ii] !== null) { Crumbs.objects[i][ii].updateChildren(); Crumbs.objects[i][ii].triggerBehavior(); }
+					if (Crumbs.objects[i][ii] !== null) { Crumbs.objects[i][ii].triggerBehavior(); Crumbs.objects[i][ii].updateChildren(); }
 				} 
 			}
 		} 
