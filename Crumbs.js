@@ -204,8 +204,10 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.sortedObjectList = {};
 	Crumbs.prefs = {
 		objects: { },
+		particles: { },
 		anchorDisplay: 0
 	}
+	Crumbs.particles = {};
 
 	Crumbs.createCanvas = function(id, parentElement, css) {
 		let div = document.createElement('canvas');
@@ -226,9 +228,11 @@ const Crumbs_Init_On_Load = function() {
 
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
+		Crumbs.particles[key] = [];
 		Crumbs.sortedObjectList[key] = [];
 		Crumbs.validScopes.push(key);
 		Crumbs.prefs.objects[key] = 1;
+		Crumbs.prefs.particles[key] = 1;
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
@@ -1252,6 +1256,50 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return data;
 	}
+	
+	Crumbs.particle = function(obj, scope) {
+		//a super-lightweight variant of Crumbs.object
+		//is always drawn on top of other objects and has no sense of order
+		//behavior is simply a function
+		//has some builtin expiry mechanic 
+		//for best performance, please put the initiating object somewhere and use the reference to call to it
+		for (let i in Crumbs.particleDefaults) { this[i] = Crumbs.particleDefaults[i]; }
+		for (let i in obj) { this[i] = obj[i]; }
+
+		if (this.init) { this.init.call(this); }
+
+		this.scope = Crumbs.particles[scope];
+
+		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
+	}
+	Crumbs.particleDefaults = {
+		x: 0,
+		y: 0,
+		width: 1,
+		height: 1,
+		rotation: 0,
+		img: '',
+		life: 2 * Game.fps,
+		init: null,
+		behavior: null
+	};
+	Crumbs.particle.prototype.die = function() {
+		this.scope.splice(this.scope.indexOf(this), 1);
+	}
+	Crumbs.particle.prototype.update = function() {
+		this.life--;
+		if (this.life <= 0) { this.die(); return; }
+		if (this.behavior) { 
+			this.behavior.call(this); 
+		}
+	}
+	Crumbs.updateParticles = function() {
+		for (let i in Crumbs.particles) {
+			for (let ii in Crumbs.particles[i]) {
+				Crumbs.particles[i][ii].update();
+			}
+		}
+	}
 
 	//below for the actual drawing
 	Crumbs.compileObjects = function(s) {
@@ -1408,6 +1456,14 @@ const Crumbs_Init_On_Load = function() {
 				}
 				
 				ctx.restore(); 
+			}
+			for (let i in Crumbs.particles[c]) {
+				const p = Crumbs.particles[c];
+				ctx.translate(p.x, p.y);
+				ctx.rotate(p.rotation);
+				ctx.drawImage(Pic(p.img), -p.width / 2, -p.height / 2, p.width, p.height);
+				ctx.rotate(-p.rotation);
+				ctx.translate(-p.x, -p.y);
 			}
 			for (let i in settingObj) {
 				ctx[i] = settingObj[i];
