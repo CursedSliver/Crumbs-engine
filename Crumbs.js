@@ -1256,7 +1256,7 @@ const Crumbs_Init_On_Load = function() {
 		return data;
 	}
 	
-	Crumbs.particle = function(obj, x, y, r, scope) {
+	Crumbs.particle = function(obj, x, y, r, a, scope) {
 		//a super-lightweight variant of Crumbs.object
 		//is always drawn on top of other objects and has no sense of order
 		//behavior is simply a function
@@ -1270,6 +1270,7 @@ const Crumbs_Init_On_Load = function() {
 		this.x = x;
 		this.y = y;
 		this.rotation = r;
+		this.alpha = a;
 
 		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
@@ -1285,11 +1286,11 @@ const Crumbs_Init_On_Load = function() {
 		behavior: null,
 		reusePool: null
 	};
-	Crumbs.spawnParticle = function(what, x, y, r, scope) {
+	Crumbs.spawnParticle = function(what, x, y, r, a, scope) {
 		if (what instanceof Crumbs.particle) { 
-			return Crumbs.reuseParticle.call(what, x, y, r, scope);
+			return Crumbs.reuseParticle.call(what, x, y, r, a, scope);
 		} else {
-			return new Crumbs.particle(what, x, y, r, scope);
+			return new Crumbs.particle(what, x, y, r, a, scope);
 		}
 	}
 	Crumbs.particle.prototype.die = function() {
@@ -1310,11 +1311,12 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
-	Crumbs.reuseParticle = function(x, y, r, scope) {
+	Crumbs.reuseParticle = function(x, y, r, a, scope) {
 		for (let i in this.obj) { this[i] = this.obj[i]; }
 		this.x = x;
 		this.y = y;
 		this.rotation = r;
+		this.alpha = a;
 		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
 
@@ -1482,10 +1484,12 @@ const Crumbs_Init_On_Load = function() {
 				const p = Crumbs.particles[c];
 				ctx.translate(p.x, p.y);
 				ctx.rotate(p.rotation);
+				ctx.globalAlpha = p.alpha;
 				ctx.drawImage(Pic(p.img), -p.width / 2, -p.height / 2, p.width, p.height);
 				ctx.rotate(-p.rotation);
 				ctx.translate(-p.x, -p.y);
 			}
+			ctx.globalAlpha = 1;
 			for (let i in settingObj) {
 				ctx[i] = settingObj[i];
 			}
