@@ -1031,15 +1031,15 @@ const Crumbs_Init_On_Load = function() {
 		const pHeight = Crumbs.getPHeight(m) * (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
 		
 		if (this.maxWidth) {
-			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
+			ctx.fillText(this.content, m.offsetX, m.offsetY, this.maxWidth);
 		} else {
-			ctx.fillText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY);
+			ctx.fillText(this.content, m.offsetX, m.offsetY);
 		}
 		if (this.outline) {
 			if (this.maxWidth) {
-				ctx.strokeText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.maxWidth);
+				ctx.strokeText(this.content, m.offsetX, m.offsetY, this.maxWidth);
 			} else {
-				ctx.strokeText(this.content, -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY);
+				ctx.strokeText(this.content, m.offsetX, m.offsetY);
 			}
 		}
 	};
