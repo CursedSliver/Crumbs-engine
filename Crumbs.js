@@ -1426,7 +1426,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 
 	Crumbs.drawObject = function(o, ctx, fromCore) {
-		if (o.alpha) { ctx.globalAlpha = o.alpha; } else { ctx.globalAlpha = 1; }
+		ctx.globalAlpha = o.alpha;
 		const p = Pic(o.imgs[o.imgUsing]);
 		const pWidth = Crumbs.getPWidth(o);
 		const pHeight = Crumbs.getPHeight(o);
