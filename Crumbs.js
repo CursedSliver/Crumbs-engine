@@ -1881,6 +1881,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.objectInits.cookieInit = function() {
 		const shine1 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
+			id: 'shine1',
 			order: -2,
 			scaleX: 4,
 			scaleY: 4,
@@ -1889,6 +1890,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 		const shine2 = {
 			imgs: ['img/shine.png', 'img/shineGold.png', 'img/shineRed.png'],
+			id: 'shine2',
 			order: -2.1,
 			scaleX: 4,
 			scaleY: 4,
