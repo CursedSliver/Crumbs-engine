@@ -1307,6 +1307,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
+	Game.registerHook('draw', Crumbs.updateParticles);
 	Crumbs.reuseParticle = function(x, y, r, a, scope) {
 		for (let i in this.obj) { this[i] = this.obj[i]; }
 		this.x = x;
@@ -1477,7 +1478,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.restore(); 
 			}
 			for (let i in Crumbs.particles[c]) {
-				const p = Crumbs.particles[c];
+				const p = Crumbs.particles[c][i];
 				ctx.translate(p.x, p.y);
 				ctx.rotate(p.rotation);
 				ctx.globalAlpha = p.alpha;
