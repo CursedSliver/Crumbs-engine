@@ -1580,7 +1580,7 @@ const Crumbs_Init_On_Load = function() {
 		c.rotation = Math.random() * 2 * Math.PI;
 		return c;
 	};
-	Game.registerHook('logic', Crumbs.spawnCookieShower);
+	Game.registerHook('logic', function() { Crumbs.spawnCookieShower(); });
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
 	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Game.mouseX+Math.random()*8-4, Game.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
 
@@ -1599,11 +1599,14 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn(w);
 	};
 
-	Game.registerHook('click', function() {
+	Crumbs.fallingCookieOnclick = function() {
 		if (Game.prefs.particles) {
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie', false, 1, 0));
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75, 0));
 		}
+	}
+	Game.registerHook('click', function() {
+		Crumbs.fallingCookieOnclick();
 	});
 
 	eval('Game.UpdateWrinklers='+replaceAll('part.r=-me.r;', '', replaceAll(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75));`, Game.UpdateWrinklers.toString()).replace('inRect(', 'Crumbs.h.inRectOld(').replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, Math.floor(ii + Math.floor(3 * (me.id + 1) * Math.random()) + 2));`).replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, 0);`)));
