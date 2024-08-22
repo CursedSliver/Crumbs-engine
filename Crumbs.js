@@ -1026,10 +1026,6 @@ const Crumbs_Init_On_Load = function() {
 		ctx.strokeStyle = this.outlineColor;
 	};
 	Crumbs.component.text.prototype.postDraw = function(m, ctx) {
-		const dims = ctx.measureText(this.content);
-		const pWidth = dims.width;
-		const pHeight = Crumbs.getPHeight(m) * (dims.actualBoundingBoxAscent+dims.actualBoundingBoxDescent) / Pic(m.imgs[m.imgUsing]).height;
-		
 		if (this.maxWidth) {
 			ctx.fillText(this.content, m.offsetX, m.offsetY, this.maxWidth);
 		} else {
