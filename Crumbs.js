@@ -1901,6 +1901,7 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shine2)
 		}
 		const veilMain = {
+			id: 'veilMain',
 			imgs: 'img/shimmeringVeil.png',
 			order: 0,
 			scaleX: 2.5,
@@ -1909,6 +1910,7 @@ const Crumbs_Init_On_Load = function() {
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.veilMain)
 		}
 		const glintGen = {
+			id: 'veilGlintGenerator',
 			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: Crumbs.veilGlintGenerator })]
 		}
 		const dragon = {
