@@ -226,6 +226,8 @@ const Crumbs_Init_On_Load = function() {
 		this.c = this.l.getContext('2d');
 		this.shaders = [];
 
+		this.background = 'none';
+
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
 		Crumbs.particles[key] = [];
@@ -1451,6 +1453,7 @@ const Crumbs_Init_On_Load = function() {
 		for (let c in Crumbs.scopedCanvas) {
 			let list = Crumbs.compileObjects(c);
 			Crumbs.sortedObjectList[c] = list;
+			Crumbs.scopedCanvas[c].l.style.background = Crumbs.scopedCanvas[c].background;
 			let ctx = Crumbs.scopedCanvas[c].c;
 			ctx.globalAlpha = 1;
 			ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); 
