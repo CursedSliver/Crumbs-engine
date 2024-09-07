@@ -4,6 +4,8 @@ if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
+	Crumbs.version = 'v0.1';
+	
 	Crumbs.h = {};
 	Crumbs.h.CSSInjects = [];
 	Crumbs.h.injectCSS = function(str) {
@@ -2731,14 +2733,9 @@ const Crumbs_Init_On_Load = function() {
 					Timer.track('milk');
 				}
 				
-				if (Game.AscendTimer>0)
-				{
-					ctx.drawImage(Pic('shadedBordersSoft.png'),0,0,ctx.canvas.width,ctx.canvas.height);
-				}
-				
 				if (Game.AscendTimer==0)
 				{
-					Game.DrawWrinklers();Timer.track('wrinklers');
+					//Game.DrawWrinklers();Timer.track('wrinklers');
 					
 					//shimmering veil
 					if (Game.Has('Shimmering veil [off]'))
@@ -2770,13 +2767,16 @@ const Crumbs_Init_On_Load = function() {
 						ctx.globalCompositeOperation='source-over';
 					}
 					
-					Game.DrawSpecial();Timer.track('evolvables');
+					//Game.DrawSpecial();Timer.track('evolvables');
 					
-					Game.particlesDraw(2);Timer.track('text particles');
+					//Game.particlesDraw(2);Timer.track('text particles');
 				}
 			}
 		Crumbs.drawObjects();
 	};
+	Crumbs.h.injectCSS('#CrumbsEngineVersion { margin-top: 2px; }');
+	l('httpsSwitch').insertAdjacentHTML('afterend','<div class="title" style="font-size:22px;" id="CrumbsEngineVersion">Crumbs engine '+Crumbs.version+'</div>');
+	
 	Crumbs.h.resolveInjects();
 	Game.registerHook('check', Crumbs.h.resolveInjects);
 
