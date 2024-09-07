@@ -1,7 +1,7 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 //todo: make order also propagate through children
-if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
+//if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
 	Crumbs.version = 'v0.1';
