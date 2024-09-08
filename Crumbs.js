@@ -329,8 +329,8 @@ const Crumbs_Init_On_Load = function() {
 
 		this.imgs = [].concat(this.imgs);
 		for (let i in this.imgs) { 
-			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) { this.imgs[i] = Crumbs.objectImgs[this.imgs[i]]; } 
 			if (typeof this.imgs === 'function') { this.imgs[i] = this.imgs[i](); }
+			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) { this.imgs[i] = Crumbs.objectImgs[this.imgs[i]]; } 
 		}
 		
 		//rotation is clockwise
