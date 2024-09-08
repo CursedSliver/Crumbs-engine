@@ -316,13 +316,11 @@ const Crumbs_Init_On_Load = function() {
 		if (parent) { this.parent = parent; }
 		
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
-		if (Crumbs.objectImgs.hasOwnProperty(this.imgs)) { this.imgs = Crumbs.objectImgs[this.imgs]; }
-		if (typeof this.imgs === 'function') { this.imgs = this.imgs(); }
+
 		this.imgs = [].concat(this.imgs);
-		for (let i in this.imgs) {
-			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) {
-				this.imgs[i] = Crumbs.objectImgs[this.imgs[i]];
-			}
+		for (let i in this.imgs) { 
+			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) { this.imgs[i] = Crumbs.objectImgs[this.imgs[i]]; } 
+			if (typeof this.imgs === 'function') { this.imgs[i] = this.imgs[i](); }
 		}
 		
 		//rotation is clockwise
@@ -407,7 +405,7 @@ const Crumbs_Init_On_Load = function() {
 		scaleY: 1,
 		rotation: 0,
 		alpha: 1,
-		imgs: Crumbs.objectImgs.empty,
+		imgs: [],
 		imgUsing: 0,
 		scope: 'foreground',
 		anchor: 'center',
@@ -1475,7 +1473,7 @@ const Crumbs_Init_On_Load = function() {
 			ctx.rotate(r);
 		} 
 		
-		if (!o.noDraw) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
+		if (!o.noDraw && o.imgs.length) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
 
 		if (!fromCore) { ctx.restore(); }
 	}
