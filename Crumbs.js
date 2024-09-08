@@ -1147,7 +1147,7 @@ const Crumbs_Init_On_Load = function() {
 	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
 	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
 		if (this.boundingType == 'rect') {
-			return Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
+			return Crumbs.h.inRect(Game.mouseX - m.x - m.canvaCenter[0], Game.mouseY - m.y - m.canvaCenter[1], {
 				w: pWidth,
 				h: pHeight,
 				r: m.rotation + (m.noRotate?0:m.rotationAdd),
