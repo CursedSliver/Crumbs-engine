@@ -21,7 +21,7 @@ const Crumbs_Init_On_Load = function() {
 		l('game').appendChild(style);
 	}
 	//t is object representing rect, where w -> width, h -> height, r -> rotation, x -> x origin, y -> y origin (by default rect has (0, 0) as its top left corner)
-	Crumbs.h.inRect = function(x,y,t) {let c=Math.cos(-t.r);let s=Math.sin(-t.r);let a=x*c-y*s;let b=x*s+y*c;if(a>-t.x&&a<t.w-t.x&&b>-t.y&&b<t.h-t.y)return true;return false;}
+	Crumbs.h.inRect = function(x,y,t) {let c=Math.cos(-t.r);let s=Math.sin(-t.r);let a=x*c-y*s;let b=x*s+y*c;return (a>-t.x&&a<t.w-t.x&&b>-t.y&&b<t.h-t.y);}
 	Crumbs.h.inRectOld = function(x,y,rect) {
 		var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
 		var h1 = Math.sqrt(dx*dx + dy*dy);
@@ -32,6 +32,8 @@ const Crumbs_Init_On_Load = function() {
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
+	//checks for if (x,y) is in 0,0 centered ellipse with horizontal radii rx, vertical radii ry, and rotation r
+	Crumbs.h.inOval = function(x,y,rx,ry,r) {let c=Math.cos(-r);let s=Math.sin(-r);let a=x*c-y*s;let b=x*s+y*c;return ((a*a)/(rx*rx)+(b*b)/(ry*ry))<=1;}
 	Crumbs.h.rv = function(r, x, y) {
 		//rotates the given vector by "r"
 		const c = Math.cos(-r);
@@ -1130,7 +1132,8 @@ const Crumbs_Init_On_Load = function() {
 		onRelease: function() { },
 		onMouseover: function() { },
 		onMouseout: function() { },
-		alwaysInteractable: false
+		alwaysInteractable: false,
+		boundingType: 'rect'
 	}
 	Crumbs.component.pointerInteractive.prototype.enable = function() {
 		this.enabled = true;
@@ -1144,13 +1147,17 @@ const Crumbs_Init_On_Load = function() {
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
 	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
 	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
-		return Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
-			w: pWidth,
-			h: pHeight,
-			r: m.rotation + (m.noRotate?0:m.rotationAdd),
-			x: Crumbs.getOffsetX(m.anchor, pWidth),
-			y: Crumbs.getOffsetY(m.anchor, pHeight)
-		});
+		if (this.boundingType == 'rect') {
+			return Crumbs.h.inRect(Game.mouseX - m.x, Game.mouseY - m.y, {
+				w: pWidth,
+				h: pHeight,
+				r: m.rotation + (m.noRotate?0:m.rotationAdd),
+				x: Crumbs.getOffsetX(m.anchor, pWidth),
+				y: Crumbs.getOffsetY(m.anchor, pHeight)
+			});
+		} else if (this.boundingType == 'oval') {
+			return Crumbs.h.inOval(Game.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, Game.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.r);
+		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
 		const pWidth = Crumbs.getPWidth(m);
