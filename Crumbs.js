@@ -1461,15 +1461,18 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.OYFA[anchor] * height;
 	};
 	Crumbs.getPWidth = function(o) {
-		return (o.width?o.width:Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactor[0]; 
+		if (!o.imgs.length) { return o.width??0; }
+		return (o.width??Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactor[0]; 
 	};
 	Crumbs.getPHeight = function(o) {
-		return (o.height?o.height:Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactor[1]; 
+		if (!o.imgs.length) { return o.height??0; }
+		return (o.height??Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactor[1]; 
 	};
 
 	Crumbs.drawObject = function(o, ctx, fromCore) {
 		ctx.globalAlpha = o.alpha;
-		const p = Pic(o.imgs[o.imgUsing]);
+		let p = null;
+		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
 		const pWidth = Crumbs.getPWidth(o);
 		const pHeight = Crumbs.getPHeight(o);
 		ctx.save();
