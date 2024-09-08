@@ -233,6 +233,15 @@ const Crumbs_Init_On_Load = function() {
 
 		this.background = 'none';
 
+		this.mouseX = 0;
+		this.mouseY = 0;
+		AddEvent(this.l, 'mousemove', function(event) {
+        	const rect = this.l.getBoundingClientRect();
+        
+	        this.mouseX = event.clientX - rect.left;
+        	this.mouseY = event.clientY - rect.top;
+		});
+
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
 		Crumbs.particles[key] = [];
@@ -316,6 +325,7 @@ const Crumbs_Init_On_Load = function() {
 		if (parent) { this.parent = parent; }
 		
 		if (!Crumbs.validScopes.includes(this.scope)) { throw 'Crumbs object type not matching. Must be one of the strings denoting a scope, or undefined';  } 
+		if (parent) { this.scope = parent.scope; }
 
 		this.imgs = [].concat(this.imgs);
 		for (let i in this.imgs) { 
@@ -1146,8 +1156,9 @@ const Crumbs_Init_On_Load = function() {
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
 	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
 	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
+		const s = Crumbs.scopedCanvas[m.scope];
 		if (this.boundingType == 'rect') {
-			return Crumbs.h.inRect(Game.mouseX - m.x - m.canvaCenter[0], Game.mouseY - m.y - m.canvaCenter[1], {
+			return Crumbs.h.inRect(s.mouseX - m.x - m.canvaCenter[0], s.mouseY - m.y - m.canvaCenter[1], {
 				w: pWidth,
 				h: pHeight,
 				r: m.rotation + (m.noRotate?0:m.rotationAdd),
@@ -1155,7 +1166,7 @@ const Crumbs_Init_On_Load = function() {
 				y: Crumbs.getOffsetY(m.anchor, pHeight)
 			});
 		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(Game.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, Game.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd));
+			return Crumbs.h.inOval(s.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, s.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd));
 		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
