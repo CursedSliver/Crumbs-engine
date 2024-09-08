@@ -480,6 +480,12 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return null;
 	};
+	Crumbs.object.prototype.addBehavior = function(behavior) {
+		if (behavior instanceof Crumbs.behavior) { behavior = new Crumbs.behaviorInstance(behavior); }
+		else if (behavior === 'function') { const b = new Crumbs.behavior(behavior); behavior = new Crumbs.behaviorInstance(b); }
+		else if (!behavior instanceof Crumbs.behaviorInstance) { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
+		this.behaviors.push(behavior);
+	};
 	Crumbs.object.prototype.reorder = function(at) {
 		Crumbs.objects[this.scope][this.index] = null;
 		Crumbs.objects[this.scope][at] = this;
