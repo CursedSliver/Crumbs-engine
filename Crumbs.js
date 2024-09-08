@@ -209,7 +209,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.prefs = {
 		objects: { },
 		particles: { },
-		anchorDisplay: 0
+		anchorDisplay: 0,
+		colliderDisplay: 0
 	}
 	Crumbs.particles = {};
 
@@ -1156,7 +1157,7 @@ const Crumbs_Init_On_Load = function() {
 				y: Crumbs.getOffsetY(m.anchor, pHeight)
 			});
 		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(Game.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, Game.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.r);
+			return Crumbs.h.inOval(Game.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, Game.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd));
 		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
@@ -1180,6 +1181,21 @@ const Crumbs_Init_On_Load = function() {
 		if (this.hovered) { 
 			if (!this.click && Crumbs.pointerHold) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
 			if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
+		}
+		if (Crumbs.prefs.colliderDisplay) {
+			const prevStrokeStyle = ctx.strokeStyle;
+			const prevLineWidth = ctx.lineWidth;
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = '#5de2fc';
+			if (this.boundingType == 'rect') {
+				ctx.strokeRect(m.x - Crumbs.getOffsetX(m.anchor, pWidth), m.y - Crumbs.getOffsetY(m.anchor, pHeight), pWidth, pHeight);
+			} else if (this.boundingType == 'oval') { 
+				ctx.beginPath();
+				ctx.ellipse(m.x - Crumbs.getOffsetX(m.anchor, pWidth), m.y - Crumbs.getOffsetY(m.anchor, pHeight), pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd), 0, Math.PI * 2);
+				ctx.stroke();
+			}
+			ctx.lineWidth = prevLineWidth;
+			ctx.strokeStyle = prevStrokeStyle;
 		}
 	};
 
