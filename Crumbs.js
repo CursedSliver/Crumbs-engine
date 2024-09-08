@@ -1191,7 +1191,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx.strokeRect(m.x - Crumbs.getOffsetX(m.anchor, pWidth), m.y - Crumbs.getOffsetY(m.anchor, pHeight), pWidth, pHeight);
 			} else if (this.boundingType == 'oval') { 
 				ctx.beginPath();
-				ctx.ellipse(m.x + Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, m.y + Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd), 0, Math.PI * 2);
+				ctx.ellipse(m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd), 0, Math.PI * 2);
 				ctx.stroke();
 			}
 			ctx.lineWidth = prevLineWidth;
