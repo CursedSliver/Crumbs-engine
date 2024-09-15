@@ -229,18 +229,13 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.canvas = function(parentEle, key, id, css) {
 		this.l = Crumbs.createCanvas(id, parentEle, css);
 		this.c = this.l.getContext('2d');
+		this.key = key;
 		this.shaders = [];
 
 		this.background = 'none';
 
 		this.mouseX = 0;
 		this.mouseY = 0;
-		AddEvent(this.l, 'mousemove', function(event) {
-        	const rect = this.l.getBoundingClientRect();
-        
-	        this.mouseX = event.clientX - rect.left;
-        	this.mouseY = event.clientY - rect.top;
-		});
 
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
@@ -281,8 +276,11 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
-			Crumbs.scopedCanvas[i].l.width = Crumbs.scopedCanvas[i].l.parentNode.offsetWidth;
-			Crumbs.scopedCanvas[i].l.height = Crumbs.scopedCanvas[i].l.parentNode.offsetHeight;
+			const c = Crumbs.scopedCanvas[i];
+			c.l.width = c.l.parentNode.offsetWidth;
+			c.l.height = c.l.parentNode.offsetHeight;
+			c.mouseX = Game.mouseX - c.l.getBoundingClientRect().left;
+			c.mouseY = Game.mouseY - c.l.getBoundingClientRect().top;
 		}
 	};
 	Crumbs.updateCanvas();
@@ -2182,7 +2180,8 @@ const Crumbs_Init_On_Load = function() {
 
 		let count = 0;
 		for (let i in this.children) {
-			if (!this.children[i].active) { continue; }
+			if (!this.children[i].active) { this.children[i].getComponent('pointerInteractive').disable(); continue; } 
+			else { this.children[i].getComponent('pointerInteractive').enable(); }
 			this.children[i].y = height - 72 - 48 * count;
 			this.children[i].placement = count;
 			count++;
