@@ -313,7 +313,7 @@ const Crumbs_Init_On_Load = function() {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
 		if (typeof obj !== 'object') { throw 'Crumbs.object constructor parameter must be an object or undefined.'; }
-		//stuff: enabled, parent, scope, imgs, imgUsing, id, order, x, y, behaviors, alpha, width, height, offsetX, offsetY, scaleX, scaleY, noDraw, children, noRotate
+		//stuff: enabled, parent, scope, imgs, imgUsing, id, order, x, y, behaviors, alpha, width, height, offsetX, offsetY, scaleX, scaleY, noDraw, children
 		for (let i in Crumbs.objectDefaults) {
 			this[i] = Crumbs.objectDefaults[i];
 		}
@@ -346,9 +346,8 @@ const Crumbs_Init_On_Load = function() {
 		}
 		
 		this.t = Crumbs.t; //the time when it was created
-		this.canvaCenter = [0, 0]; //[x, y], for if it is a child
-		this.scaleFactor = [1, 1]; //[x, y], for if it is a child
-		this.rotationAdd = 0; //for if it is a child
+		this.scaleFactorX = 1;
+		this.scaleFactorY = 1;
 		
 		const childrenToSpawn = [].concat(this.children);
 		this.children = [];
@@ -427,7 +426,6 @@ const Crumbs_Init_On_Load = function() {
 		offsetY: 0,
 		sx: 0,
 		sy: 0,
-		noRotate: false,
 		components: [],
 		noDraw: false,
 		children: []
@@ -514,10 +512,8 @@ const Crumbs_Init_On_Load = function() {
 		if (!this.enabled) { return; }
 		this.triggerBehavior();
 		if (this.parent !== null) {
-			this.rotationAdd = this.parent.rotation + this.parent.rotationAdd;
-			let m = Crumbs.h.rv(this.rotationAdd, this.parent.offsetX, this.parent.offsetY);
-			this.canvaCenter = [m[0] + this.parent.x + this.parent.canvaCenter[0], -m[1] + this.parent.y + this.parent.canvaCenter[1]];
-			this.scaleFactor = [this.parent.scaleX * this.parent.scaleFactor[0], this.parent.scaleY * this.parent.scaleFactor[1]];
+			this.scaleFactorX = this.parent.scaleX * this.parent.scaleFactorX;
+			this.scaleFactorY = this.parent.scaleY * this.parent.scaleFactorY;
 		}
 		for (let i in this.children) {
 			if (this.children[i] !== null) {
@@ -1156,15 +1152,15 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
 		const s = Crumbs.scopedCanvas[m.scope];
 		if (this.boundingType == 'rect') {
-			return Crumbs.h.inRect(s.mouseX - m.x - m.canvaCenter[0], s.mouseY - m.y - m.canvaCenter[1], {
+			return Crumbs.h.inRect(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), {
 				w: pWidth,
 				h: pHeight,
-				r: m.rotation + (m.noRotate?0:m.rotationAdd),
+				r: m.getTrueRotation(),
 				x: Crumbs.getOffsetX(m.anchor, pWidth),
 				y: Crumbs.getOffsetY(m.anchor, pHeight)
 			});
 		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(s.mouseX - m.x - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, s.mouseY - m.y - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.rotation + (m.noRotate?0:m.rotationAdd));
+			return Crumbs.h.inOval(s.mouseX - m.getTrueX() - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, s.mouseY - m.getTrueY() - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.getTrueRotation());
 		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
@@ -1232,7 +1228,7 @@ const Crumbs_Init_On_Load = function() {
 		c.width = Crumbs.getCanvasByScope(m.scope).canvas.width;
 		c.height = Crumbs.getCanvasByScope(m.scope).canvas.height;
 		let ctx = c.getContext('2d');
-		Crumbs.drawObject(m, ctx);
+		//Crumbs.drawObject(m, ctx);
 		let data = ctx.getImageData(0, 0, c.width, c.height);
 		const passed = Crumbs.h.grayscaleMap(data);
 		for (let i = 0; i < passed.length; i++) {
@@ -1365,17 +1361,22 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.compileObjects = function(s) {
 		let arr = []; //each entry is an object, which in this case includes all childrens, sorted by the order variable
 		for (let i of Crumbs.objects[s]) {
-			if (i) { i.compile(arr); }
+			if (i !== null) {
+				arr.push(i);
+			}
 		}
 		return Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
-	Crumbs.object.prototype.compile = function(arr) {
-		if (!this.enabled) { return; }
+	Crumbs.object.prototype.compile = function() {
+		if (!this.enabled || !this.children.length) { return [this]; }
+		let arr = [];
 		arr.push(this);
-		if (!this.children.length) { return; }
-		for (let i in this.children) {
-			if (this.children[i] !== null) { this.children[i].compile(arr); }
+		for (let i of this.children) {
+			if (i !== null) { 
+				arr.push(i); 
+			}
 		}
+		return Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
 	Crumbs.merge = function(arr, left, middle, right) {
 		//merges two object arrays together sorting based on order
@@ -1460,34 +1461,74 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.getPWidth = function(o) {
 		if (!o.imgs.length) { return o.width??0; }
-		return (o.width??Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactor[0]; 
+		return (o.width??Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactorX; 
 	};
 	Crumbs.getPHeight = function(o) {
 		if (!o.imgs.length) { return o.height??0; }
-		return (o.height??Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactor[1]; 
+		return (o.height??Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactorY; 
 	};
 
-	Crumbs.drawObject = function(o, ctx, fromCore) {
+	Crumbs.drawAnchorDisplay = function(o, ctx, p) {
+		ctx.save();
+		if (o.parent) { ctx.fillStyle = '#57d2f2'; } else { ctx.fillstyle = '#ccfffb'; }
+		ctx.globalAlpha = 1;
+		ctx.fillRect(o.offsetX - 3, o.offsetY - 3, 6, 6);
+		ctx.restore();
+	}
+	Crumbs.iterateObject = function(o, ctx) {
+		ctx.save(); 
+		
 		ctx.globalAlpha = o.alpha;
 		let p = null;
 		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
 		const pWidth = Crumbs.getPWidth(o);
 		const pHeight = Crumbs.getPHeight(o);
 		ctx.save();
-		if (fromCore) { for (let ii = 0; ii < o.components.length; ii++) {
+		for (let ii = 0; ii < o.components.length; ii++) {
 			if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
-		} }
+		}
 		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
-		const r = o.rotation + (o.noRotate?0:o.rotationAdd);
-		ctx.translate(o.x + o.canvaCenter[0], o.y + o.canvaCenter[1]);
-		if (o.rotation + o.rotationAdd) {
-			ctx.rotate(r);
+		ctx.translate(o.x, o.y);
+		if (o.rotation) {
+			ctx.rotate(o.rotation);
 		} 
 		
-		if (!o.noDraw && o.imgs.length) { ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); }
-
-		if (!fromCore) { ctx.restore(); }
+		const toDraw = o.compile();
+		for (let i in toDraw) {
+			if (toDraw[i] != o) {
+				Crumbs.iterateObject(toDraw[i], ctx);
+				continue;
+			}
+			
+			if (!o.noDraw && o.imgs.length) { 
+				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); 
+			}
+			if (Crumbs.prefs.anchorDisplay) { Crumbs.drawAnchorDisplay(o, ctx); }
+			for (let ii = o.components.length - 1; ii >= 0; ii--) {
+				if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx); }
+			}
+		}
+		
+		ctx.restore(); 
+	}
+	Crumbs.object.prototype.getTrueX = function() {
+		if (this.parent) {
+			return this.x + this.parent.getTrueX();
+		}
+		return this.x;
+	}
+	Crumbs.object.prototype.getTrueY = function() {
+		if (this.parent) {
+			return this.y + this.parent.getTrueY();
+		}
+		return this.y;
+	}
+	Crumbs.object.prototype.getTrueRotation = function() {
+		if (this.parent) {
+			return this.rotation + this.parent.getTrueRotation();
+		}
+		return this.rotation;
 	}
 
 	Crumbs.drawObjects = function() {
@@ -1505,21 +1546,7 @@ const Crumbs_Init_On_Load = function() {
 			for (let i = 0; i < list.length; i++) {
 				let o = list[i];
 				if (!o.enabled) { continue; }
-				Crumbs.drawObject(o, ctx, true);
-
-				for (let ii = o.components.length - 1; ii >= 0; ii--) {
-					if (o.components[ii].enabled) { o.components[ii].postDraw(o, ctx); }
-				}
-
-				if (Crumbs.prefs.anchorDisplay) {
-					ctx.save();
-					if (o.parent) { ctx.fillStyle = '#57d2f2'; } else { ctx.fillstyle = '#ccfffb'; }
-					ctx.globalAlpha = 1;
-					ctx.fillRect(o.offsetX - 3, o.offsetY - 3, 6, 6);
-					ctx.restore();
-				}
-				
-				ctx.restore(); 
+				Crumbs.iterateObject(o, ctx);
 			}
 			for (let i in Crumbs.particles[c]) {
 				const p = Crumbs.particles[c][i];
@@ -2084,6 +2111,7 @@ const Crumbs_Init_On_Load = function() {
 			anchor: 'top-left',
 			scope: 'background',
 			order: 1,
+			id: 'shadedBorders',
 			imgs: ['shadedBordersSoft.png', 'shadedBordersGold.png', 'shadedBordersRed.png'],
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole)]
 		}
