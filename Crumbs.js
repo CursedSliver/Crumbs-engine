@@ -2814,8 +2814,10 @@ const Crumbs_Init_On_Load = function() {
 			}
 		Crumbs.drawObjects();
 	};
-	Crumbs.h.injectCSS('#CrumbsEngineVersion { margin-top: 2px; }');
-	l('httpsSwitch').insertAdjacentHTML('afterend','<div class="title" style="font-size:22px;" id="CrumbsEngineVersion">Crumbs engine '+Crumbs.version+'</div>');
+	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
+	Crumbs.h.injectCSS('#CrumbsEngineVersion { margin-top: 2px; pointer-events: none; }');
+	l('gameVersionText').insertAdjacentHTML('beforebegin','<div class="title" style="font-size:22px;" id="CrumbsEngineVersion">Crumbs engine '+Crumbs.version+'</div>');
+	
 	
 	Crumbs.h.resolveInjects();
 	Game.registerHook('check', Crumbs.h.resolveInjects);
