@@ -280,7 +280,7 @@ const Crumbs_Init_On_Load = function() {
 			c.l.width = c.l.parentNode.offsetWidth;
 			c.l.height = c.l.parentNode.offsetHeight;
 			c.mouseX = Game.mouseX - c.l.getBoundingClientRect().left;
-			c.mouseY = Game.mouseY - c.l.getBoundingClientRect().top;
+			c.mouseY = Game.mouseY - c.l.getBoundingClientRect().top + (App?0:32);
 		}
 	};
 	Crumbs.updateCanvas();
@@ -1195,7 +1195,7 @@ const Crumbs_Init_On_Load = function() {
 			ctx.lineWidth = 2;
 			ctx.strokeStyle = '#5de2fc';
 			if (this.boundingType == 'rect') {
-				ctx.strokeRect(m.x - Crumbs.getOffsetX(m.anchor, pWidth), m.y - Crumbs.getOffsetY(m.anchor, pHeight), pWidth, pHeight);
+				ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth), -Crumbs.getOffsetY(m.anchor, pHeight), pWidth, pHeight);
 			} else if (this.boundingType == 'oval') { 
 				ctx.beginPath();
 				ctx.ellipse(-Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, -Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, 0, 0, Math.PI * 2);
