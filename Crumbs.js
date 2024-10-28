@@ -1864,7 +1864,7 @@ const Crumbs_Init_On_Load = function() {
 			}),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeWithDragon)],
 			id: 'cursors'
-		})
+		});
 	};
 	Crumbs.objectBehaviors.dragonDisplayBehavior = new Crumbs.behavior(function() {
 		if (Game.hasBuff('Dragonflight') || Game.hasBuff('Dragon Harvest')) { this.noDraw = false; } else { this.noDraw = true; return; }
@@ -2860,5 +2860,3 @@ Game.registerMod('Crumbs engine', {
 	save: function() { return Crumbs.t + ''; },
 	load: function(str) { Crumbs.t = parseInt(str); }
 });
-
-console.log('Crumbs engine loaded: ' + Crumbs.version);
