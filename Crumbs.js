@@ -1,7 +1,6 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 //todo: make order also propagate through children
-//if (typeof gamePause === 'undefined') { Game.LoadMod(`https://glander.club/asjs/qdNgUW9y`); }
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
 	Crumbs.version = 'v0.1';
@@ -1160,7 +1159,7 @@ const Crumbs_Init_On_Load = function() {
 				y: Crumbs.getOffsetY(m.anchor, pHeight)
 			});
 		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(s.mouseX - m.getTrueX() - Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, s.mouseY - m.getTrueY() - Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, m.getTrueRotation());
+			return Crumbs.h.inOval(s.mouseX - m.getTrueX() + Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, s.mouseY - m.getTrueY() + Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, pWidth / 2, pHeight / 2, m.getTrueRotation());
 		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
