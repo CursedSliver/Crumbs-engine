@@ -31,8 +31,8 @@ const Crumbs_Init_On_Load = function() {
 		if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
 		return false;
 	}
-	//checks for if (x,y) is in 0,0 centered ellipse with horizontal radii rx, vertical radii ry, and rotation r
-	Crumbs.h.inOval = function(x,y,rx,ry,r) {let c=Math.cos(-r);let s=Math.sin(-r);let a=x*c-y*s;let b=x*s+y*c;return ((a*a)/(rx*rx)+(b*b)/(ry*ry))<=1;}
+	//checks for if (x,y) is in 0,0 centered ellipse with horizontal radii rx, vertical radii ry, x origin ox, y origin oy, and rotation r
+	Crumbs.h.inOval = function(x,y,rx,ry,ox,oy,r) {let c=Math.cos(-r);let s=Math.sin(-r);let a=x*c-y*s+ox;let b=x*s+y*c+oy;return ((a*a)/(rx*rx)+(b*b)/(ry*ry))<=1;}
 	Crumbs.h.rv = function(r, x, y) {
 		//rotates the given vector by "r"
 		const c = Math.cos(-r);
@@ -1159,7 +1159,7 @@ const Crumbs_Init_On_Load = function() {
 				y: Crumbs.getOffsetY(m.anchor, pHeight)
 			});
 		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(s.mouseX - m.getTrueX() + Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, s.mouseY - m.getTrueY() + Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, pWidth / 2, pHeight / 2, m.getTrueRotation());
+			return Crumbs.h.inOval(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), pWidth / 2, pHeight / 2, Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, m.getTrueRotation());
 		}
 	}
 	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
