@@ -1672,7 +1672,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.fallingCookieOnclick = function() {
 		if (Game.prefs.particles) {
 			Crumbs.spawn(Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie', false, 1, 0));
-			Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75, 0));
+			Crumbs.spawn(Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'clickedCookie', true, Math.random()*0.5+0.75, 2));
 		}
 	}
 	Game.registerHook('click', function() {
@@ -2128,9 +2128,6 @@ const Crumbs_Init_On_Load = function() {
 		if (Game.specialTab==p.tab) { this.x = 24; } else { this.x = 0; }
 		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6);
 	}, { tab: '' });
-	Crumbs.objectBehaviors.santaSkin = new Crumbs.behavior(function() {
-		this.sx = 96 * Game.santaLevel;
-	});
 	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target.getComponent('pointerInteractive').hovered) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
 	Crumbs.objectBehaviors.follow = new Crumbs.behavior(function(p) { this.x = p.target.x + (p.offset?p.target.offsetX:0); this.y = p.target.y + (p.offset?p.target.offsetY:0); }, { target: null, offset: false });
 	Crumbs.shine = function(scaleMult, target1, target2) {
@@ -2145,63 +2142,6 @@ const Crumbs_Init_On_Load = function() {
 					   ]
 		};
 	}
-	Crumbs.initSanta = function(anchor) {
-		let h = anchor.spawnChild({
-			id: 'santa',
-			scaleX: 0.5,
-			scaleY: 0.5,
-			order: 100,
-			x: 24,
-			width: 96,
-			height: 96,
-			placement: 0,
-			active: false,
-			children: {
-				id: 'santaDisplay',
-				imgs: 'santa.png?v='+Game.version,
-				order: 100,
-				width: 96,
-				height: 96,
-				behaviors: [
-					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.santaSkin),
-					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'santa' })
-				]
-			},
-			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'santa') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'santa'; Game.ToggleSpecialMenu(true); } } }),
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'santa', enableCondition: function() { return (Game.Has('A festive hat')); } })]
-		});
-		h.spawnChild(Crumbs.shine(1, h, h.findChild('santaDisplay')));
-	}
-	Crumbs.objectBehaviors.dragonSkin = new Crumbs.behavior(function() {
-		this.sx = Game.dragonLevels[Game.dragonLevel].pic;
-	});
-	Crumbs.initDragon = function(anchor) {
-		let h = anchor.spawnChild({
-			id: 'dragon',
-			scaleX: 0.5,
-			scaleY: 0.5,
-			order: 100,
-			x: 24,
-			width: 96,
-			height: 96,
-			placement: 0,
-			active: false,
-			children: {
-				id: 'dragonDisplay',
-				imgs: 'dragon.png?v='+Game.version,
-				order: 100,
-				width: 96,
-				height: 96,
-				behaviors: [
-					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.dragonSkin),
-					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: 'dragon' })
-				]
-			},
-			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == 'dragon') { Game.ToggleSpecialMenu(); } else { Game.specialTab = 'dragon'; Game.ToggleSpecialMenu(true); } } }),
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: 'dragon', enableCondition: function() { return (Game.Has('A crumbly egg')); } })]
-		});
-		h.spawnChild(Crumbs.shine(1, h, h.findChild('dragonDisplay')));
-	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
 		const height = Crumbs.getCanvasByScope(this.scope).canvas.height;
 
@@ -2215,15 +2155,67 @@ const Crumbs_Init_On_Load = function() {
 		}
 	});
 	Crumbs.initPets = function() {
-		let anchor = Crumbs.spawn({
+		Crumbs.spawn({
 			id: 'petAnchor',
 			noDraw: true,
 			scope: 'left',
 			order: 100,
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petManager)
 		});
-		Crumbs.initDragon(anchor);
-		Crumbs.initSanta(anchor);
+		//Crumbs.initDragon(anchor);
+		//Crumbs.initSanta(anchor);
+		Crumbs.createPet({
+			special: 'santa',
+			image: 'santa.png?v='+Game.version,
+			skinFunction: function() {
+				this.sx = 96 * Game.santaLevel;
+			},
+			enableCondition: function() { return (Game.Has('A festive hat')); }
+		});
+		Crumbs.createPet({
+			special: 'dragon',
+			image: 'dragon.png?v='+Game.version,
+			skinFunction: function() {
+				this.sx = Game.dragonLevels[Game.dragonLevel].pic;
+			},
+			enableCondition: function() { return (Game.Has('A crumbly egg')); }
+		});
+	}
+	Crumbs.createPet = function(obj) {
+		//creates the crumbs object only
+		//obj description
+		//special: specialTab string
+		//image: spritesheet
+		//skinFunction: function to update the sprite of the pet
+		//enableCondition: function to check if the pet is enabled
+		const anchor = Crumbs.findObject('petAnchor', 'left');
+		let h = anchor.spawnChild({
+			id: obj.special,
+			scaleX: 1,
+			scaleY: 1,
+			order: 100,
+			x: 24,
+			width: 48,
+			height: 48,
+			placement: 0,
+			active: false,
+			children: {
+				id: obj.special+'Display',
+				imgs: obj.image,
+				order: 100,
+				width: 96,
+				scaleX: 0.5,
+				height: 96,
+				scaleY: 0.5,
+				behaviors: [
+					new Crumbs.behaviorInstance(new Crumbs.behavior(obj.skinFunction)),
+					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: obj.special })
+				]
+			},
+			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == obj.special) { Game.ToggleSpecialMenu(); } else { Game.specialTab = obj.special; Game.ToggleSpecialMenu(true); } } }),
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: obj.special, enableCondition: obj.enableCondition })]
+		});
+		h.spawnChild(Crumbs.shine(0.5, h, h.findChild(obj.special+'Display')));
 	}
 	Crumbs.objectBehaviors.nebulaTrack = new Crumbs.behavior(function() {
 		if (this.children.length < 2) { return; }
@@ -2289,6 +2281,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.spawnCookieClickPopup = function(x, y, text) {
 		if (!Game.prefs.numbers) { return; }
 		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
+		if (!s || !s.components) {return;}
 		s.x = x;
 		s.y = y;
 		s.components.push(new Crumbs.component.text({
