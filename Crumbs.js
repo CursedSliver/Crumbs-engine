@@ -580,8 +580,8 @@ const Crumbs_Init_On_Load = function() {
 		if (Game.T % 3600 == 0) { Crumbs.reorderAllObjects(); } 
 	};
 
-	Crumbs.spawn = function(obj) {
-		if ((Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
+	Crumbs.spawn = function(obj, force) {
+		if (!force && (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
 		return new Crumbs.object(obj);
 	};
 	Crumbs.sleepDetectionBuffer = 1000 * (30 / Game.fps); //equal to 30 draw frames
