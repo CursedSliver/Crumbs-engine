@@ -1,6 +1,5 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
-//todo: make order also propagate through children
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
 	Crumbs.version = 'v0.1';
@@ -1364,7 +1363,14 @@ const Crumbs_Init_On_Load = function() {
 				arr.push(i);
 			}
 		}
-		return Crumbs.mergeSort(arr, 0, arr.length - 1);
+		arr = Crumbs.mergeSort(arr, 0, arr.length - 1);
+		let c = 0;
+		while (c < arr.length) {
+			const arr2 = arr[c].recursiveCompile();
+			arr.splice(c, 1, ...arr2);
+			c += arr2.length;
+		}
+		return arr;
 	};
 	Crumbs.object.prototype.compile = function() {
 		if (!this.enabled) { return []; }
@@ -1378,6 +1384,28 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return Crumbs.mergeSort(arr, 0, arr.length - 1);
 	};
+	Crumbs.object.prototype.recursiveCompile = function() {
+		if (!this.enabled) { return []; }
+		if (!this.children.length) { return [this]; }
+		let arr = [];
+		arr.push(this);
+		for (let i of this.children) {
+			if (i !== null) { arr.push(i); }
+		}
+		arr = Crumbs.mergeSort(arr, 0, arr.length - 1);
+		let c = 0;
+		while (c < arr.length) {
+			if (arr[c] != this) { 
+				const arr2 = arr[c].recursiveCompile();
+				arr.splice(c, 1, ...arr2); //spread operator oh no (performance go die die die)
+				//ok but actually performance isnt a concern, memory is
+				c += arr2.length;
+			} else {
+				c++;
+			}
+		}
+		return arr;
+	}
 	Crumbs.merge = function(arr, left, middle, right) {
 		//merges two object arrays together sorting based on order
 		let a1 = new Array(middle - left + 1);
@@ -1413,7 +1441,6 @@ const Crumbs_Init_On_Load = function() {
 	
 	    return arr;
 	};
-
 	//I love stealing code
 	Crumbs.mergeSort = function(arr, left, right) {
 	    if (left >= right) {
@@ -1543,6 +1570,7 @@ const Crumbs_Init_On_Load = function() {
 				ctx[i] = Crumbs.settings[i];
 			}
 			for (let i = 0; i < list.length; i++) {
+				if (list[i].parent) { continue; }
 				let o = list[i];
 				if (!o.enabled) { continue; }
 				Crumbs.iterateObject(o, ctx);
