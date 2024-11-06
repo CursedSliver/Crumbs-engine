@@ -2204,7 +2204,7 @@ const Crumbs_Init_On_Load = function() {
 			special: 'dragon',
 			image: 'dragon.png?v='+Game.version,
 			skinFunction: function() {
-				this.sx = Game.dragonLevels[Game.dragonLevel].pic;
+				this.sx = Game.dragonLevels[Game.dragonLevel].pic * 96;
 			},
 			enableCondition: function() { return (Game.Has('A crumbly egg')); }
 		});
