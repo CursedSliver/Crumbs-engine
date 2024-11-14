@@ -362,13 +362,13 @@ const Crumbs_Init_On_Load = function() {
 		if (this.parent === null) {
 			let pushed = false;
 			for (let i in Crumbs.objects[this.scope]) {
-				if (Crumbs.objects[this.scope][i] === null) { this.index = i; Crumbs.objects[this.scope][i] = this; pushed = true; break; }
+				if (Crumbs.objects[this.scope][i] === null) { this.index = parseInt(i); Crumbs.objects[this.scope][i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = Crumbs.objects[this.scope].length; Crumbs.objects[this.scope].push(this); }
 		} else {
 			let pushed = false;
 			for (let i in this.parent.children) {
-				if (this.parent.children[i] === null) { this.index = i; this.parent.children[i] = this; pushed = true; break; }
+				if (this.parent.children[i] === null) { this.index = parseInt(i); this.parent.children[i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
 		}
@@ -566,7 +566,7 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.prefs.objects[scope];
 	};
 	Crumbs.lastUpdate = Date.now();
-	Crumbs.updateObjects = function() { //called every draw frame
+	Crumbs.updateObjects = function() { //called every logic frame
 		if (typeof gamePause !== 'undefined' && gamePause) { return; } //p for pause support
 		for (let i in Crumbs.objects) { 
 			if (Crumbs.objectsEnabled(i)) {
@@ -578,6 +578,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.lastUpdate = Date.now();
 		if (Game.T % 3600 == 0) { Crumbs.reorderAllObjects(); } 
 	};
+	Game.registerHook('logic', Crumbs.updateObjects);
 
 	Crumbs.spawn = function(obj, force) {
 		if (!force && (Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
@@ -1246,8 +1247,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.bloom.prototype.postDraw = function(m, ctx) {
 		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, Crumbs.getCanvasByScope(m.scope).canvas.width, Crumbs.getCanvasByScope(m.scope).canvas.height), this.data), 0, 0);
 	};
-	
-	Game.registerHook('logic', Crumbs.updateObjects);
 	
 	Crumbs.shader = {};
 	Crumbs.shaderDefaults = {};
@@ -2294,41 +2293,11 @@ const Crumbs_Init_On_Load = function() {
 		});
 	}
 
-	Crumbs.cookieClickPopup = {
-		order: 8,
-		id: 'cookieClickText',
-		scope: 'left',
-		anchor: 'bottom',
-		components: [],
-		behaviors: new Crumbs.behaviorInstance(function() {
-			this.alpha -= 1 / (4 * Game.fps);
-			if (this.alpha <= 0) { return 't'; }
-			this.y -= 2;
-		})
-	}
-	Crumbs.spawnCookieClickPopup = function(x, y, text) {
-		if (!Game.prefs.numbers) { return; }
-		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
-		if (!s || !s.components) {return;}
-		s.x = x;
-		s.y = y;
-		s.components.push(new Crumbs.component.text({
-			size: 20,
-			color: '#fff',
-			align: 'center',
-			content: text
-		}));
-	}
-	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.unfocusedSpawn = false; }
-	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
-	
-	//extreme unfunniness intensifies
-	
-	Game.DrawWrinklers = function() {
-		var ctx=Game.LeftBackground;
+	Crumbs.drawEyeOfTheWrinkler = function(m, ctx) {
+		if (!Game.Has('Eye of the wrinkler')) { return; }
 		for (var i in Game.wrinklers)
 		{
-			if (Game.wrinklers[i].selected && Game.Has('Eye of the wrinkler'))
+			if (Game.wrinklers[i].selected)
 			{
 				//lazy lazy lazy lazy lazy
 				var selected = Game.wrinklers[i];
@@ -2369,6 +2338,46 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
+	Crumbs.initEyeOfTheWrinkler = function() {
+		Crumbs.spawn({
+			scope: 'left',
+			id: 'eyeOfTheWrinkler',
+			components: new Crumbs.component.canvasManipulator({ function: Crumbs.drawEyeOfTheWrinkler }),
+			order: 10
+		});
+	}
+
+	Crumbs.cookieClickPopup = {
+		order: 8,
+		id: 'cookieClickText',
+		scope: 'left',
+		anchor: 'bottom',
+		components: [],
+		behaviors: new Crumbs.behaviorInstance(function() {
+			this.alpha -= 1 / (4 * Game.fps);
+			if (this.alpha <= 0) { return 't'; }
+			this.y -= 2;
+		})
+	}
+	Crumbs.spawnCookieClickPopup = function(x, y, text) {
+		if (!Game.prefs.numbers) { return; }
+		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
+		if (!s || !s.components) {return;}
+		s.x = x;
+		s.y = y;
+		s.components.push(new Crumbs.component.text({
+			size: 20,
+			color: '#fff',
+			align: 'center',
+			content: text
+		}));
+	}
+	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.unfocusedSpawn = false; }
+	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
+	
+	//extreme unfunniness intensifies
+	
+	Game.DrawWrinklers = function() { }
 
 	Crumbs.h.rebuildBigCookieButton();
 
@@ -2863,6 +2872,12 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.drawObjects();
 	};
 	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
+	Game.attachTooltip(l('httpsSwitch'),'<div style="padding:8px;width:350px;text-align:center;font-size:11px;">'+loc("You are currently playing Cookie Clicker on the <b>%1</b> protocol.<br>The <b>%2</b> version uses a different save slot than this one.<br>Click this lock to reload the page and switch to the <b>%2</b> version!",[(Game.https?'HTTPS':'HTTP'),(Game.https?'HTTP':'HTTPS')])+'</div>','this');
+	AddEvent(l('httpsSwitch'),'click',function(){
+		PlaySound('snd/pop'+Math.floor(Math.random()*3+1)+'.mp3',0.75);
+		if (location.protocol=='https:') location.href='http:'+window.location.href.substring(window.location.protocol.length);
+		else if (location.protocol=='http:') location.href='https:'+window.location.href.substring(window.location.protocol.length);
+	});
 	Crumbs.h.injectCSS('#CrumbsEngineVersion { margin-top: 2px; pointer-events: none; }');
 	l('gameVersionText').insertAdjacentHTML('beforebegin','<div class="title" style="font-size:22px;" id="CrumbsEngineVersion">Crumbs engine '+Crumbs.version+'</div>');
 	
