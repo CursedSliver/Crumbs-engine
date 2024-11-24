@@ -740,6 +740,9 @@ const Crumbs_Init_On_Load = function() {
 		if ((Crumbs.t - this.t) >= p.t) { return 't'; } else { return {}; }
 	}, { t: 1e21 });
 	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.offsetWidth / 2; this.y = this.scope.l.offsetHeight * 0.4; });
+	Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound = new Crumbs.behavior(function() {
+		if (this.x > this.scope.l.offsetWidth + 100 || this.x < -100 || this.y > this.scope.l.offsetHeight + 100) { this.die(); }
+	});
 
 	Crumbs.component = {};
 	Crumbs.defaultComp = {};
@@ -1582,6 +1585,8 @@ const Crumbs_Init_On_Load = function() {
 		for (let c in Crumbs.scopedCanvas) {
 			let list = Crumbs.compileObjects(c);
 			Crumbs.sortedObjectList[c] = list;
+			Crumbs.scopedCanvas[c].sortedObjects = Crumbs.sortedObjectList[c];
+			Crumbs.scopedCanvas[c].objects = Crumbs.objects[c];
 			Crumbs.scopedCanvas[c].l.style.background = Crumbs.scopedCanvas[c].background;
 			let ctx = Crumbs.scopedCanvas[c].c;
 			ctx.globalAlpha = 1;
@@ -1636,28 +1641,12 @@ const Crumbs_Init_On_Load = function() {
 	Game.registerHook('check', Crumbs.compileCookieIcons);
 	if (Game.ready) { Crumbs.compileCookieIcons(); } else { Game.registerHook('create', Crumbs.compileCookieIcons); }
 
-	Crumbs.randomCookie = function() {
-		let i = [];
-		if (Game.bakeryName.toLowerCase()=='ortiel' || Math.random()<1/10000) { i=[17,5]; } else { i = choose(Crumbs.cookieIcons); }
-		return Crumbs.cookieObject;
-	};
 	Crumbs.cookieObject = {
 		width: 48,
 		height: 48,
 		imgs: 'icons',
 		scope: 'left'
 	}
-
-	Crumbs.dollar = function() {
-		return {
-			imgs: 'dollar',
-			width: 64,
-			height: 64,
-			sx: Math.floor(Math.random() * 8) * 64,
-			sy: 0,
-			scope: 'left',
-		};
-	};
 	Crumbs.dollarObject = {
 		imgs: 'dollar',
 		width: 64,
@@ -1685,14 +1674,15 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, noInit) {
-		if (Game.AscendTimer) { return; }
+		if (Game.AscendTimer || !Game.prefs.particles) { return; }
 		let icon = (Game.season=='fools'?[]:((Math.random()<0.0001)?[17,5]:choose(Crumbs.cookieIcons)));
 		let c = {
 			behaviors: [
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: yd}), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: speed}), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}), 
-				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)})
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)}),
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound)
 			],
 			x: (onMouse?Game.mouseX:x),
 			y: (onMouse?Game.mouseY:y),
