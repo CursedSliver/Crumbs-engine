@@ -214,7 +214,7 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.createCanvas = function(id, parentElement, css) {
 		let div = document.createElement('canvas');
-		div.id = id; div.style = 'background: none;';
+		div.id = id; div.style.background = 'none'; 
 		let cont = document.createElement('div');
 		cont.classList.add('CrumbsCanvaContainer');
 		if (css) { cont.style = css; }
@@ -277,7 +277,7 @@ const Crumbs_Init_On_Load = function() {
 	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'z-index: 2147483647; position: absolute; top: 0; left: 0;');
 	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'z-index: 2147483647; position: absolute; top: 0; left: 0;');
 	l('backgroundCanvas').remove(); 
-	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'background: none; z-index: -1000000000'); 
+	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'z-index: -1000000000'); 
 	Game.Background = Crumbs.scopedCanvas.background.c;
 
 	Crumbs.updateCanvas = function() {
@@ -1206,8 +1206,8 @@ const Crumbs_Init_On_Load = function() {
 		if (b && !this.hovered) { this.hovered = true; this.onMouseover.call(m); }
 		else if (!b && this.hovered) { this.hovered = false; this.onMouseout.call(m); }
 		if (this.hovered) { 
-			if (!this.click && Crumbs.pointerHold) { this.click = true; if (this.hovered) { this.onClick.call(m); } }
-			if (this.click && !Crumbs.pointerHold) { this.click = false; if (this.hovered) { this.onRelease.call(m); } }
+			if (!this.click && Crumbs.pointerHold) { this.click = true; this.onClick.call(m); }
+			if (this.click && !Crumbs.pointerHold) { this.click = false; this.onRelease.call(m); }
 		}
 		if (Crumbs.prefs.colliderDisplay) {
 			const prevStrokeStyle = ctx.strokeStyle;
@@ -1459,10 +1459,14 @@ const Crumbs_Init_On_Load = function() {
 			k++;
 	    }
 	    while (i < a1.length) {
-	        arr[k] = a1[i]; i++; k++;
+	        arr[k] = a1[i];
+			i++;
+			k++;
 	    }
 	    while (j < a2.length) {
-	        arr[k] = a2[j]; j++; k++;
+	        arr[k] = a2[j];
+			j++;
+			k++;
 	    }
 	
 	    return arr;
@@ -1791,31 +1795,11 @@ const Crumbs_Init_On_Load = function() {
 		this.rotation = -(me.r)*Math.PI/180;
 		this.alpha = me.close;
 	});
-	Crumbs.randomGlint = {
-		imgs: 'glint',
-		anchor: 'top-left',
-		components: new Crumbs.component.settings({globalCompositeOperation: 'lighter'}),
-		order: 5,
-		behaviors: function(p) {
-			if ((Crumbs.t - this.t) > 0) { return 't'; }
-			return {};
-		}
-	}
 	Crumbs.objectBehaviors.wrinklerParticles = new Crumbs.behavior(function(p) {
 		if (!Game.prefs.particles) { return; }
 		const me = Game.wrinklers[this.wId];
 		if (me.phase == 2 && Math.random() < 0.03) {
 			Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, true);
-		}
-		if (me.type == 1 && Math.random()<0.3) {
-			const s = Math.random()*30+5;
-			this.spawnChild(Crumbs.randomGlint, { 
-				alpha: Math.random()*0.65+0.1, 
-				offsetX: Math.random()*50, 
-				offsetY: Math.random()*200, 
-				scaleX: s / 32, 
-				scaleY: s / 32,
-			}); 
 		}
 	});
 	Crumbs.wrinklerSkins = [Crumbs.objectImgs.empty, 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'];
@@ -1830,6 +1814,13 @@ const Crumbs_Init_On_Load = function() {
 			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerMovement), 
 			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerParticles)
 		],
+		components: new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
+			if (Game.wrinklers[m.wId].type != 1 || Math.random() >= 0.3 || !Game.prefs.particles) { return; }
+			ctx.globalAlpha=Math.random()*0.65+0.1;
+			var s=Math.random()*30+5;
+			ctx.globalCompositeOperation='lighter';
+			ctx.drawImage(Pic('glint.png'),-s/2+Math.random()*50-25,-s/2+Math.random()*200,s,s);
+		} }),
 		children: [
 			Crumbs.wrinklerShadowObj,
 			Crumbs.wrinklerEyeObj
@@ -1950,6 +1941,25 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: (0.98)*2,
 			scaleY: (0.98*161/151)*2,
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.drawOnEaster)
+		});
+		this.spawnChild({
+			order: 1,
+			components: new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
+				if (!Game.prefs.particles) { return; }
+				let goodBuff = false;
+				for (var i in Game.buffs) {
+					if (Game.buffs[i].aura == 1) { goodBuff = true; }
+				}
+				if (!goodBuff) { return; }
+				ctx.globalCompositeOperation = 'lighter';
+				for (var i = 0; i < 1; i++) {
+					ctx.globalAlpha = Math.random() * 0.65 + 0.1;
+					var size = Math.random() * 30 + 5;
+					var a = Math.random() * Math.PI * 2;
+					var d = 256 * Game.BigCookieSize * 0.9 * Math.random() / 2;
+					ctx.drawImage(Pic('glint.png'), -size / 2 + Math.sin(a) * d, -size / 2 + Math.cos(a) * d, size, size);
+				}
+			} })
 		});
 	}
 	Crumbs.objectBehaviors.cookieWobble = new Crumbs.behavior(function() {
@@ -2241,6 +2251,17 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn({
 			anchor: 'top-left',
 			scope: 'background',
+			components: new Crumbs.component.canvasManipulator({
+				function: function(m, ctx) {
+					ctx.fillStyle = 'black';
+					ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				}
+			}),
+			order: -Infinity
+		})
+		Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'background',
 			imgs: Game.bg,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
@@ -2249,7 +2270,7 @@ const Crumbs_Init_On_Load = function() {
 			anchor: 'top-left',
 			scope: 'background',
 			imgs: 'starbg.jpg',
-			alpha: 0.5,
+			//alpha: 0.5,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground)
 		});
@@ -2258,7 +2279,7 @@ const Crumbs_Init_On_Load = function() {
 			scope: 'background',
 			imgs: 'starbg.jpg',
 			order: 0.5,
-			alpha: 0.5,
+			//alpha: 0.5,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.ascendBackground, { fancyRequire: true, alphaFluctuation: true, sMult: function() { return 2*(1+Math.sin(Game.T*0.002)*0.07); } })
 		});
@@ -2298,7 +2319,8 @@ const Crumbs_Init_On_Load = function() {
 		if (Game.specialTab==p.tab) { this.x = 24; } else { this.x = 0; }
 		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6);
 	}, { tab: '' });
-	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target.getComponent('pointerInteractive').hovered) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
+	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target && p.target.getComponent('pointerInteractive').hovered) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
+	Crumbs.objectBehaviors.petShineEnable = new Crumbs.behavior(function(p) { if (p.target && (p.target.getComponent('pointerInteractive').hovered || (Game.specialTab && p.target.id.includes(Game.specialTab)))) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
 	Crumbs.objectBehaviors.follow = new Crumbs.behavior(function(p) { this.x = p.target.x + (p.offset?p.target.offsetX:0); this.y = p.target.y + (p.offset?p.target.offsetY:0); }, { target: null, offset: false });
 	Crumbs.shine = function(scaleMult, target1, target2) {
 		return {
@@ -2307,7 +2329,7 @@ const Crumbs_Init_On_Load = function() {
 			scaleX: scaleMult,
 			scaleY: scaleMult,
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), 
-						new Crumbs.behaviorInstance(Crumbs.objectBehaviors.enableOnHover, { target: target1 }),
+						new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petShineEnable, { target: target1 }),
 						new Crumbs.behaviorInstance(Crumbs.objectBehaviors.follow, { target: target2 })
 					   ]
 		};
@@ -2411,28 +2433,50 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleY = s;
 	});
 	Crumbs.initNebula = function() {
+		//Crumbs.initNebulaConservative(); return;
 		let nebulaAnchor = Crumbs.spawn({
 			id: 'nebulaAnchor',
 			noDraw: true,
 			scope: 'background',
 			order: 2,
+			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaTrack)
 		});
 		nebulaAnchor.spawnChild({
 			id: 'nebula1',
 			imgs: 'heavenRing1.jpg',
-			alpha: 0.5,
+			//alpha: 0.5,
 			order: 2,
-			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin1)
 		});
 		nebulaAnchor.spawnChild({
 			id: 'nebula2',
 			imgs: 'heavenRing2.jpg',
-			alpha: 0.5,
+			//alpha: 0.5,
 			order: 3,
-			components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaSpin2)
+		});
+		//I seriously dont get it somehow I need to turn alpha to 1 in order to get the effects that vanilla creates with an alpha of 0.5 ?????????????
+	}
+	Crumbs.initNebulaConservative = function() {
+		Crumbs.spawn({
+			id: 'nebulaAnchor',
+			noDraw: true,
+			scope: 'background',
+			order: 2,
+			components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.canvasManipulator({ function: function(m, ctx) { 
+				ctx.fillStyle = 'black';
+				ctx.fillRect(0, 0, 1000, 1000)
+				ctx.globalCompositeOperation = 'lighter';
+				ctx.globalAlpha = 0.5;
+				ctx.rotate(Game.T * 0.001);
+				let s = (600 + 150 * Math.sin(Game.T * 0.007)) * Game.AscendZoom;
+				ctx.drawImage(Pic('heavenRing1.jpg'), -s / 2, -s / 2, s, s);
+				ctx.rotate(-Game.T * 0.0017);
+				s = (600 + 150 * Math.sin(Game.T * 0.0037)) * Game.AscendZoom;
+				ctx.drawImage(Pic('heavenRing2.jpg'), -s / 2, -s / 2, s, s);
+			} })],
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.nebulaTrack)
 		});
 	}
 
@@ -2714,7 +2758,7 @@ const Crumbs_Init_On_Load = function() {
 					y+=(Math.random()*2-1)*10*shake;
 					
 					var s=1;
-					if (tBase>0)
+					if (false)
 					{
 						ctx.save();
 						ctx.globalAlpha=1-Math.pow(t,0.5);
