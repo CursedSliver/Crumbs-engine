@@ -2,7 +2,7 @@ if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
-	Crumbs.version = 'v0.1';
+	Crumbs.version = 'v1.0';
 	
 	Crumbs.h = {};
 	Crumbs.h.CSSInjects = [];
@@ -538,13 +538,12 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.findChild = function(id) {
 		for (let i in this.children) { 
-			if (this.children[i] !== null) {
-				if (this.children[i].id === id) {
-					return this.children[i];
-				} else {
-					let cd = this.children[i].findChild(id);
-					if (cd !== null) { return cd; }
-				}
+			if (this.children[i] === null) { continue; }
+			if (this.children[i].id === id) {
+				return this.children[i];
+			} else {
+				let cd = this.children[i].findChild(id);
+				if (cd !== null) { return cd; }
 			}
 		}
 		return null;
@@ -552,12 +551,11 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.object.prototype.getChildren = function(id) {
 		let toReturn = [];
 		for (let i in this.children) {
-			if (this.children[i] !== null) {
-				if (this.children[i].id === id) {
-					toReturn.push(this.children[i]);
-				} else {
-					toReturn.concat(this.children[i].getChildren(id)); 
-				}
+			if (this.children[i] === null) { continue; }
+			if (this.children[i].id === id) {
+				toReturn.push(this.children[i]);
+			} else {
+				toReturn.concat(this.children[i].getChildren(id)); 
 			}
 		}
 		return toReturn;
