@@ -1530,6 +1530,8 @@ const Crumbs_Init_On_Load = function() {
 		ctx.fillRect(o.offsetX - 3, o.offsetY - 3, 6, 6);
 		ctx.restore();
 	}
+	//testing comment
+	//Crumbs.spawn({ x: 100, y: 100, imgs: 'glint.png', scaleX: 2, scaleY: 2, children: { y: 30, imgs: 'glint.png', scaleX: 0.5, scaleY: 0.5 }, id: 1, behaviors: function() { this.rotation += 0.01; } });
 	Crumbs.iterateObject = function(o, ctx) {
 		ctx.save(); 
 		
@@ -1543,7 +1545,11 @@ const Crumbs_Init_On_Load = function() {
 		}
 		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
-		ctx.translate(o.x, o.y);
+
+		const c = o.parent?Math.cos(-o.parent.rotation):1;
+		const s = o.parent?Math.sin(-o.parent.rotation):0;
+		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
+
 		if (o.rotation) {
 			ctx.rotate(o.rotation);
 		} 
