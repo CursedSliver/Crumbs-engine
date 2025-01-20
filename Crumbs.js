@@ -1720,12 +1720,12 @@ const Crumbs_Init_On_Load = function() {
 		const o = Crumbs.findObject('wrinkler'+originId);
 		w.x = o.x;
 		w.y = o.y;
-		w.offsetX = o.offsetX;
+		w.offsetX = o.offsetX - 50;
 		w.offsetY = o.offsetY;
 		w.rotation = o.rotation;
 		w.order = 2;
 		w.id = 'wrinklerBits.png';
-		Crumbs.spawn(w);
+		return Crumbs.spawn(w);
 	};
 
 	Crumbs.fallingCookieOnclick = function() {
@@ -1744,10 +1744,10 @@ const Crumbs_Init_On_Load = function() {
 		}
 	}
 
-	eval('Game.UpdateWrinklers='+replaceAll('part.r=-me.r;', '', replaceAll(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75);`, Game.UpdateWrinklers.toString()).replace('inRect(', 'Crumbs.h.inRectOld(').replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, Math.floor(ii + Math.floor(3 * (me.id + 1) * Math.random()) + 2));`).replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, 0);`)));
+	eval('Game.UpdateWrinklers='+replaceAll('part.r=-me.r;', '', replaceAll(`Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1.5,2);`, `Crumbs.spawnFallingCookie(0, 0, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPoppedCookie', true, Math.random()*0.5+0.75);`, Game.UpdateWrinklers.toString()).replace('inRect(', 'Crumbs.h.inRectOld(').replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, Math.floor(ii + Math.floor(3 * (me.id + 1) * Math.random()) + 2));`).replace(`var part=Game.particleAdd(x,y,Math.random()*4-2,Math.random()*-2-2,1,1,2,me.type==1?'shinyWrinklerBits.png':'wrinklerBits.png');`, `Crumbs.spawnWrinklerBits(me.type, me.id, ii);`)));
 
 	Crumbs.wrinklerShadowObj = {
-		anchor: 'top-left',
+		anchor: 'top',
 		y: 30,
 		scaleX: 5,
 		scaleY: 5,
@@ -1796,7 +1796,7 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleY = sh / 200;
 		this.x = me.x;
 		this.y = me.y;
-		this.offsetX = -sw/2;
+		this.offsetX = -sw/2 + 50;
 		this.rotation = -(me.r)*Math.PI/180;
 		this.alpha = me.close;
 	});
@@ -1807,25 +1807,40 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, true);
 		}
 	});
+    Crumbs.onWrinklerClick = function() {
+        const me = Game.wrinklers[this.wId];
+        if (Game.keys[17] && Game.sesame) { me.type = !me.type; PlaySound('snd/shimmerClick.mp3'); return; }
+        Game.playWrinklerSquishSound();
+        me.clicks++;
+        if (me.clicks >= 50) Game.Win('Wrinkler poker');
+        me.hurt = 1;
+        me.hp -= 0.75;
+        if (Game.prefs.particles && !Game.prefs.notScary && !Game.WINKLERS && !(me.hp <= 0.5 && me.phase > 0)) {
+            for (let i = 0; i < 3; i++) { Crumbs.spawnWrinklerBits(me.type, me.id, Math.floor(i + Math.floor(3 * (me.id + 1) * Math.random()) + 2)); }
+        }
+    }
 	Crumbs.wrinklerSkins = ['', 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'];
 	Crumbs.wrinklerObj = {
 		imgs: Crumbs.wrinklerSkins,
 		order: 1.5,
 		scope: 'left',
-		anchor: 'top-left',
+		anchor: 'top',
 		offsetY: -10,
 		behaviors: [
 			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerSkins), 
 			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerMovement), 
 			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerParticles)
 		],
-		components: new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
-			if (Game.wrinklers[m.wId].type != 1 || Math.random() >= 0.3 || !Game.prefs.particles) { return; }
-			ctx.globalAlpha=Math.random()*0.65+0.1;
-			var s=Math.random()*30+5;
-			ctx.globalCompositeOperation='lighter';
-			ctx.drawImage(Pic('glint.png'),-s/2+Math.random()*50-25,-s/2+Math.random()*200,s,s);
-		} }),
+		components: [
+            new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
+                if (Game.wrinklers[m.wId].type != 1 || Math.random() >= 0.3 || !Game.prefs.particles) { return; }
+                ctx.globalAlpha=Math.random()*0.65+0.1;
+                var s=Math.random()*30+5;
+                ctx.globalCompositeOperation='lighter';
+                ctx.drawImage(Pic('glint.png'),-s/2+Math.random()*50-25,-s/2+Math.random()*200,s,s);
+            } }),
+            new Crumbs.component.pointerInteractive({ boundingType: 'rect', onRelease: Crumbs.onWrinklerClick }),
+        ],
 		children: [
 			Crumbs.wrinklerShadowObj,
 			Crumbs.wrinklerEyeObj
