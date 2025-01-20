@@ -1752,12 +1752,11 @@ const Crumbs_Init_On_Load = function() {
 		scaleX: 5,
 		scaleY: 5,
 		order: 1,
-		wId: i,
 		imgs: ['img/wrinklerShadow.png'],
 		behaviors: new Crumbs.behaviorInstance(function(p) {
-			if (Game.prefs.fancy && Game.wrinklers[this.wId].close > 0) {
+			if (Game.prefs.fancy && Game.wrinklers[this.parent.wId].close > 0) {
 				this.noDraw = false;
-				this.alpha = Game.wrinklers[this.wId].close;
+				this.alpha = Game.wrinklers[this.parent.wId].close;
 				return;
 			} 
 			this.noDraw = true;
@@ -1768,13 +1767,12 @@ const Crumbs_Init_On_Load = function() {
 		anchor: 'top-left',
 		offsetY: -10+Math.sin(Game.T*0.2+i*3+1.2),
 		order: 3,
-		wId: i,
 		scope: 'left',
 		behaviors: new Crumbs.behaviorInstance(function(p) {
-			if (Game.prefs.notScary && Game.wrinklers[this.wId].close > 0) {
+			if (Game.prefs.notScary && Game.wrinklers[this.parent.wId].close > 0) {
 				this.offsetY = -10+Math.sin(Game.T*0.2+this.wId*3+1.2);
 				this.imgUsing = Math.sin(Game.T*0.003+i*11+137+Math.sin(Game.T*0.017+i*13))>0.9997?1:2;
-				this.alpha = Game.wrinklers[this.wId].close;
+				this.alpha = Game.wrinklers[this.parent.wId].close;
 				return;
 			}
 			this.imgUsing = 0;
