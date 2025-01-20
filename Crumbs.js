@@ -293,17 +293,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s].c;
 	};
-	
-	Crumbs.objectImgs = {
-		none: 'img/empty.png',
-		empty: 'img/empty.png',
-		rect: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2P4DwQACfsD/Z8fLAAAAAAASUVORK5CYII=',
-		glint: 'img/glint.png',
-		icons: 'img/icons.png',
-		dollar: 'img/smallDollars.png',
-		wrinklerBits: 'img/wrinklerBits.png',
-		shinyWrinklerBits: 'img/shinyWrinklerBits.png'
-	};
 	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
@@ -416,7 +405,6 @@ const Crumbs_Init_On_Load = function() {
 		this.imgs = [].concat(this.imgs);
 		for (let i in this.imgs) { 
 			if (typeof this.imgs === 'function') { this.imgs[i] = this.imgs[i](); }
-			if (Crumbs.objectImgs.hasOwnProperty(this.imgs[i])) { this.imgs[i] = Crumbs.objectImgs[this.imgs[i]]; } 
 		}
 
 		if (this.parent) { 
@@ -549,6 +537,7 @@ const Crumbs_Init_On_Load = function() {
 		return null;
 	};
 	Crumbs.object.prototype.getChildren = function(id) {
+		if (!id) { return [].concat(this.children); }
 		let toReturn = [];
 		for (let i in this.children) {
 			if (this.children[i] === null) { continue; }
@@ -1307,6 +1296,14 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return data;
 	}
+
+	Crumbs.preloads = [];
+	Crumbs.preloadRequired = false;
+	Crumbs.preload = function(items) {
+		items = [].concat(items);
+		Crumbs.preloads = Crumbs.preloads.concat(items);
+		Crumbs.preloadRequired = true;
+	}
 	
 	Crumbs.particle = function(obj, x, y, r, a, scope) {
 		//a super-lightweight variant of Crumbs.object
@@ -1624,6 +1621,15 @@ const Crumbs_Init_On_Load = function() {
 			for (let i in settingObj) {
 				ctx[i] = settingObj[i];
 			}
+			if (Crumbs.preloadRequired) {
+				const prev = ctx.globalAlpha;
+				ctx.globalAlpha = 0;
+				for (let i in Crumbs.preloads) {
+					ctx.drawImage(Pic(Crumbs.preloads[i]), 0, 0);
+				}
+				ctx.globalAlpha = prev;
+				Crumbs.preloadRequired = false;
+			}
 			if (!Crumbs.scopedCanvas[c].shaders.length) { continue; }
 			let data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
 			for (let i of Crumbs.scopedCanvas[c].shaders) {
@@ -1631,13 +1637,8 @@ const Crumbs_Init_On_Load = function() {
 			}
 			ctx.putImageData(data, 0, 0);
 		}
+		if (Crumbs.preloads.length) { Crumbs.preloads = []; }
 	};
-
-	Crumbs.leftBackgroundElements = [{
-		id: 'cFall',
-		imgs: 'icons',
-		
-	}, {}, {}];
 
 	Crumbs.cookieIcons = [[10, 0]];
 
@@ -1654,7 +1655,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.cookieObject = {
 		width: 48,
 		height: 48,
-		imgs: 'icons',
+		imgs: 'icons.png',
 		scope: 'left'
 	}
 	Crumbs.dollarObject = {
@@ -1668,7 +1669,7 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.wrinklerBit = function(id) {
 		return {
-			imgs: 'wrinklerBits',
+			imgs: 'wrinklerBits.png',
 			width: 100,
 			height: 200,
 			sx: ((id * 3) % 8) * 100,
@@ -1714,7 +1715,7 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
 		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
-		if (type == 1) { w.imgs = 'shinyWrinklerBits'; }
+		if (type == 1) { w.imgs = 'shinyWrinklerBits.png'; }
 		w.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})];
 		const o = Crumbs.findObject('wrinkler'+originId);
 		w.x = o.x;
@@ -1723,7 +1724,7 @@ const Crumbs_Init_On_Load = function() {
 		w.offsetY = o.offsetY;
 		w.rotation = o.rotation;
 		w.order = 2;
-		w.id = 'wrinklerBits';
+		w.id = 'wrinklerBits.png';
 		Crumbs.spawn(w);
 	};
 
@@ -1763,7 +1764,7 @@ const Crumbs_Init_On_Load = function() {
 		})
 	}
 	Crumbs.wrinklerEyeObj = {
-		imgs: [Crumbs.objectImgs.empty, 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
+		imgs: ['', 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
 		anchor: 'top-left',
 		offsetY: -10+Math.sin(Game.T*0.2+i*3+1.2),
 		order: 3,
@@ -1806,7 +1807,7 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.spawnFallingCookie(me.x, me.y, Math.random()*-2-2, Math.random()*4-2, 1, 'wrinklerPassive', false, Math.random()*0.5+0.5, 4, true);
 		}
 	});
-	Crumbs.wrinklerSkins = [Crumbs.objectImgs.empty, 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'];
+	Crumbs.wrinklerSkins = ['', 'img/wrinkler.png', 'img/shinyWrinkler.png', 'img/winterWrinkler.png', 'winkler.png', 'shinyWinkler.png', 'winterWinkler.png'];
 	Crumbs.wrinklerObj = {
 		imgs: Crumbs.wrinklerSkins,
 		order: 1.5,
