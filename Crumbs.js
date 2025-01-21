@@ -1535,7 +1535,8 @@ const Crumbs_Init_On_Load = function() {
 		ctx.globalAlpha = o.alpha;
 		let p = null;
 		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
-		const pWidth = Crumbs.getPWidth(o);
+		//pWidth and pHeight basically means actual width and actual height
+		const pWidth = Crumbs.getPWidth(o); 
 		const pHeight = Crumbs.getPHeight(o);
 		for (let ii = 0; ii < o.components.length; ii++) {
 			if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
@@ -1543,6 +1544,7 @@ const Crumbs_Init_On_Load = function() {
 		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
 
+		//in the case of parent, rotate in the other direction to make sure x and y are still absolute offsets
 		const c = o.parent?Math.cos(-o.parent.rotation):1;
 		const s = o.parent?Math.sin(-o.parent.rotation):0;
 		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
@@ -1825,9 +1827,9 @@ const Crumbs_Init_On_Load = function() {
 		anchor: 'top',
 		offsetY: -10,
 		behaviors: [
-			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerSkins), 
-			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerMovement), 
-			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerParticles)
+			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerSkins.f.call(this.getInfo()); }), 
+			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerMovement.f.call(this.getInfo()); }), 
+			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerParticles.f.call(this.getInfo()); })
 		],
 		components: [
             new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
