@@ -1808,6 +1808,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	});
     Crumbs.onWrinklerClick = function() {
+        if (Game.OnAscend) return;
         const me = Game.wrinklers[this.wId];
         if (Game.keys[17] && Game.sesame) { me.type = !me.type; PlaySound('snd/shimmerClick.mp3'); return; }
         Game.playWrinklerSquishSound();
