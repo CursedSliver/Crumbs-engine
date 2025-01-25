@@ -585,7 +585,6 @@ const Crumbs_Init_On_Load = function() {
 	Game.registerHook('logic', Crumbs.updateObjects);
 
 	Crumbs.spawn = function(obj, custom) {
-		if ((Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
 		const h = new Crumbs.object(obj);
 		if (custom) { for (let i in custom) {
 			h[i] = custom[i];
@@ -593,6 +592,10 @@ const Crumbs_Init_On_Load = function() {
 		h.commenceInit();
 		return h;
 	};
+	Crumbs.spawnVisible = function(obj, custom) {
+		if ((Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer < Date.now() || !Game.visible) && !Crumbs.unfocusedSpawn) { return false; } 
+		return Crumbs.spawn(obj, custom);
+	}
 	Crumbs.sleepDetectionBuffer = 1000 * (30 / Game.fps); //equal to 30 draw frames
 	
 	Crumbs.findObject = function(id, scope) {
@@ -1709,7 +1712,7 @@ const Crumbs_Init_On_Load = function() {
 		};
 		if (!onMouse && !noInit) { c.init = Crumbs.objectInits.topRandom; }
 		if (icon[2]) { c.imgs = icon[2]; }
-		return Crumbs.spawn((Game.season=='fools'?Crumbs.dollarObject:Crumbs.cookieObject), c);
+		return Crumbs.spawnVisible((Game.season=='fools'?Crumbs.dollarObject:Crumbs.cookieObject), c);
 	};
 	Game.registerHook('logic', function() { Crumbs.spawnCookieShower(); });
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
@@ -1727,7 +1730,7 @@ const Crumbs_Init_On_Load = function() {
 		w.rotation = o.rotation;
 		w.order = 2;
 		w.id = 'wrinklerBits.png';
-		return Crumbs.spawn(w);
+		return Crumbs.spawnVisible(w);
 	};
 
 	Crumbs.fallingCookieOnclick = function() {
@@ -1808,7 +1811,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	});
     Crumbs.onWrinklerClick = function() {
-        if (Game.OnAscend) return;
+		if (Game.OnAscend) { return; }
         const me = Game.wrinklers[this.wId];
         if (Game.keys[17] && Game.sesame) { me.type = !me.type; PlaySound('snd/shimmerClick.mp3'); return; }
         Game.playWrinklerSquishSound();
@@ -2569,7 +2572,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.spawnCookieClickPopup = function(x, y, text) {
 		if (!Game.prefs.numbers) { return; }
-		let s = Crumbs.spawn(Crumbs.cookieClickPopup);
+		let s = Crumbs.spawnVisible(Crumbs.cookieClickPopup);
 		if (!s || !s.components) {return;}
 		s.x = x;
 		s.y = y;
