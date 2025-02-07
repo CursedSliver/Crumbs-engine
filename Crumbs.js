@@ -2,6 +2,8 @@ if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 var CrumbsEngineLoaded = false;
 const Crumbs_Init_On_Load = function() {
+	if (l('topbarFrenzy')) { return; }
+
 	Crumbs.version = 'v1.0';
 	
 	Crumbs.h = {};
@@ -448,9 +450,6 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.h.tempVar = false;
 	Crumbs.object.prototype.spawnChild = function(obj, custom) {
-		if (!Game.visible || !Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer >= Date.now()) {
-			return;
-		}
 		const h = new Crumbs.object(obj, this);
 		if (custom) { for (let i in custom) {
 			h[i] = custom[i];
@@ -458,6 +457,12 @@ const Crumbs_Init_On_Load = function() {
 		h.commenceInit();
 		return h;
 	};
+	Crumbs.object.prototype.spawnChildVisible = function(obj, custom) {
+		if (!Game.visible || !Crumbs.lastUpdate + Crumbs.sleepDetectionBuffer >= Date.now()) {
+			return;
+		}
+		return this.spawnChild(obj, custom);
+	}
 	Crumbs.object.prototype.hasChildren = function() {
 		return (this.children.length > 0);
 	};
