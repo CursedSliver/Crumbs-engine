@@ -1620,12 +1620,14 @@ const Crumbs_Init_On_Load = function() {
 			}
 			for (let i in Crumbs.particles[c]) {
 				const p = Crumbs.particles[c][i];
+				if (p.globalCompositeOperation) { ctx.globalCompositeOperation = p.globalCompositeOperation; }
 				ctx.translate(p.x, p.y);
 				ctx.rotate(p.rotation);
 				ctx.globalAlpha = p.alpha;
 				ctx.drawImage(Pic(p.obj.img), -p.width / 2, -p.height / 2, p.width, p.height);
 				ctx.rotate(-p.rotation);
 				ctx.translate(-p.x, -p.y);
+				if (p.globalCompositeOperation) { ctx.globalCompositeOperation = settingObj.globalCompositeOperation; }
 			}
 			ctx.globalAlpha = 1;
 			for (let i in settingObj) {
