@@ -43,6 +43,20 @@ const Crumbs_Init_On_Load = function() {
 			x * s + y * c
 		];
 	}
+	Crumbs.h.isTouchDevice = function () {
+		const userAgent = navigator.userAgent.toLowerCase();
+
+		const touchDevices = [
+			'iphone', 'ipod', 'android', 'blackberry', 'windows phone', 'tablet', 'mobile', 'touch'
+		];
+		const isTouchScreenDevice = touchDevices.some(agent => userAgent.includes(agent));
+
+		const isTouchSupported = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+		return isTouchScreenDevice && isTouchSupported;
+	}
+	if (Crumbs.h.isTouchDevice()) { Crumbs.mobile = true; }
+	else { Crumbs.mobile = false; }
 	Crumbs.h.rebuildBigCookieButton = function() {
 		l('bigCookie').remove();
 		var bigCookie = document.createElement('button');
@@ -1168,6 +1182,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.pointerHold = false;
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
 	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
+	AddEvent(document, 'touchstart', function() { Crumbs.pointerHold = true; });
+	AddEvent(document, 'touchend', function() { Crumbs.pointerHold = false; });
 	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
 		const s = m.scope;
 		if (this.boundingType == 'rect') {
@@ -1569,7 +1585,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 			
 			if (!o.noDraw && o.imgs.length) { 
-				ctx.drawImage(p, o.sx, o.sy, o.width?o.width:p.width, o.height?o.height:p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); 
+				ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); 
 			}
 			if (Crumbs.prefs.anchorDisplay) { Crumbs.drawAnchorDisplay(o, ctx); }
 			for (let ii = o.components.length - 1; ii >= 0; ii--) {
