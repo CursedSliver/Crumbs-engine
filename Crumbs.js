@@ -1177,28 +1177,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.pointerInteractive.prototype.disable = function() {
 		this.enabled = false;
 	};
-	Crumbs.component.pointerInteractive.prototype.logic = function(m) { };
-	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
-	Crumbs.pointerHold = false;
-	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
-	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
-	AddEvent(document, 'touchstart', function() { Crumbs.pointerHold = true; });
-	AddEvent(document, 'touchend', function() { Crumbs.pointerHold = false; });
-	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
-		const s = m.scope;
-		if (this.boundingType == 'rect') {
-			return Crumbs.h.inRect(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), {
-				w: pWidth,
-				h: pHeight,
-				r: m.getTrueRotation(),
-				x: Crumbs.getOffsetX(m.anchor, pWidth),
-				y: Crumbs.getOffsetY(m.anchor, pHeight)
-			});
-		} else if (this.boundingType == 'oval') {
-			return Crumbs.h.inOval(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), pWidth / 2, pHeight / 2, Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, m.getTrueRotation());
-		}
-	}
-	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
+	Crumbs.component.pointerInteractive.prototype.logic = function(m) {
 		const pWidth = Crumbs.getPWidth(m);
 		const pHeight = Crumbs.getPHeight(m);
 		let b = this.getHoverStatus(m, pWidth, pHeight);
@@ -1220,7 +1199,31 @@ const Crumbs_Init_On_Load = function() {
 			if (!this.click && Crumbs.pointerHold) { this.click = true; this.onClick.call(m); }
 			if (this.click && !Crumbs.pointerHold) { this.click = false; this.onRelease.call(m); }
 		}
+	};
+	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
+	Crumbs.pointerHold = false;
+	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
+	AddEvent(document, 'mouseup', function() { Crumbs.pointerHold = false; });
+	AddEvent(document, 'touchstart', function() { Crumbs.pointerHold = true; });
+	AddEvent(document, 'touchend', function() { Crumbs.pointerHold = false; });
+	Crumbs.component.pointerInteractive.prototype.getHoverStatus = function(m, pWidth, pHeight) {
+		const s = m.scope;
+		if (this.boundingType == 'rect') {
+			return Crumbs.h.inRect(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), {
+				w: pWidth,
+				h: pHeight,
+				r: m.getTrueRotation(),
+				x: Crumbs.getOffsetX(m.anchor, pWidth),
+				y: Crumbs.getOffsetY(m.anchor, pHeight)
+			});
+		} else if (this.boundingType == 'oval') {
+			return Crumbs.h.inOval(s.mouseX - m.getTrueX(), s.mouseY - m.getTrueY(), pWidth / 2, pHeight / 2, Crumbs.getOffsetX(m.anchor, pWidth) - pWidth / 2, Crumbs.getOffsetY(m.anchor, pHeight) - pHeight / 2, m.getTrueRotation());
+		}
+	}
+	Crumbs.component.pointerInteractive.prototype.postDraw = function(m, ctx) {
 		if (Crumbs.prefs.colliderDisplay) {
+			const pWidth = Crumbs.getPWidth(m);
+			const pHeight = Crumbs.getPHeight(m);
 			const prevStrokeStyle = ctx.strokeStyle;
 			const prevLineWidth = ctx.lineWidth;
 			ctx.lineWidth = 2;
