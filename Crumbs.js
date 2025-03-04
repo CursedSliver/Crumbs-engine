@@ -369,7 +369,7 @@ const Crumbs_Init_On_Load = function() {
 		'right': new Crumbs.anchor(1, 0.5),
 		'bottom-left': new Crumbs.anchor(0, 1),
 		'bottom': new Crumbs.anchor(0.5, 1),
-		'bottom-right': new Crumbs.anchor(1, 1),
+		'bottom-right': new Crumbs.anchor(1, 1)
 	}
 	Crumbs.object.prototype.setAnchor = function(anchor) {
 		this.anchor = Crumbs.defaultAnchors[anchor] || anchor;
@@ -528,7 +528,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.addBehavior = function(behavior) {
 		if (behavior instanceof Crumbs.behavior) { behavior = new Crumbs.behaviorInstance(behavior); }
-		else if (behavior === 'function') { const b = new Crumbs.behavior(behavior); behavior = new Crumbs.behaviorInstance(b); }
+		else if (typeof behavior === 'function') { const b = new Crumbs.behavior(behavior); behavior = new Crumbs.behaviorInstance(b); }
 		else if (!behavior instanceof Crumbs.behaviorInstance) { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		this.behaviors.push(behavior);
 	};
@@ -2306,6 +2306,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn({
 			anchor: 'top-left',
 			scope: 'background',
+			id: 'gameBG',
 			imgs: Game.bg,
 			components: new Crumbs.component.patternFill(),
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.background)
