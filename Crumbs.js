@@ -309,7 +309,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.getCanvasByScope = function(s) {
 		return Crumbs.scopedCanvas[s].c;
 	};
-	Crumbs.validAnchors = ['center', 'top-left', 'top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left'];
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
 		imageSmoothingEnabled: true,
@@ -328,9 +327,6 @@ const Crumbs_Init_On_Load = function() {
 			this[i] = obj[i];
 		}
 		if (parent) { this.parent = parent; }
-		
-		//rotation is clockwise
-		if (!Crumbs.validAnchors.includes(this.anchor)) { throw '"'+obj.anchor+'" is not a valid anchor!"'; }
 		
 		this.t = Crumbs.t; //the time when it was created
 		this.scaleFactorX = 1;
@@ -360,6 +356,25 @@ const Crumbs_Init_On_Load = function() {
 			init.call(this);
 		}
 	}
+	Crumbs.anchor = function(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+	Crumbs.defaultAnchors = {
+		'top-left': new Crumbs.anchor(0, 0),
+		'top': new Crumbs.anchor(0.5, 0),
+		'top-right': new Crumbs.anchor(1, 0),
+		'left': new Crumbs.anchor(0, 0.5),
+		'center': new Crumbs.anchor(0.5, 0.5),
+		'right': new Crumbs.anchor(1, 0.5),
+		'bottom-left': new Crumbs.anchor(0, 1),
+		'bottom': new Crumbs.anchor(0.5, 1),
+		'bottom-right': new Crumbs.anchor(1, 1),
+	}
+	Crumbs.object.prototype.setAnchor = function(anchor) {
+		this.anchor = Crumbs.defaultAnchors[anchor] || anchor;
+		if (typeof this.anchor === 'string') { throw '"'+anchor+'" is not a valid anchor!"'; }
+	}
 	Crumbs.nonQuickSettable = ['newChild', 'behaviorParams', 'settings', 'components', 'children'];
 	Crumbs.nonValidProperties = ['scope', 'behaviors', 'init'];
 	Crumbs.allProperties = ['x', 'y', 'scaleX', 'scaleY', 'rotation', 'alpha', 'id', 'init', 'order', 'imgs', 'imgUsing', 'behaviorParams', 'scope', 'behaviors', 'width', 'height', 'sx', 'sy', 'newChild', 'anchor', 'offsetX', 'offsetY', 'components', 'enabled', 'children', 'noDraw'];
@@ -374,8 +389,8 @@ const Crumbs_Init_On_Load = function() {
 		alpha: 1,
 		imgs: [],
 		imgUsing: 0,
-		scope: 'foreground',
-		anchor: 'center',
+		scope: Crumbs.scopedCanvas['foreground'],
+		anchor: Crumbs.defaultAnchors.center,
 		init: null, //Crumbs.objectInits.default, set after it is initialized
 		behaviors: null, //Crumbs.objectBehaviors.idle, set after it is initialized
 		id: null,
@@ -429,6 +444,8 @@ const Crumbs_Init_On_Load = function() {
 			this.scope = Crumbs.scopedCanvas[this.scope];
 		} 
 
+		this.setAnchor(this.anchor);
+
 		const childrenToSpawn = [].concat(this.children);
 		this.children = [];
 		for (let i in childrenToSpawn) {
@@ -444,14 +461,14 @@ const Crumbs_Init_On_Load = function() {
 
 		if (this.parent === null) {
 			let pushed = false;
-			for (let i in this.scope.objects) {
-				if (this.scope.objects[i] === null) { this.index = parseInt(i); this.scope.objects[i] = this; pushed = true; break; }
+			for (let i = 0; i < this.scope.objects.length; i++) {
+				if (this.scope.objects[i] === null) { this.index = i; this.scope.objects[i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = this.scope.objects.length; this.scope.objects.push(this); }
 		} else {
 			let pushed = false;
-			for (let i in this.parent.children) {
-				if (this.parent.children[i] === null) { this.index = parseInt(i); this.parent.children[i] = this; pushed = true; break; }
+			for (let i = 0; i < this.parent.children.length; i++) {
+				if (this.parent.children[i] === null) { this.index = i; this.parent.children[i] = this; pushed = true; break; }
 			}
 			if (!pushed) { this.index = this.parent.children.length; this.parent.children.push(this); }
 		}
@@ -590,7 +607,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.lastUpdate = Date.now();
 	Crumbs.updateObjects = function() { //called every logic frame
-		if (typeof gamePause !== 'undefined' && gamePause) { return; } //p for pause support
+		if (window.gamePause) { return; } //p for pause support
 		for (let i in Crumbs.objects) { 
 			if (Crumbs.objectsEnabled(i)) {
 				for (let ii in Crumbs.objects[i]) {
@@ -1382,7 +1399,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	}
 	Crumbs.updateParticles = function() {
-		if (typeof gamePause !== 'undefined' && gamePause) { return; }
+		if (window.gamePause) { return; }
 		for (let i in Crumbs.particles) {
 			for (let ii in Crumbs.particles[i]) {
 				Crumbs.particles[i][ii].update();
@@ -1509,34 +1526,11 @@ const Crumbs_Init_On_Load = function() {
 		return arr;
 	}
 
-	
-	Crumbs.OXFA = {
-		'top-left': 0,
-		'top': 0.5,
-		'top-right': 1,
-		'left': 0,
-		'center': 0.5,
-		'right': 1,
-		'bottom-left': 0,
-		'bottom': 0.5,
-		'bottom-right': 1
-	};
 	Crumbs.getOffsetX = function(anchor, width) {
-		return Crumbs.OXFA[anchor] * width;
-	};
-	Crumbs.OYFA = {
-		'top-left': 0,
-		'top': 0,
-		'top-right': 0,
-		'left': 0.5,
-		'center': 0.5,
-		'right': 0.5,
-		'bottom-left': 1,
-		'bottom': 1,
-		'bottom-right': 1
+		return anchor.x * width;
 	};
 	Crumbs.getOffsetY = function(anchor, height) {
-		return Crumbs.OYFA[anchor] * height;
+		return anchor.y * height;
 	};
 	Crumbs.getPWidth = function(o) {
 		if (!o.imgs.length) { return o.width??0; }
