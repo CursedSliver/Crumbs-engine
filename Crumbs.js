@@ -1568,7 +1568,7 @@ const Crumbs_Init_On_Load = function() {
 		//in the case of parent, rotate in the other direction to make sure x and y are still absolute offsets
 		const c = o.parent?Math.cos(-o.parent.rotation):1;
 		const s = o.parent?Math.sin(-o.parent.rotation):0;
-		ctx.translate((o.x * c - o.y * s) * o.scaleFactorX, (o.x * s + o.y * c) * o.scaleFactorY);
+		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
 
 		if (o.rotation) {
 			ctx.rotate(o.rotation);
