@@ -1709,9 +1709,9 @@ const Crumbs_Init_On_Load = function() {
 			Crumbs.spawnFallingCookie(0, -64, 0, 0, 2, 'fallingCookie');
 		}
 	};
-	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, noInit) {
+	Crumbs.spawnFallingCookie = function(x, y, yd, speed, t, id, onMouse, sc, order, noInit, iconInput) {
 		if (Game.AscendTimer || !Game.prefs.particles) { return; }
-		let icon = (Game.season=='fools'?[]:((Math.random()<0.0001)?[17,5]:choose(Crumbs.cookieIcons)));
+		let icon = iconInput || (Game.season=='fools'?[]:((Math.random()<0.0001)?[17,5]:choose(Crumbs.cookieIcons)));
 		let c = {
 			behaviors: [
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: yd}), 
