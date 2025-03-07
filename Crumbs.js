@@ -1568,7 +1568,7 @@ const Crumbs_Init_On_Load = function() {
 		//in the case of parent, rotate in the other direction to make sure x and y are still absolute offsets
 		const c = o.parent?Math.cos(-o.parent.rotation):1;
 		const s = o.parent?Math.sin(-o.parent.rotation):0;
-		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
+		ctx.translate((o.x * c - o.y * s) * o.scaleFactorX, (o.x * s + o.y * c) * o.scaleFactorY);
 
 		if (o.rotation) {
 			ctx.rotate(o.rotation);
@@ -2584,7 +2584,6 @@ const Crumbs_Init_On_Load = function() {
 		id: 'cookieClickText',
 		scope: 'left',
 		anchor: 'bottom',
-		components: [],
 		behaviors: new Crumbs.behaviorInstance(function() {
 			this.alpha -= 1 / (4 * Game.fps);
 			if (this.alpha <= 0) { return 't'; }
@@ -2593,16 +2592,16 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.spawnCookieClickPopup = function(x, y, text) {
 		if (!Game.prefs.numbers) { return; }
-		let s = Crumbs.spawnVisible(Crumbs.cookieClickPopup);
-		if (!s || !s.components) {return;}
-		s.x = x;
-		s.y = y;
-		s.components.push(new Crumbs.component.text({
-			size: 20,
-			color: '#fff',
-			align: 'center',
-			content: text
-		}));
+		Crumbs.spawnVisible(Crumbs.cookieClickPopup, {
+			'x': x,
+			'y': y,
+			components: [new Crumbs.component.text({
+				size: 20,
+				color: '#fff',
+				align: 'center',
+				content: text
+			})]
+		});
 	}
 	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
