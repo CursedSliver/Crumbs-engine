@@ -1582,7 +1582,7 @@ const Crumbs_Init_On_Load = function() {
 			}
 			
 			if (!o.noDraw && o.imgs.length) { 
-				ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX, -oy + o.offsetY, pWidth, pHeight); 
+				ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX * o.scaleFactorX, -oy + o.offsetY * o.scaleFactorY, pWidth, pHeight); 
 			}
 			if (Crumbs.prefs.anchorDisplay) { Crumbs.drawAnchorDisplay(o, ctx); }
 			for (let ii = o.components.length - 1; ii >= 0; ii--) {
