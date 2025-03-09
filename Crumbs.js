@@ -2058,6 +2058,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.cookieAscendBreakFunc = function(m, ctx) {
 		if (!Game.AscendTimer) { return; }
 		var tBase = Math.max(0, (Game.AscendTimer - Game.AscendBreakpoint) / (Game.AscendDuration - Game.AscendBreakpoint));
+        /*
 		//big crumbling cookie
 		//var t=(3*Math.pow(tBase,2)-2*Math.pow(tBase,3));//S curve
 		var t = Math.pow(tBase, 0.5);
@@ -2099,7 +2100,7 @@ const Crumbs_Init_On_Load = function() {
 
 		var chunks = { 0: 7, 1: 6, 2: 3, 3: 2, 4: 8, 5: 1, 6: 9, 7: 5, 8: 0, 9: 4 };
 		s *= t / 2 + 1;
-		/*ctx.globalAlpha=(1-t)*0.33;
+		ctx.globalAlpha=(1-t)*0.33;
 		for (var i=0;i<10;i++)
 		{
 			var d=(t-0.2)*(80+((i+2)%3)*40);
@@ -2110,7 +2111,7 @@ const Crumbs_Init_On_Load = function() {
 		{
 			var d=(t-0.1)*(80+((i+2)%3)*40);
 			ctx.drawImage(Pic('brokenCookie.png'),256*(chunks[i]),0,256,256,-s/2+Math.sin(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,-s/2+Math.cos(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,s,s);
-		}*/
+		}
 		ctx.globalAlpha = 1 - t;
 		for (var i = 0; i < 10; i++) {
 			var d = (t) * (80 + ((i + 2) % 3) * 40);
@@ -2124,13 +2125,13 @@ const Crumbs_Init_On_Load = function() {
 		ctx.drawImage(Pic('brokenCookieHalo.png'), -s / 1.3333, -s / 1.3333, s * 1.5, s * 1.5);
 
 		ctx.restore();
-
+        */
 		//flares
 		var n = 9;
 		var t = Game.AscendTimer / Game.AscendBreakpoint;
 		if (Game.AscendTimer < Game.AscendBreakpoint) {
 			ctx.save();
-			ctx.translate(x, y);
+			ctx.translate(Game.cookieOriginX, Game.cookieOriginY);
 			for (var i = 0; i < n; i++) {
 				if (Math.floor(t / 3 * n * 3 + i * 2.7) % 2) {
 					var t2 = Math.pow((t / 3 * n * 3 + i * 2.7) % 1, 1.5);
@@ -2149,13 +2150,13 @@ const Crumbs_Init_On_Load = function() {
 		if (tBase < 0.1 && tBase > 0) {
 			ctx.globalAlpha = 1 - tBase / 0.1;
 			ctx.fillStyle = '#fff';
-			ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillRect(-m.x, -m.y, ctx.canvas.width, ctx.canvas.height);
 			ctx.globalAlpha = 1;
 		}
 		if (tBase > 0.8) {
 			ctx.globalAlpha = (tBase - 0.8) / 0.2;
 			ctx.fillStyle = '#000';
-			ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillRect(-m.x, -m.y, ctx.canvas.width, ctx.canvas.height);
 			ctx.globalAlpha = 1;
 		}
 	}
@@ -2238,11 +2239,96 @@ const Crumbs_Init_On_Load = function() {
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieWobble)
 			]
 		});
-		Crumbs.spawn({
-			scope: 'left',
-			components: new Crumbs.component.canvasManipulator({ function: Crumbs.cookieAscendBreakFunc })
-		});
 	};
+
+    Crumbs.objectBehaviors.brokenCookieChunk = new Crumbs.behavior(function(p) {
+        var tBase=Math.max(0,(Game.AscendTimer-Game.AscendBreakpoint)/(Game.AscendDuration-Game.AscendBreakpoint));
+        var t=Math.pow(tBase,0.5);
+        var x2 = 0;
+        var y2 = 0;
+        if (tBase > 0) {
+            this.x = this.y = 0;
+        }
+        else {
+            var shake=Game.AscendTimer/Game.AscendBreakpoint;
+            x2=(Math.random()*2-1)*5*shake; 
+            y2=(Math.random()*2-1)*5*shake;
+        }
+        var s = 256 * (t*0.5+1);
+        var d=t*(80+((p.cID+2)%3)*40);
+        var h = -(((p.cNum+4)%10)*0.1)*Math.PI*2;
+        this.rotation = -t*Math.PI*0.2;
+        this.alpha = 1 - t;
+        this.offsetX = -s*0.5 + Math.sin(h)*d+x2;
+        this.offsetY = -s*0.5 + Math.cos(h)*d+y2;
+        this.scaleX = this.scaleY = s *  0.00390625;
+    });
+    Crumbs.objectBehaviors.brokenCookieHalo = new Crumbs.behavior(function() {
+        this.noDraw = Game.AscendTimer > Game.AscendBreakpoint;
+        if (this.noDraw) { return; }
+        this.alpha = Game.AscendTimer / Game.AscendBreakpoint;
+    });
+    Crumbs.objectBehaviors.brokenCookieRing = new Crumbs.behavior(function(p) {
+        let tBase=(Game.AscendTimer-Game.AscendBreakpoint)/(Game.AscendDuration-Game.AscendBreakpoint);
+        this.alpha = tBase >= 0 ? 1 - tBase**0.25 : 0;
+        this.rotation = Game.T * (p.id == 1 ? 0.007 : -0.002);
+        this.scaleX = this.scaleY = 4.6875 * (0.5 + (p.id == 1 ? tBase ** 0.6 : (1-tBase) ** 0.4));
+    });
+    Crumbs.objectBehaviors.brokenCookie = new Crumbs.behavior(function() {
+        if (!Game.AscendTimer) { this.enabled = false; }
+        else {
+            var shake=Game.AscendTimer/Game.AscendBreakpoint;
+            if (shake < 1) {
+                this.x+=(Math.random()*2-1)*10*shake;
+                this.y+=(Math.random()*2-1)*10*shake;
+            }
+        }
+    });
+    Crumbs.initBrokenCookie = function() {
+        let brokenCookieAnchor = Crumbs.spawn({
+            scope: 'left',
+            id: 'brokenCookie',
+            behaviors: [
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.centerOnBigCookie),
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.brokenCookie)
+            ]
+        });
+        for (let i = 1; i <= 2; i++) {
+            brokenCookieAnchor.spawnChild({
+                id: 'brokenCookieRing' + i,
+                imgs: 'img/heavenRing' + i + '.jpg',
+                order: 0,
+                behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.brokenCookieRing, { id: i }),
+                components: new Crumbs.component.settings({ globalCompositeOperation: 'lighter' })
+            });
+        }
+        let chunks = {0:7,1:6,2:3,3:2,4:8,5:1,6:9,7:5,8:0,9:4};
+        for (let i = 0; i < 10; i++) {
+            brokenCookieAnchor.spawnChild({
+                imgs: 'img/brokenCookie.png',
+                sx: 256 * chunks[i],
+                width: 256,
+                id: 'brokenCookiePiece' + i,
+                order: 1,
+                anchor: 'top-left',
+                behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.brokenCookieChunk, { cID: i, cNum: chunks[i] })
+            });
+        }
+        brokenCookieAnchor.spawnChild({
+            imgs: 'img/brokenCookieHalo.png',
+            id: 'brokenCookieHalo',
+            scaleX: 2,
+            scaleY: 2,
+            order: 2,
+            behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.brokenCookieHalo)
+        });
+        Crumbs.spawn({
+            scope: 'left',
+            order: 3,
+            components: new Crumbs.component.canvasManipulator({ function: Crumbs.cookieAscendBreakFunc })
+        });
+    }
+    eval('Game.UpdateAscendIntro='+Game.UpdateAscendIntro.toString().replace("if (Game.AscendTimer==1) PlaySound('snd/charging.mp3');", "if (Game.AscendTimer==1) { PlaySound('snd/charging.mp3'); Crumbs.findObject('brokenCookie').enabled = true; }"))
 	eval('Game.Ascend='+Game.Ascend.toString().replace('Game.AscendTimer=1;', 'Game.AscendTimer=1; Crumbs.killAllFallingCookies();'));
 	Crumbs.objectBehaviors.cookieShowerBackground = new Crumbs.behavior(function() {
 		if (!Game.prefs.particles || Game.cookiesPs<=50 || Game.AscendTimer!=0) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
@@ -2603,7 +2689,7 @@ const Crumbs_Init_On_Load = function() {
 			})]
 		});
 	}
-	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.unfocusedSpawn = false; }
+	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.initBrokenCookie(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
