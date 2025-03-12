@@ -224,7 +224,8 @@ const Crumbs_Init_On_Load = function() {
 		objects: { },
 		particles: { },
 		anchorDisplay: 0,
-		colliderDisplay: 0
+		colliderDisplay: 0,
+		warnDuplicateComponents: 1
 	}
 	Crumbs.particles = {};
 
@@ -502,25 +503,26 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.object.prototype.addComponent = function(comp) {
 		if (!comp) { return; }
-		for (let i in this.components) {
-			if (this.components[i].type == comp.type) {
-				console.warn('An object has two components of the same type "'+comp.type+'"!');
+		if (Crumbs.prefs.warnDuplicateComponents) { for (let i in this.components) {
+			if (this.components[i].constructor === comp.constructor) {
+				console.warn('An object has two components of the same type!');
+				console.log(comp);
 			}
-		}
+		} }
 		if (comp.init) { comp.init(this); }
 		this.components.push(comp);
 	};
 	Crumbs.object.prototype.removeComponent = function(type) {
 		for (let i in this.components) {
-			if (this.components[i].type == type) {
+			if (this.components[i] instanceof Crumbs.component[type]) {
 				return this.components.splice(i, 1);
 			}
 		}
-		return false;
+		return null;
 	};
 	Crumbs.object.prototype.getComponent = function(type) {
 		for (let i in this.components) {
-			if (this.components[i].type == type) {
+			if (this.components[i] instanceof (Crumbs.component[type] || type)) {
 				return this.components[i];
 			}
 		}
@@ -782,8 +784,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in obj) {
 			this[i] = obj[i];
 		}
-
-		this.type = 'rect';
 	};
 	Crumbs.defaultComp.rect = {
 		enabled: true,
@@ -822,8 +822,6 @@ const Crumbs_Init_On_Load = function() {
 		}
 		
 		this.paths = [].concat(this.paths); 
-
-		this.type = 'path';
 	};
 	Crumbs.defaultComp.path = {
 		enabled: true,
@@ -862,7 +860,6 @@ const Crumbs_Init_On_Load = function() {
 		return {};
 	};
 	Crumbs.component.pathConfig = function(obj) {
-		this.type = 'config';
 		this.obj = obj;
 	};
 	Crumbs.defaultPathConfigs = {
@@ -1005,8 +1002,6 @@ const Crumbs_Init_On_Load = function() {
 			if (!globals.includes(i)) { throw '"'+i+'" is not a valid setting for a settings component!'; }
 		} 
 		this.obj = obj||def.obj;
-
-		this.type = 'settings';
 	};
 	Crumbs.defaultComp.settings = {
 		enabled: true,
@@ -1032,8 +1027,6 @@ const Crumbs_Init_On_Load = function() {
 			this[i] = Crumbs.defaultComp.canvasManipulator[i];
 		}
 		for (let i in obj) { this[i] = obj[i]; }
-
-		this.type = 'canvasManipulator';
 	};
 	Crumbs.defaultComp.canvasManipulator = {
 		enabled: true,
@@ -1060,8 +1053,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in obj) {
 			this[i] = obj[i];
 		}
-
-		this.type = 'text';
 	};
 	Crumbs.defaultComp.text = {
 		enabled: true,
@@ -1114,8 +1105,6 @@ const Crumbs_Init_On_Load = function() {
 			this[i] = obj[i];
 		}
 		this.noDrawStatus = false;
-
-		this.type = 'patternFill';
 	};
 	Crumbs.defaultComp.patternFill = {
 		enabled: true,
@@ -1152,8 +1141,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in obj) {
 			this[i] = obj[i];
 		}
-
-		this.type = 'tCounter';
 	}
 	Crumbs.defaultComp.tCounter = {
 		enabled: true,
@@ -1177,7 +1164,6 @@ const Crumbs_Init_On_Load = function() {
 
 		this.hovered = false;
 		this.click = false;
-		this.type = 'pointerInteractive';
 	}
 	Crumbs.defaultComp.pointerInteractive = {
 		enabled: true,
@@ -1268,7 +1254,6 @@ const Crumbs_Init_On_Load = function() {
 
 		this.data = null;
 		this.lastUpdate = 0;
-		this.type = 'bloom';
 	}
 	Crumbs.defaultComp.bloom = {
 		enabled: true,
@@ -1303,6 +1288,115 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.bloom.prototype.postDraw = function(m, ctx) {
 		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, m.scope.c.canvas.width, m.scope.c.canvas.height), this.data), 0, 0);
 	};
+
+	Crumbs.component.linearFade = function(obj) {
+		obj = obj||{};
+		for (let i in Crumbs.defaultComp.linearFade) {
+			this[i] = Crumbs.defaultComp.linearFade[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
+		
+		this.noDrawStatus = false;
+	}
+	Crumbs.defaultComp.linearFade = {
+		progress: 1, //midpoint of fade
+		distance: 30, //px, total distance, scales
+		sliceWidth: 3, //px between each redraw
+		horizontal: false,
+		initialAlpha: null, //can force opacity set, if not set it uses base opacity of object
+		finalAlpha: null, //if not set uses 0
+
+		enabled: true
+	}
+	Crumbs.component.linearFade.prototype.enable = function() { this.enabled = true; } 
+	Crumbs.component.linearFade.prototype.disable = function() { this.enabled = false; }
+	Crumbs.component.linearFade.prototype.logic = function(m) {
+
+	}
+	Crumbs.component.linearFade.prototype.preDraw = function(m) {
+		this.noDrawStatus = m.noDraw;
+		m.noDraw = true;
+	}
+	Crumbs.component.linearFade.prototype.postDraw = function(m, ctx) {
+		//best I can do without webGL
+		if (!m.imgs[m.imgUsing]) { return; }
+		const pWidth = Crumbs.getPWidth(m);
+		const pHeight = Crumbs.getPHeight(m);
+		const prevAlpha = ctx.globalAlpha;
+		if (this.horizontal) {
+			this.drawHorizontal(m, ctx, pWidth, pHeight);
+		} else {
+			this.drawVertical(m, ctx, pWidth, pHeight)
+		}
+		ctx.globalAlpha = prevAlpha;
+
+		m.noDraw = this.noDrawStatus;
+		//you know what I tried to make it not a giant blob of spaghetti but then I realized said blob might be more efficient
+	}
+	Crumbs.component.linearFade.prototype.drawVertical = function(m, ctx, pWidth, pHeight) {
+		const dx = pWidth * m.scaleX * m.scaleFactorX;
+		const dyM = m.scaleY * m.scaleFactorY;
+		const pic = Pic(m.imgs[m.imgUsing]);
+		const initOffset = this.progress * pHeight - this.distance / 2;
+		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
+		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
+		const slicesTotal = Math.ceil(this.distance / this.sliceWidth);
+		const alphaStep = ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
+
+		ctx.globalAlpha = this.initialAlpha ?? m.alpha;
+		if (initOffset >= 0) { ctx.drawImage(pic, 0, 0, pWidth, initOffset, ox, oy, dx, initOffset * dyM); }
+		for (let i = 0; i < slicesTotal; i++) {
+			ctx.globalAlpha -= alphaStep;
+			if (initOffset + i * this.sliceWidth > pHeight) { return; }
+			ctx.drawImage(pic, 0, initOffset + i * this.sliceWidth, pWidth, this.sliceWidth, ox, oy + initOffset + i * this.sliceWidth, dx, Math.ceil(this.sliceWidth * dyM));
+		}
+		ctx.globalAlpha = this.finalAlpha ?? 0;
+		if (initOffset + slicesTotal * this.sliceWidth > pHeight || !ctx.globalAlpha) { return; }
+		ctx.drawImage(pic, 
+			0, 
+			initOffset + slicesTotal * this.sliceWidth, 
+			pWidth, 
+			pHeight - slicesTotal * this.sliceWidth - initOffset, 
+			ox, 
+			oy + initOffset + slicesTotal * this.sliceWidth,
+			dx,
+			(pHeight - slicesTotal * this.sliceWidth - initOffset) * dyM
+		);
+	}
+	Crumbs.component.linearFade.prototype.drawHorizontal = function(m, ctx, pWidth, pHeight) {
+		const dxM = m.scaleX * m.scaleFactorX;
+		const dy = pHeight * m.scaleY * m.scaleFactorY;
+		const pic = Pic(m.imgs[m.imgUsing]);
+		const initOffset = this.progress * pWidth - this.distance / 2;
+		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
+		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
+		const slicesTotal = Math.ceil(this.distance / this.sliceWidth);
+		const alphaStep = ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
+
+		ctx.globalAlpha = this.initialAlpha ?? m.alpha;
+		if (initOffset >= 0) { ctx.drawImage(pic, 0, 0, initOffset, pHeight, ox, oy, initOffset * dxM, dy); }
+		for (let i = 0; i < slicesTotal; i++) {
+			ctx.globalAlpha -= alphaStep;
+			if (initOffset + i * this.sliceWidth > pWidth) { return; }
+			ctx.drawImage(pic, initOffset + i * this.sliceWidth, 0, this.sliceWidth, pHeight, ox + initOffset + i * this.sliceWidth, oy, Math.ceil(this.sliceWidth * dxM), dy);
+		}
+		ctx.globalAlpha = this.finalAlpha ?? 0;
+		if (initOffset + slicesTotal * this.sliceWidth > pWidth || !ctx.globalAlpha) { return; }
+		ctx.drawImage(pic, 
+			initOffset + slicesTotal * this.sliceWidth, 
+			0,
+			pWidth - slicesTotal * this.sliceWidth - initOffset, 
+			pHeight, 
+			ox + initOffset + slicesTotal * this.sliceWidth, 
+			oy,
+			(pHeight - slicesTotal * this.sliceWidth - initOffset) * dxM,
+			dy
+		);
+	}
+	//testing code
+	//Crumbs.spawn({ imgs: 'wrinkler.png', x: 100, y: 100, anchor: 'top', components: new Crumbs.component.linearFade({ progress: 0.5, distance: 40, sliceWidth: 1 }) });
 	
 	Crumbs.shader = {};
 	Crumbs.shaderDefaults = {};
@@ -1315,8 +1409,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in obj) {
 			this[i] = obj[i];
 		}
-
-		this.type = 'gaussianBlur';
 	}
 	Crumbs.shaderDefaults.gaussianBlur = {
 		enabled: true,
@@ -1330,8 +1422,6 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in Crumbs.shaderDefaults.allWhite) {
 			this[i] = Crumbs.shaderDefaults.allWhite[i];
 		}
-		
-		this.type = 'allWhite';
 	}
 	Crumbs.shaderDefaults.allWhite = { enabled: true }
 	Crumbs.shader.allWhite.prototype.update = function(data) {
@@ -3189,12 +3279,14 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.drawObjects();
 	};
 	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
-	Game.attachTooltip(l('httpsSwitch'),'<div style="padding:8px;width:350px;text-align:center;font-size:11px;">'+loc("You are currently playing Cookie Clicker on the <b>%1</b> protocol.<br>The <b>%2</b> version uses a different save slot than this one.<br>Click this lock to reload the page and switch to the <b>%2</b> version!",[(Game.https?'HTTPS':'HTTP'),(Game.https?'HTTP':'HTTPS')])+'</div>','this');
-	AddEvent(l('httpsSwitch'),'click',function(){
-		PlaySound('snd/pop'+Math.floor(Math.random()*3+1)+'.mp3',0.75);
-		if (location.protocol=='https:') location.href='http:'+window.location.href.substring(window.location.protocol.length);
-		else if (location.protocol=='http:') location.href='https:'+window.location.href.substring(window.location.protocol.length);
-	});
+	if (!App) { 
+		Game.attachTooltip(l('httpsSwitch'),'<div style="padding:8px;width:350px;text-align:center;font-size:11px;">'+loc("You are currently playing Cookie Clicker on the <b>%1</b> protocol.<br>The <b>%2</b> version uses a different save slot than this one.<br>Click this lock to reload the page and switch to the <b>%2</b> version!",[(Game.https?'HTTPS':'HTTP'),(Game.https?'HTTP':'HTTPS')])+'</div>','this'); 
+		AddEvent(l('httpsSwitch'),'click',function(){
+			PlaySound('snd/pop'+Math.floor(Math.random()*3+1)+'.mp3',0.75);
+			if (location.protocol=='https:') location.href='http:'+window.location.href.substring(window.location.protocol.length);
+			else if (location.protocol=='http:') location.href='https:'+window.location.href.substring(window.location.protocol.length);
+		});
+	}
 	Crumbs.h.injectCSS('#CrumbsEngineVersion { margin-top: 2px; pointer-events: none; }');
 	l('gameVersionText').insertAdjacentHTML('beforebegin','<div class="title" style="font-size:22px;" id="CrumbsEngineVersion">Crumbs engine '+Crumbs.version+'</div>');
 	
