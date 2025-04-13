@@ -214,6 +214,23 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return newData;
 	}
+	ttern = function(ctx, img, w, h, dx, dy, dw, dh, sx, sy, sw, sh, offx, offy) {
+		if (img.alt != 'blank') {
+			[dx, dy, dw, dh, sx, sy, sw, sh, offx, offy] = [dx||0, dy||0, dw||img.width, dh||img.height, sx||0, sy||0, sw||img.width, sh||img.height, offx||0, offy||0];
+
+			if (offx<0) { offx -= Math.floor(offx / dw) * dw; }
+			else if (offx>0) { offx = (offx % dw) - dw; }
+			if (offy<0) { offy -= Math.floor(offy / dh) * dh; }
+			else if (offy>0) { offy = (offy % dh) - dh; }
+
+			for (let y = offy; y < h; y += dh) {
+				for (let x = offx; x < w; x += dw) {
+					ctx.drawImage(img, sx, sy, sw, sh, dx+x, dy+y, dw, dh);
+					// console.log(img.src.slice(25), sx, sy, sw, sh, dx+x, dy+y, dw, dh)
+				}
+			}
+		}
+	}
 
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
@@ -1128,7 +1145,10 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.patternFill.prototype.postDraw = function(m, ctx) {
 		const pWidth = Crumbs.getPWidth(m);
 		const pHeight = Crumbs.getPHeight(m);
-		if (!this.noDrawStatus) { ctx.fillPattern(Pic(m.imgs[m.imgUsing]), -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.width, this.height, pWidth, pHeight, this.offX, this.offY); }
+		if (!this.noDrawStatus) {
+			let [dx, dy, dw, dh, sw, sh] = [-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.imgWidth || Crumbs.getPWidth(m), this.imgHeight || Crumbs.getPHeight(m), this.sw || Pic(m.imgs[m.imgUsing]).width, this.sh || Pic(m.imgs[m.imgUsing]).height];
+			ttern(ctx, Pic(m.imgs[m.imgUsing]), this.width, this.height, dx, dy, dw, dh, this.sx || 0, this.sy || 0, sw, sh, this.offX, this.offY);
+		}
 
 		m.noDraw = this.noDrawStatus;
 	};
@@ -1879,7 +1899,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.wrinklerEyeObj = {
 		imgs: ['', 'img/wrinklerBlink.png', 'img/wrinklerGooglies.png'],
-		anchor: 'top-left',
+		anchor: 'top',
 		offsetY: -10+Math.sin(Game.T*0.2+i*3+1.2),
 		order: 3,
 		scope: 'left',
