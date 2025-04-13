@@ -214,7 +214,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return newData;
 	}
-	ttern = function(ctx, img, w, h, dx, dy, dw, dh, sx, sy, sw, sh, offx, offy) {
+	Crumbs.h.fillPattern = function(ctx, img, w, h, dx, dy, dw, dh, sx, sy, sw, sh, offx, offy) {
 		if (img.alt != 'blank') {
 			[dx, dy, dw, dh, sx, sy, sw, sh, offx, offy] = [dx||0, dy||0, dw||img.width, dh||img.height, sx||0, sy||0, sw||img.width, sh||img.height, offx||0, offy||0];
 
@@ -1128,7 +1128,13 @@ const Crumbs_Init_On_Load = function() {
 		width: 2,
 		height: 2,
 		offX: 0,
-		offY: 0
+		offY: 0,
+		dWidth: null,
+		dHeight: null,
+		sWidth: null,
+		sHeight: null,
+		sx: null,
+		sy: null
 	};
 	Crumbs.component.patternFill.prototype.enable = function() {
 		this.enabled = true;
@@ -1146,8 +1152,8 @@ const Crumbs_Init_On_Load = function() {
 		const pWidth = Crumbs.getPWidth(m);
 		const pHeight = Crumbs.getPHeight(m);
 		if (!this.noDrawStatus) {
-			let [dx, dy, dw, dh, sw, sh] = [-Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY, this.imgWidth || Crumbs.getPWidth(m), this.imgHeight || Crumbs.getPHeight(m), this.sw || Pic(m.imgs[m.imgUsing]).width, this.sh || Pic(m.imgs[m.imgUsing]).height];
-			ttern(ctx, Pic(m.imgs[m.imgUsing]), this.width, this.height, dx, dy, dw, dh, this.sx || 0, this.sy || 0, sw, sh, this.offX, this.offY);
+			let [dx, dy, dw, dh, sw, sh] = [-Crumbs.getOffsetX(m.anchor, this.dWidth || pWidth) + m.offsetX, -Crumbs.getOffsetY(m.anchor, this.dHeight || pHeight) + m.offsetY, this.dWidth || pWidth, this.dHeight|| pHeight, this.sWidth || Pic(m.imgs[m.imgUsing]).width, this.sHeight || Pic(m.imgs[m.imgUsing]).height];
+			Crumbs.h.fillPattern(ctx, Pic(m.imgs[m.imgUsing]), this.width, this.height, dx, dy, dw, dh, this.sx || 0, this.sy || 0, sw, sh, this.offX, this.offY);
 		}
 
 		m.noDraw = this.noDrawStatus;
