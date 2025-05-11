@@ -954,20 +954,13 @@ const Crumbs_Init_On_Load = function() {
 		//ctx, then the subpath object, then the path object (optional
 		config: function(ctx, p) {
 			for (let ii in p.obj) {
-				let str1 = '';
-				let str2 = '';
-				if (typeof p.obj[ii] === 'string') {
-					str1 = '"';
-					str2 = '"';
-				} else if (Array.isArray(p.obj[ii])) {
-					str1 = '[';
-					str2 = ']';
-				}
-				if (Crumbs.validPathConfigs.includes(ii)) {
-					eval('ctx.'+ii+'='+str1+p.obj[ii]+str2);
-				} else if (Crumbs.validPathFuncs.includes(ii)) {
-					eval('ctx.'+ii+'('+str1+p.obj[ii]+str2+');');
-				} else { throw 'Unrecognized config '+ii+'!'; }
+                if (Crumbs.validPathConfigs.includes(ii)) {
+                    ctx[ii] = p.obj[ii];
+                } 
+                else if (Crumbs.validPathFuncs.includes(ii)) {
+                    ctx[ii](p.obj[ii]);
+                }
+                else { throw 'Unrecognized config '+ii+'!'; }
 			}
 		},
 		move: function(ctx, p, pm) {
@@ -2815,7 +2808,85 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.h.rebuildBigCookieButton();
 
 	Game.DrawSpecial = function() { };
-	
+
+    Loader = function() {
+        this.loadingN=0;
+        this.assetsN=0;
+        this.assets = {};
+        this.assetsLoading = new Set();
+        this.assetsLoaded = new Set();
+        this.domain = '';
+        this.loaded = 0;
+        this.doneLoading = 0;
+
+        this.blank = document.createElement('canvas');
+        this.blank.width = 8;
+        this.blank.height = 8;
+        this.blank.alt = 'blank';
+
+        this.Load=function(assets) {
+            for (let i in assets) {
+                this.loadingN++;
+                this.assetsN++;
+                let asset = assets[i];
+                if (!this.assetsLoading.has(asset) && !this.assetsLoaded.has(asset))
+                {
+                    let img=new Image();
+                    if (!Game.local) img.crossOrigin = 'anonymous';
+                    img.alt = asset;
+                    img.onload = bind(this, this.onLoad);
+                    this.assets[asset] = img;
+                    this.assetsLoading.add(asset);
+                    if (asset.indexOf('/')!=-1) img.src = asset;
+                    else img.src = this.domain + asset;
+                }
+            }
+        }
+        this.Replace = function(old, newer) {
+            if (!this.assets[old]) this.Load([old]);
+            let img = new Image();
+            if (!Game.local) img.crossOrigin = 'anonymous';
+            if (newer.indexOf('/') != -1) img.src = newer;
+            else img.src = this.domain + newer;
+            img.alt = newer;
+            img.onload = bind(this, this.onLoad);
+            this.assets[old] = img;
+        }
+        this.onLoadReplace = function() { }
+        this.onLoad = function(e) {
+            this.assetsLoaded.add(e.target.alt);
+            this.assetsLoading.delete(e.target.alt);
+            this.loadingN--;
+            if (this.doneLoading == 0 && this.loadingN <= 0 && this.loaded != 0) {
+                this.doneLoading=1;
+                this.loaded();
+            }
+        }
+        this.waitForLoad=function(assets,callback)
+        {
+            //execute callback if all assets are ready to use, else check again every 200ms
+            let me = this;
+            let checkLoadedLoop = function() {
+                for (let i = 0; i < assets.length; i++) {
+                    if (!me.assetsLoaded.has(assets[i])) { setTimeout(checkLoadedLoop,200); return false }
+                }
+                callback();
+                return true;
+            }
+            me.Load(assets);
+            checkLoadedLoop();
+        }
+        this.getProgress=function() {
+            return (1 - this.loadingN / this.assetsN);
+        }
+    }
+
+    Pic = function(what) {
+        return Game.Loader.assetsLoaded.has(what) ? Game.Loader.assets[what] : (!Game.Loader.assetsLoading.has(what) && Game.Loader.Load([what]), Game.Loader.blank);
+    }
+
+    Game.Load(function() { })
+    
 	Game.DrawBackground = function() {
 		Timer.clean();
 			//background
