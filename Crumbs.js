@@ -1642,12 +1642,10 @@ const Crumbs_Init_On_Load = function() {
 		return anchor.y * height;
 	};
 	Crumbs.getPWidth = function(o) {
-		if (!o.imgs.length) { return o.width??0; }
-		return (o.width??Pic(o.imgs[o.imgUsing]).width) * o.scaleX * o.scaleFactorX; 
-	};
+		return (o.width??Pic(o.imgs[o.imgUsing]??'').width) * o.scaleX * o.scaleFactorX; 
+	};  
 	Crumbs.getPHeight = function(o) {
-		if (!o.imgs.length) { return o.height??0; }
-		return (o.height??Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactorY; 
+		return (o.height??Pic(o.imgs[o.imgUsing]??'').height) * o.scaleY * o.scaleFactorY; 
 	};
 
 	Crumbs.drawAnchorDisplay = function(o, ctx, p) {
@@ -2167,74 +2165,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.cookieAscendBreakFunc = function(m, ctx) {
 		if (!Game.AscendTimer) { return; }
 		var tBase = Math.max(0, (Game.AscendTimer - Game.AscendBreakpoint) / (Game.AscendDuration - Game.AscendBreakpoint));
-        /*
-		//big crumbling cookie
-		//var t=(3*Math.pow(tBase,2)-2*Math.pow(tBase,3));//S curve
-		var t = Math.pow(tBase, 0.5);
-
-		var shake = 0;
-		if (Game.AscendTimer < Game.AscendBreakpoint) { shake = Game.AscendTimer / Game.AscendBreakpoint; }
-		//else {shake=1-t;}
-
-		ctx.globalAlpha = 1;
-
-		var x = Game.cookieOriginX;
-		var y = Game.cookieOriginY;
-
-		x += (Math.random() * 2 - 1) * 10 * shake;
-		y += (Math.random() * 2 - 1) * 10 * shake;
-
-		var s = 1;
-		if (tBase > 0) {
-			ctx.save();
-			ctx.globalAlpha = 1 - Math.pow(t, 0.5);
-			ctx.translate(x, y);
-			ctx.globalCompositeOperation = 'lighter';
-			ctx.rotate(Game.T * 0.007);
-			s = 0.5 + Math.pow(tBase, 0.6) * 1;
-			var s2 = (600) * s;
-			ctx.drawImage(Pic('heavenRing1.jpg'), -s2 / 2, -s2 / 2, s2, s2);
-			ctx.rotate(-Game.T * 0.002);
-			s = 0.5 + Math.pow(1 - tBase, 0.4) * 1;
-			s2 = (600) * s;
-			ctx.drawImage(Pic('heavenRing2.jpg'), -s2 / 2, -s2 / 2, s2, s2);
-			ctx.restore();
-		}
-
-		s = 256;//*Game.BigCookieSize;
-
-		ctx.save();
-		ctx.translate(x, y);
-		ctx.rotate((t * (-0.1)) * Math.PI * 2);
-
-		var chunks = { 0: 7, 1: 6, 2: 3, 3: 2, 4: 8, 5: 1, 6: 9, 7: 5, 8: 0, 9: 4 };
-		s *= t / 2 + 1;
-		ctx.globalAlpha=(1-t)*0.33;
-		for (var i=0;i<10;i++)
-		{
-			var d=(t-0.2)*(80+((i+2)%3)*40);
-			ctx.drawImage(Pic('brokenCookie.png'),256*(chunks[i]),0,256,256,-s/2+Math.sin(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,-s/2+Math.cos(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,s,s);
-		}
-		ctx.globalAlpha=(1-t)*0.66;
-		for (var i=0;i<10;i++)
-		{
-			var d=(t-0.1)*(80+((i+2)%3)*40);
-			ctx.drawImage(Pic('brokenCookie.png'),256*(chunks[i]),0,256,256,-s/2+Math.sin(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,-s/2+Math.cos(-(((chunks[i]+4)%10)/10)*Math.PI*2)*d,s,s);
-		}
-		ctx.globalAlpha = 1 - t;
-		for (var i = 0; i < 10; i++) {
-			var d = (t) * (80 + ((i + 2) % 3) * 40);
-			var x2 = (Math.random() * 2 - 1) * 5 * shake;
-			var y2 = (Math.random() * 2 - 1) * 5 * shake;
-			ctx.drawImage(Pic('brokenCookie.png'), 256 * (chunks[i]), 0, 256, 256, -s / 2 + Math.sin(-(((chunks[i] + 4) % 10) / 10) * Math.PI * 2) * d + x2, -s / 2 + Math.cos(-(((chunks[i] + 4) % 10) / 10) * Math.PI * 2) * d + y2, s, s);
-		}
-		var brokenHalo = 1 - Math.min(t / (1 / 3), 1 / 3) * 3;
-		if (Game.AscendTimer < Game.AscendBreakpoint) brokenHalo = Game.AscendTimer / Game.AscendBreakpoint;
-		ctx.globalAlpha = brokenHalo;
-		ctx.drawImage(Pic('brokenCookieHalo.png'), -s / 1.3333, -s / 1.3333, s * 1.5, s * 1.5);
-
-		ctx.restore();
-        */
 		//flares
 		var n = 9;
 		var t = Game.AscendTimer / Game.AscendBreakpoint;
@@ -2552,15 +2482,16 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn(Crumbs.shadedBorderObj, { scope: 'left', components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }), behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shadedBorderAura)] });
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
-		if (!p.enableCondition() || Game.AscendTimer) { this.findChild(p.pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(p.pet+'Display').enabled = true; this.active = true; }
+		if (!p.enableCondition() || Game.AscendTimer) { this.findChild(p.pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(p.pet+'Display').enabled = true; this.active = true; this.scaleX = this.scaleY = Game.specialTab == p.pet ? 2 : 1; this.x = Game.specialTab == p.pet ? 48 : 24; }
 	}, { pet: '', enableCondition: function() { } });
 	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
-		this.offsetX = ((Game.specialTab==p.tab)?0:Math.sin(Game.T*0.2+this.parent.placement)*3);
-		if (Game.specialTab==p.tab) { this.x = 24; } else { this.x = 0; }
-		this.offsetY = ((Game.specialTab==p.tab)?6:Math.abs(Math.cos(Game.T*0.2+this.parent.placement))*6);
+        if (!Game.prefs.fancy) { this.offsetX = 0; this.offsetY = 0; return; }
+		this.offsetX = Game.specialTab == p.tab ? 0 : Math.sin(Game.T * 0.2 + this.parent.placement) * 3;
+		this.offsetY = -(Game.specialTab == p.tab ? 6 : Math.abs(Math.cos(Game.T * 0.2 + this.parent.placement)) * 6);
 	}, { tab: '' });
-	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { if (p.target && p.target.getComponent('pointerInteractive').hovered) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
-	Crumbs.objectBehaviors.petShineEnable = new Crumbs.behavior(function(p) { if (p.target && (p.target.getComponent('pointerInteractive').hovered || (Game.specialTab && p.target.id.includes(Game.specialTab)))) { this.noDraw = false; } else { this.noDraw = true; } }, { target: null });
+    Crumbs.objectBehaviors.petDisplaySize = new Crumbs.behavior(function(p) { this.scaleX = this.scaleY = Game.specialTab == p.tab ? 0.25 : 0.5; }, { tab: '' });
+	Crumbs.objectBehaviors.enableOnHover = new Crumbs.behavior(function(p) { this.noDraw = !p?.target.getComponent('pointerInteractive').hovered; }, { target: null });
+	Crumbs.objectBehaviors.petShineEnable = new Crumbs.behavior(function(p) { this.noDraw = !(p.target?.getComponent('pointerInteractive').hovered || (Game.specialTab && p.target.id.includes(Game.specialTab))); }, { target: null });
 	Crumbs.objectBehaviors.follow = new Crumbs.behavior(function(p) { this.x = p.target.x + (p.offset?p.target.offsetX:0); this.y = p.target.y + (p.offset?p.target.offsetY:0); }, { target: null, offset: false });
 	Crumbs.shine = function(scaleMult, target1, target2) {
 		return {
@@ -2568,10 +2499,12 @@ const Crumbs_Init_On_Load = function() {
 			imgs: 'img/shine.png',
 			scaleX: scaleMult,
 			scaleY: scaleMult,
-			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), 
-						new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petShineEnable, { target: target1 }),
-						new Crumbs.behaviorInstance(Crumbs.objectBehaviors.follow, { target: target2 })
-					   ]
+			behaviors: [
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, { spin: (0.5/360)*Math.PI*2 }), 
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petShineEnable, { target: target1 }),
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplaySize, { tab: target1.id }),
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.follow, { target: target2 })
+            ]
 		};
 	}
 	Crumbs.objectBehaviors.petManager = new Crumbs.behavior(function() {
@@ -2596,6 +2529,15 @@ const Crumbs_Init_On_Load = function() {
 		});
 		//Crumbs.initDragon(anchor);
 		//Crumbs.initSanta(anchor);
+        Crumbs.createPet({
+			special: 'dragon',
+			image: 'dragon.png?v='+Game.version,
+			skinFunction: function() {
+				this.sx = Game.dragonLevels[Game.dragonLevel].pic * 96;
+			},
+			enableCondition: function() { return (Game.Has('A crumbly egg')); }
+		});
+
 		Crumbs.createPet({
 			special: 'santa',
 			image: 'santa.png?v='+Game.version,
@@ -2603,14 +2545,6 @@ const Crumbs_Init_On_Load = function() {
 				this.sx = 96 * Game.santaLevel;
 			},
 			enableCondition: function() { return (Game.Has('A festive hat')); }
-		});
-		Crumbs.createPet({
-			special: 'dragon',
-			image: 'dragon.png?v='+Game.version,
-			skinFunction: function() {
-				this.sx = Game.dragonLevels[Game.dragonLevel].pic * 96;
-			},
-			enableCondition: function() { return (Game.Has('A crumbly egg')); }
 		});
 	}
 	Crumbs.createPet = function(obj) {
@@ -2641,10 +2575,11 @@ const Crumbs_Init_On_Load = function() {
 				scaleY: 0.5,
 				behaviors: [
 					new Crumbs.behaviorInstance(new Crumbs.behavior(obj.skinFunction)),
-					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: obj.special })
+					new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplayMove, { tab: obj.special }),
+                    new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petDisplaySize, { tab: obj.special })
 				]
 			},
-			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (Game.specialTab == obj.special) { Game.ToggleSpecialMenu(); } else { Game.specialTab = obj.special; Game.ToggleSpecialMenu(true); } } }),
+			components: new Crumbs.component.pointerInteractive({ onRelease: function() { if (document.elementFromPoint(Game.mouseX, Game.mouseY) == l('specialPic')) return; PlaySound('snd/press.mp3'); if (Game.specialTab == obj.special) { Game.ToggleSpecialMenu(false); } else { Game.specialTab = obj.special; Game.ToggleSpecialMenu(true); } } }),
 			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.petInteractive, { pet: obj.special, enableCondition: obj.enableCondition })]
 		});
 		h.spawnChild(Crumbs.shine(0.5, h, h.findChild(obj.special+'Display')));
