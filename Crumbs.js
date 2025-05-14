@@ -2482,7 +2482,17 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.spawn(Crumbs.shadedBorderObj, { scope: 'left', components: new Crumbs.component.settings({ globalCompositeOperation: 'source-over' }), behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fillWhole), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.shadedBorderAura)] });
 	}
 	Crumbs.objectBehaviors.petInteractive = new Crumbs.behavior(function(p) {
-		if (!p.enableCondition() || Game.AscendTimer) { this.findChild(p.pet+'Display').enabled = false; this.active = false; return; } else { this.findChild(p.pet+'Display').enabled = true; this.active = true; this.scaleX = this.scaleY = Game.specialTab == p.pet ? 2 : 1; this.x = Game.specialTab == p.pet ? 48 : 24; }
+		if (!p.enableCondition() || Game.AscendTimer) {
+            this.findChild(p.pet+'Display').enabled = false;
+            this.active = false;
+            return;
+        }
+        else {
+            this.findChild(p.pet+'Display').enabled = true;
+            this.active = true;
+            this.scaleX = this.scaleY = Game.specialTab == p.pet ? 2 : 1;
+            this.x = Game.specialTab == p.pet ? 48 : 24;
+        }
 	}, { pet: '', enableCondition: function() { } });
 	Crumbs.objectBehaviors.petDisplayMove = new Crumbs.behavior(function(p) {
         if (!Game.prefs.fancy) { this.offsetX = 0; this.offsetY = 0; return; }
