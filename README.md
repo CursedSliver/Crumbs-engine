@@ -181,13 +181,13 @@ You can create your own anchors by assigning something to a new instance of Crum
 
 | Property        | Type     | Default | Description                                                                                      |
 |-----------------|----------|---------|--------------------------------------------------------------------------------------------------|
+| `enabled`       | boolean  | true    | Whether the linear fade effect is active.                                                        |
 | `progress`      | number   | 1       | Midpoint of the fade effect (0 to 1).                                                            |
 | `distance`      | number   | 30      | Total distance of the fade in pixels; scales with the object.                                    |
 | `sliceWidth`    | number   | 3       | Width in pixels between each redraw slice.                                                       |
 | `horizontal`    | boolean  | false   | If true, the fade is applied horizontally; otherwise, it is vertical.                            |
 | `initialAlpha`  | number/null | null | Starting opacity for the fade. If null, uses the object's base opacity.                          |
 | `finalAlpha`    | number/null | null | Ending opacity for the fade. If null, defaults to 0 (fully transparent).                         |
-| `enabled`       | boolean  | true    | Whether the linear fade effect is active.                                                        |
 
 ---
 
