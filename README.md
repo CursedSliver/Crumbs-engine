@@ -95,6 +95,7 @@ You can create your own anchors by assigning something to a new instance of Crum
 - y: the amount of distance downward compared to the height of the object of the anchor, starting from top left
 - For example, Crumbs.defaultAnchors.center has x and y set to 0.5 each.
 - Note that you can set them to any value you like, including numbers bigger than 1 and smaller than 0.
+- Helpful tip: You can see the anchors of objects by setting `Crumbs.prefs.anchorDisplay` to 1.
 
 ---
 
@@ -103,10 +104,12 @@ You can create your own anchors by assigning something to a new instance of Crum
 - To create a new component, use `new Crumbs.component[component key](obj)`.
 - Attach the component to the component key either by itself or in an array with other components.
 - Components can be used for more complex behaviors, such as cursor interaction, draw settings, pattern fill, text, and more.
+- You can disable the warnings for having multiple of the same component on an object with `Crumbs.prefs.warnDuplicateComponents`.
 
 ### `Crumbs.component.pointerInteractive`
 - Handles interaction with the mouse, allowing for hover detection and click detection.
 - Always maximally fits the width and height of the object it's attached to.
+- Helpful tip: You can see the collider boxes of objects with this component by setting `Crumbs.prefs.colliderDisplay` to 1.
 #### `pointerInteractive` Component Properties
 
 | Property            | Type     | Default   | Description                                                                 |
