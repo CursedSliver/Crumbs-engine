@@ -152,6 +152,7 @@ You can create your own anchors by assigning something to a new instance of Crum
 
 | Property                  | Type      | Default   | Description                                                                                   |
 |---------------------------|-----------|-----------|-----------------------------------------------------------------------------------------------|
+| `enabled`  | boolean | true    | Whether the setting changes are active.                                                          |
 | `globalCompositeOperation`| string    | 'source-over' | Sets how new drawings are composited onto the existing canvas. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation) for options. |
 | `imageSmoothingEnabled`   | boolean   | true      | Enables or disables image smoothing when scaling images.                                       |
 | `imageSmoothingQuality`   | string    | 'low'     | Sets the quality of image smoothing. Possible values: 'low', 'medium', 'high'.                |
