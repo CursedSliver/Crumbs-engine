@@ -148,6 +148,24 @@ You can create your own anchors by assigning something to a new instance of Crum
 | `imageSmoothingEnabled`   | boolean   | true      | Enables or disables image smoothing when scaling images.                                       |
 | `imageSmoothingQuality`   | string    | 'low'     | Sets the quality of image smoothing. Possible values: 'low', 'medium', 'high'.                |
 
+### `Crumbs.component.patternFill`
+- Fills the image of the object across some width and length in a grid pattern.
+#### `patternFill` Component Properties
+
+| Property   | Type    | Default | Description                                                                                  |
+|------------|---------|---------|----------------------------------------------------------------------------------------------|
+| `enabled`  | boolean | true    | Whether the pattern fill is active.                                                          |
+| `width`    | number  | 2       | Number of minimum pixels to fill by repeating the image horizontally.                                            |
+| `height`   | number  | 2       | Number of minimum pixels to fill by repeating the image vertically.                                          |
+| `offX`     | number  | 0       | Horizontal offset (in pixels) for the pattern's starting position.                           |
+| `offY`     | number  | 0       | Vertical offset (in pixels) for the pattern's starting position.                             |
+| `dWidth`   | number/null | null | Destination width for each pattern tile. If null, uses the image's width.                    |
+| `dHeight`  | number/null | null | Destination height for each pattern tile. If null, uses the image's height.                  |
+| `sWidth`   | number/null | null | Source width from the image to use for each tile. If null, uses the full image width.        |
+| `sHeight`  | number/null | null | Source height from the image to use for each tile. If null, uses the full image height.      |
+| `sx`       | number/null | null | X-coordinate of the top-left corner of the source rectangle. If null, starts at 0.           |
+| `sy`       | number/null | null | Y-coordinate of the top-left corner of the source rectangle. If null, starts at 0.           |
+
 ### `Crumbs.component.linearFade`
 - Adds a gradual fading effect onto the object.
 #### `linearFade` Component Properties
