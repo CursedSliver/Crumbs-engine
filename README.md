@@ -211,4 +211,4 @@ const myObject = Crumbs.spawn({
 
 ---
 
-For more details, refer to the source code.
+For more details, refer to the [source code](https://github.com/CursedSliver/Crumbs-engine/blob/main/Crumbs.js).
