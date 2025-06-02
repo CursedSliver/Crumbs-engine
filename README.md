@@ -63,6 +63,41 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 
 ---
 
+## Children
+
+- Child objects can be created upon initialization or for existing objects via `Crumbs.object.prototype.spawnChild`.
+- Children inherit the coordinate plane and rotation of their parent, and also scales with them. You can nest children in children to create more complex effects.
+
+---
+
+## Canvas Scopes & Custom Canvases
+
+Available canvas scopes in `Crumbs.scopedCanvas`:
+
+- **left**: The leftmost section of the game, containing the big cookie.
+- **middle**: The rows of building displays, containing the minigames.
+- **right**: The store.
+- **background**: The background of the entire game.
+- **foreground**: A canvas overlayed on top of the entire game.
+
+You can create a new canvas by doing `new Crumbs.canvas(parentEle, key, id, css)`.
+- `parentEle`: parent element to attach the canvas to. The canvas will assume 100% of the parent's width and height.
+- `key`: its key in `Crumbs.scopedCanvas`.
+- `id`: id of the canvas itself (not the canvas container)
+- `css`: optional CSS
+
+---
+
+## Custom anchors
+
+You can create your own anchors by assigning something to a new instance of Crumbs.anchor. It takes two parameters:
+- x: the amount of distance to the right compared to the width of the object of the anchor, starting from top left 
+- y: the amount of distance downward compared to the height of the object of the anchor, starting from top left
+- For example, Crumbs.defaultAnchors.center has x and y set to 0.5 each.
+- Note that you can set them to any value you like, including numbers bigger than 1 and smaller than 0.
+
+---
+
 ## Notable Components
 
 - To create a new component, use `new Crumbs.component[component key](obj)`.
@@ -126,41 +161,6 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `initialAlpha`  | number/null | null | Starting opacity for the fade. If null, uses the object's base opacity.                          |
 | `finalAlpha`    | number/null | null | Ending opacity for the fade. If null, defaults to 0 (fully transparent).                         |
 | `enabled`       | boolean  | true    | Whether the linear fade effect is active.                                                        |
-
----
-
-## Children
-
-- Child objects can be created upon initialization or for existing objects via `Crumbs.object.prototype.spawnChild`.
-- Children inherit the coordinate plane and rotation of their parent, and also scales with them. You can nest children in children to create more complex effects.
-
----
-
-## Canvas Scopes & Custom Canvases
-
-Available canvas scopes in `Crumbs.scopedCanvas`:
-
-- **left**: The leftmost section of the game, containing the big cookie.
-- **middle**: The rows of building displays, containing the minigames.
-- **right**: The store.
-- **background**: The background of the entire game.
-- **foreground**: A canvas overlayed on top of the entire game.
-
-You can create a new canvas by doing `new Crumbs.canvas(parentEle, key, id, css)`.
-- `parentEle`: parent element to attach the canvas to. The canvas will assume 100% of the parent's width and height.
-- `key`: its key in `Crumbs.scopedCanvas`.
-- `id`: id of the canvas itself (not the canvas container)
-- `css`: optional CSS
-
----
-
-## Custom anchors
-
-You can create your own anchors by assigning something to a new instance of Crumbs.anchor. It takes two parameters:
-- x: the amount of distance to the right compared to the width of the object of the anchor, starting from top left 
-- y: the amount of distance downward compared to the height of the object of the anchor, starting from top left
-- For example, Crumbs.defaultAnchors.center has x and y set to 0.5 each.
-- Note that you can set them to any value you like, including numbers bigger than 1 and smaller than 0.
 
 ---
 
