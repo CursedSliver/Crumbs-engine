@@ -195,16 +195,17 @@ You can create your own anchors by assigning something to a new instance of Crum
 ```js
 const myBehavior = new Crumbs.behavior(function(p) { 
     this.x += 10 / Game.fps;
-    this.y += p.rate;
+    this.y -= p.rate;
     p.rate += 1 / Game.fps;
 }, { rate: 0 })
 const myObject = Crumbs.spawn({
     x: 100,
     y: 200,
-    imgs: "myImage.png",
+    scaleX: 3,
+    scaleY: 2,
+    imgs: "glint.png",
     behaviors: [new Crumbs.behaviorInstance(myBehavior)],
-    components: [myComponent],
-    anchor: "center"
+    components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' })]
 });
 ```
 
