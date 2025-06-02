@@ -2,6 +2,11 @@
 
 Crumbs Engine allows you to easily manipulate and change canvas-based elements, including any that were present in vanilla. Traditionally, canvas elements are created through large functions that redraw the canvas every frame based on various factors, making them clunky to edit and difficult to mod. Crumbs Engine solves this by abstracting much of that complexity away, leaving the user with core functionalities designed for creating more content.
 
+## Integration
+Load the mod with `Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Crumbs.js');`.
+
+If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the global variable `CrumbsEngineLoaded` becomes `true`.
+
 ---
 
 ## Object
