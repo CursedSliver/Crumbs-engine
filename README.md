@@ -52,7 +52,7 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `behaviors`| array/function/<br>Crumbs.behavior/<br>Crumbs.behaviorInstance | [] | Instances of `Crumbs.behaviorInstance`, containing a function called every logic frame. Non-arrays are converted to arrays. |
 | `components`| array/component | [] | Instances of objects listed in `Crumbs.component`. Non-arrays are converted to arrays. |
 | `children` | array     | []      | Child objects to create upon initialization. Not stored in the resulting object; converted to an array of children `Crumbs.object` instead. |
-| `t`        | number    |         | Cannot be set on object initialization. The moment when the object is created, relative to `Crumbs.t`. |
+| `t`        | number    |         | Cannot be set on object initialization. The moment when the object is created, relative to `Crumbs.t`. You can thus get the lifespan of the object in terms of frames by doing `Crumbs.t - object.t`. |
 | `parent`   | Crumbs.object/null | | Cannot be set on object initialization. The parent object, or null if it is not a child. |
 
 ---
