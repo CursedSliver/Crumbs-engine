@@ -27,8 +27,8 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `x`        | number    | 0       | The x-coordinate of the object. |
 | `y`        | number    | 0       | The y-coordinate of the object. |
 | `rotation` | number    | 0       | The rotation of the object, clockwise in radians. |
-| `scaleX`   | number    | 1       | Scaling multiplier on the x-direction (positive). |
-| `scaleY`   | number    | 1       | Scaling multiplier on the y-direction (positive). |
+| `scaleX`   | number    | 1       | Scaling multiplier on the x-direction. |
+| `scaleY`   | number    | 1       | Scaling multiplier on the y-direction. |
 | `alpha`    | number    | 1       | The opacity of the image drawn (between 0 and 1 inclusive). |
 | `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of strings. Strings are automatically converted to arrays. |
 | `imgUsing` | number    | 0       | The image currently displayed, out of all the images listed in `imgs`. |
