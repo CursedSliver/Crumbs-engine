@@ -35,8 +35,8 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `noDraw`   | boolean   | false   | Prevents the object from being drawn, but its behaviors and components still function. |
 | `offsetX`  | number    | 0       | Offset the image drawn by that amount on the x axis, which also rotates with its rotation. |
 | `offsetY`  | number    | 0       | Like `offsetX`, but on the y axis. |
-| `anchor`   | string/Crumbs.anchor \ninstance    | "center"/\nCrumbs.defaultAnchors.center | The location of its position on the image. Values: “top-left”, “top”, “top-right”, “left”, “center”, “right”, “bottom-left”, “bottom”, “bottom-right”, or custom by creating custom Crumbs.anchor instances (instructions detailed below). |
-| `scope`    | string/Crumbs.canvas \ninstance    | "foreground"/\nCrumbs.scopedCanvas.foreground | Which canvas to draw it on, represented by its key in `Crumbs.scopedCanvas`. <br>Defaults available: “left”, “middle”, “right”, “background”, “foreground” (but you can create your own canvases). |
+| `anchor`   | string/Crumbs.anchor instance    | "center"/Crumbs.defaultAnchors.center | The location of its position on the image. Values: “top-left”, “top”, “top-right”, “left”, “center”, “right”, “bottom-left”, “bottom”, “bottom-right”, or custom by creating custom Crumbs.anchor instances (instructions detailed below). |
+| `scope`    | string/Crumbs.canvas instance    | "foreground"/Crumbs.scopedCanvas.foreground | Which canvas to draw it on, represented by its key in `Crumbs.scopedCanvas`. <br>Defaults available: “left”, “middle”, “right”, “background”, “foreground” (but you can create your own canvases). |
 | `order`    | number    | 0       | The order in which to draw the object (acts as the z-index). |
 | `width`    | number/null | null  | If assigned, overrides the width from the image. |
 | `height`   | number/null | null  | If assigned, overrides the height from the image. |
@@ -44,7 +44,7 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `sy`       | number    | 0       | The y-coordinate of the top-left corner of the rectangle to draw the image provided. |
 | `id`       | any       | null    | An identifier of the object. Can be used to find objects via `Crumbs.findObject`, `Crumbs.getObjects`, `Crumbs.object.prototype.findChild`, and `Crumbs.object.prototype.getChildren`. |
 | `init`     | function  | empty   | A function to be called on object initialization, with `this` being the object. |
-| `behaviors`| array/function/\nCrumbs.behavior/\nCrumbs.behaviorInstance | [] | Instances of `Crumbs.behaviorInstance`, containing a function called every logic frame. Non-arrays are converted to arrays. |
+| `behaviors`| array/function/Crumbs.behavior/Crumbs.behaviorInstance | [] | Instances of `Crumbs.behaviorInstance`, containing a function called every logic frame. Non-arrays are converted to arrays. |
 | `components`| array/component | [] | Instances of objects listed in `Crumbs.component`. Non-arrays are converted to arrays. |
 | `children` | array     | []      | Child objects to create upon initialization. Not stored in the resulting object; converted to an array of children `Crumbs.object` instead. |
 | `t`        | number    |         | Cannot be set on object initialization. The moment when the object is created, relative to `Crumbs.t`. |
