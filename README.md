@@ -85,6 +85,7 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 Crumbs Engine contains many helper methods to help you find, manipulate, and do more stuff.
 
 ### `Crumbs.object.prototype` methods
+
 | Method         | Description         |
 |----------------|---------------------|
 | `hasChildren()` | Returns `true` if the object has any children, otherwise `false`. |
@@ -100,6 +101,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `spawnChildVisible(template, custom)` | Instantiates a child object using the given template and custom properties, and attaches it as a child of the current object, if the game is currently being viewed. |
 
 ### Global methods
+
 | Method         | Description         |
 |----------------|---------------------|
 | `Crumbs.findObject(id, scope)` | Returns the first object with the specified `id`. If `scope` is provided, searches only within that canvas scope. Returns `null` if not found. |
