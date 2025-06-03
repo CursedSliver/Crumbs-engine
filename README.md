@@ -5,7 +5,7 @@ Crumbs Engine allows you to easily manipulate and change canvas-based elements, 
 ## Integration
 Load the mod with `Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Crumbs.js');`.
 
-If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the global variable `CrumbsEngineLoaded` becomes `true`.
+If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of Steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the global variable `CrumbsEngineLoaded` becomes `true`.
 
 ---
 
@@ -19,8 +19,13 @@ The core of the mod’s functionality, an object is exactly what it sounds like.
 
 ### Instantiation
 
-Instantiate a `Crumbs.object` by passing an object into the function `Crumbs.spawn` that contains the parameters for the new object. Every property of the passed-in object will be copied over to the new object.  
-For any properties that aren’t specified, defaults are taken from `Crumbs.objectDefaults`.
+Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`. Pass in an object into `template`, and (optionally) pass in another into `custom`. 
+- Every property of the passed-in object in `template` will be copied over to the new object.  
+- Then, every property of the passed-in object in `custom`, if there is one, will be copied over to the new object.
+- Essentially, you can create a "template" for your Crumbs objects by creating an object and assigning it to another variable, then specify details for each object you want to create with that template.
+- You can use `Crumbs.spawnVisible(template, custom)` to have it only spawn the object when the game is being looked at.
+- You can also use `Crumbs.object.prototype.die()` to remove the object from the game.
+- For any properties that aren’t specified in either object, defaults are taken from `Crumbs.objectDefaults`.
 
 ---
 
@@ -38,7 +43,7 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 | `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of strings. Strings are automatically converted to arrays. |
 | `imgUsing` | number    | 0       | The image currently displayed, out of all the images listed in `imgs`. |
 | `noDraw`   | boolean   | false   | Prevents the object from being drawn, but its behaviors and components still function. |
-| `offsetX`  | number    | 0       | Offset the image drawn by that amount on the x axis, which also rotates with its rotation. |
+| `offsetX`  | number    | 0       | Offsets the image drawn by that amount on the x axis, which also rotates with its rotation. |
 | `offsetY`  | number    | 0       | Like `offsetX`, but on the y axis. |
 | `anchor`   | string/`Crumbs.anchor` <br>instance    | "center"/<br>`Crumbs.defaultAnchors.center` | The location of its position on the image. Values: “top-left”, “top”, “top-right”, “left”, “center”, “right”, “bottom-left”, “bottom”, “bottom-right”, or custom by creating custom Crumbs.anchor instances (instructions detailed below). |
 | `scope`    | string/`Crumbs.canvas` <br>instance    | "foreground"/<br>`Crumbs.scopedCanvas.foreground` | Which canvas to draw it on, represented by its key in `Crumbs.scopedCanvas`. <br>Defaults available: “left”, “middle”, “right”, “background”, “foreground” (but you can create your own canvases). |
@@ -70,8 +75,36 @@ For any properties that aren’t specified, defaults are taken from `Crumbs.obje
 
 ## Children
 
-- Child objects can be created upon initialization or for existing objects via `Crumbs.object.prototype.spawnChild`.
-- Children inherit the coordinate plane and rotation of their parent, and also scales with them. You can nest children in children to create more complex effects.
+- Child objects can be created upon initialization or for existing objects via `Crumbs.object.prototype.spawnChild(template, custom)` or `Crumbs.object.prototype.spawnChildVisible(template, custom)`.
+- Children inherit the coordinate plane and rotation of their parent, and also scale with them. You can nest children in children to create more complex effects.
+
+-- 
+
+## Methods & Helpers
+
+Crumbs Engine contains many helper methods to help you find, manipulate, and do more stuff.
+
+### `Crumbs.object.prototype` methods
+| Method | Description |
+|--------|-------------|
+| `hasChildren()` | Returns `true` if the object has any children, otherwise `false`. |
+| `removeChild(index)` | Removes the child at the specified index by setting it to `null`. Note: Children arrays are not automatically cleaned, so manage them carefully. |
+| `addComponent(comp)` | Adds a component to the object, and calls the component's `init` method if it exists. |
+| `removeComponent(type)` | Removes the first component of the specified type from the object and returns it; returns `null` if not found. |
+| `getComponent(type)` | Returns the first component of the specified type attached to the object, or `null` if not found. |
+| `addBehavior(behavior)` | Adds a behavior to the object. Accepts a `Crumbs.behavior`, `Crumbs.behaviorInstance`, or a function. |
+| `findChild(id)` | Recursively searches for a child (or descendant) with the specified `id` and returns it. Returns `null` if not found. |
+| `getChildren(id)` | Returns an array of all direct children, or all children (and descendants) with the specified `id` if provided. |
+| `die()` | Removes the object from the game. |
+| `spawnChild(template, custom)` | Instantiates a child object using the given template and custom properties, and attaches it as a child of the current object. |
+| `spawnChildVisible(template, custom)` | Instantiates a child object using the given template and custom properties, and attaches it as a child of the current object, if the game is currently being viewed. |
+
+### Global methods
+| Method | Description |
+|--------|-------------|
+| `Crumbs.findObject(id, scope)` | Returns the first object with the specified `id`. If `scope` is provided, searches only within that canvas scope. Returns `null` if not found. |
+| `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
+| `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
 
 ---
 
@@ -83,21 +116,21 @@ Available canvas scopes in `Crumbs.scopedCanvas`:
 - **middle**: The rows of building displays, containing the minigames.
 - **right**: The store.
 - **background**: The background of the entire game.
-- **foreground**: A canvas overlayed on top of the entire game.
+- **foreground**: A canvas overlaid on top of the entire game.
 
 You can create a new canvas by doing `new Crumbs.canvas(parentEle, key, id, css)`.
-- `parentEle`: parent element to attach the canvas to. The canvas will assume 100% of the parent's width and height.
-- `key`: its key in `Crumbs.scopedCanvas`.
-- `id`: id of the canvas itself (not the canvas container)
-- `css`: optional CSS
+- `parentEle`: Parent element to attach the canvas to. The canvas will assume 100% of the parent's width and height.
+- `key`: Its key in `Crumbs.scopedCanvas`.
+- `id`: ID of the canvas itself (not the canvas container).
+- `css`: Optional CSS.
 
 ---
 
 ## Custom anchors
 
-You can create your own anchors by assigning something to a new instance of Crumbs.anchor. It takes two parameters:
-- x: the amount of distance to the right compared to the width of the object of the anchor, starting from top left 
-- y: the amount of distance downward compared to the height of the object of the anchor, starting from top left
+You can create your own anchors by assigning something to a new instance of `Crumbs.anchor`. It takes two parameters:
+- x: The amount of distance to the right compared to the width of the object of the anchor, starting from the top left.
+- y: The amount of distance downward compared to the height of the object of the anchor, starting from the top left.
 - For example, Crumbs.defaultAnchors.center has x and y set to 0.5 each.
 - Note that you can set them to any value you like, including numbers bigger than 1 and smaller than 0.
 - Helpful tip: You can see the anchors of objects by setting `Crumbs.prefs.anchorDisplay` to 1.
@@ -114,18 +147,30 @@ You can create your own anchors by assigning something to a new instance of Crum
 ### `Crumbs.component.pointerInteractive`
 - Handles interaction with the mouse, allowing for hover detection and click detection.
 - Always maximally fits the width and height of the object it's attached to.
+- The `this` keyword refers to the object that it's attached to.
 - Helpful tip: You can see the collider boxes of objects with this component by setting `Crumbs.prefs.colliderDisplay` to 1.
 #### `pointerInteractive` Component Properties
 
 | Property            | Type     | Default   | Description                                                                 |
 |---------------------|----------|-----------|-----------------------------------------------------------------------------|
 | `enabled`           | boolean  | true      | Whether the component is active and can interact with pointer events.       |
-| `onClick`           | function | empty     | Function called when the object is clicked down.                                 |
+| `onClick`           | function | empty     | Function called when the object is clicked down.                            |
 | `onRelease`         | function | empty     | Function called when the mouse button is released over the object.          |
 | `onMouseover`       | function | empty     | Function called when the mouse enters the object's area.                    |
 | `onMouseout`        | function | empty     | Function called when the mouse leaves the object's area.                    |
-| `alwaysInteractable`| boolean  | false     | If true, the object is interactable even if another object with a pointerInteractive component is drawn above it
-| `boundingType`      | string   | 'rect'/'oval'    | The shape used for hit detection                  |
+| `alwaysInteractable`| boolean  | false     | If true, the object is interactable even if another object with a pointerInteractive component is drawn above it. |
+| `boundingType`      | string   | 'rect'/'oval'    | The shape used for hit detection.                  |
+
+### `Crumbs.component.canvasManipulator`
+- Gives raw control over the canvas, with drawing operations centered on the object itself (discounting offsetX and offsetY).
+- The `this` keyword refers to the component object itself, not the object it's attached to.
+- Be careful! Make sure that you have an equal amount of `ctx.save();` and `ctx.restore();` in each canvasManipulator, otherwise things will break horribly.
+#### `canvasManipulator` Component Properties
+
+| Property   | Type     | Default | Description                                                                                 |
+|------------|----------|---------|---------------------------------------------------------------------------------------------|
+| `enabled`  | boolean  | true    | Whether the canvasManipulator component is active.                                           |
+| `function` | function | empty   | Function called with the object (`m`) and the canvas context (`ctx`) for custom drawing.     |
 
 ### `Crumbs.component.text`
 - Displays text on the origins of the object.
@@ -164,8 +209,8 @@ You can create your own anchors by assigning something to a new instance of Crum
 | Property   | Type    | Default | Description                                                                                  |
 |------------|---------|---------|----------------------------------------------------------------------------------------------|
 | `enabled`  | boolean | true    | Whether the pattern fill is active.                                                          |
-| `width`    | number  | 2       | Number of minimum pixels to fill by repeating the image horizontally.                                            |
-| `height`   | number  | 2       | Number of minimum pixels to fill by repeating the image vertically.                                          |
+| `width`    | number  | 2       | Number of minimum pixels to fill by repeating the image horizontally.                        |
+| `height`   | number  | 2       | Number of minimum pixels to fill by repeating the image vertically.                          |
 | `offX`     | number  | 0       | Horizontal offset (in pixels) for the pattern's starting position.                           |
 | `offY`     | number  | 0       | Vertical offset (in pixels) for the pattern's starting position.                             |
 | `dWidth`   | number/null | null | Destination width for each pattern tile. If null, uses the image's width.                    |
@@ -209,6 +254,38 @@ const myObject = Crumbs.spawn({
     components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' })]
 });
 ```
+
+---
+
+## Particles
+
+A particle is a simplified version of `Crumbs.object` that uses less memory and less computing power, but with reduced functionality. They are always drawn on top of all objects and does not support drawing order, components, or stacking images and behaviors. Declare a particle with `Crumbs.spawnParticle(template, x, y, r, a, scope);`, where:
+- template: detailed in table below;
+- x: x position;
+- y: y position;
+- r: rotation; 
+- a: alpha (opacity);
+- scope: same as scope in regular objects.
+
+### Particle Template Properties
+
+| Property     | Type      | Default           | Description                                                                 |
+|--------------|-----------|-------------------|-----------------------------------------------------------------------------|
+| `width`      | number    | 1                 | Width of the particle.                                                      |
+| `height`     | number    | 1                 | Height of the particle.                                                     |
+| `img`        | string    | (empty)           | Image used for the particle (optional).                                     |
+| `life`       | number    | `2 * Game.fps`    | Lifespan of the particle in frames.                                         |
+| `init`       | function  | null              | Function called on particle initialization.                                 |
+| `behavior`   | function  | null              | Function called every frame for custom particle logic.                      |
+| `reusePool`  | array     | null              | Pool for reusing particle instances (optional, for optimization).           |
+
+---
+
+## Vanilla Implementation
+
+Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects.
+
+For details on how they are implemented and how to refer to them in code, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
 
 ---
 
