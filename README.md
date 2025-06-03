@@ -85,8 +85,8 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 Crumbs Engine contains many helper methods to help you find, manipulate, and do more stuff.
 
 ### `Crumbs.object.prototype` methods
-| Method | Description |
-|--------|-------------|
+| Method         | Description         |
+|----------------|---------------------|
 | `hasChildren()` | Returns `true` if the object has any children, otherwise `false`. |
 | `removeChild(index)` | Removes the child at the specified index by setting it to `null`. Note: Children arrays are not automatically cleaned, so manage them carefully. |
 | `addComponent(comp)` | Adds a component to the object, and calls the component's `init` method if it exists. |
@@ -100,8 +100,8 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `spawnChildVisible(template, custom)` | Instantiates a child object using the given template and custom properties, and attaches it as a child of the current object, if the game is currently being viewed. |
 
 ### Global methods
-| Method | Description |
-|--------|-------------|
+| Method         | Description         |
+|----------------|---------------------|
 | `Crumbs.findObject(id, scope)` | Returns the first object with the specified `id`. If `scope` is provided, searches only within that canvas scope. Returns `null` if not found. |
 | `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
 | `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
