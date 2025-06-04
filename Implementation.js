@@ -268,9 +268,9 @@
 		anchor: 'top',
 		offsetY: -10,
 		behaviors: [
-			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerSkins.f.call(this.getInfo()); }), 
-			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerMovement.f.call(this.getInfo()); }), 
-			new Crumbs.behaviorInstance(function() { return Crumbs.objectBehaviors.wrinklerParticles.f.call(this.getInfo()); })
+			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerSkins), 
+			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerMovement), 
+			new Crumbs.behaviorInstance(Crumbs.objectBehaviors.wrinklerParticles)
 		],
 		components: [
             new Crumbs.component.canvasManipulator({ function: function(m, ctx) {
