@@ -1542,7 +1542,7 @@ const Crumbs_Init_On_Load = function() {
 	        return arr;
 	    }
 	    
-		const middle = left + parseInt((right - left) / 2);
+		const middle = left + Math.floor((right - left) / 2);
 	    
 	    Crumbs.mergeSort(arr, left, middle);
 	    Crumbs.mergeSort(arr, middle + 1, right);
