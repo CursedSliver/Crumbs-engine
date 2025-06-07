@@ -1444,11 +1444,12 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.spawnParticle = function(what, x, y, r, a, scope) {
 		if (!Game.visible) { return {}; }
-		if (what instanceof Crumbs.particle) { 
-			return Crumbs.reuseParticle.call(what, x, y, r, a, scope);
-		} else {
-			return new Crumbs.particle(what, x, y, r, a, scope);
+		if (what.reusePool && what.reusePool.at(-1)) {
+			const s = what.reusePool.splice(what.reusePool.length - 1, 1);
+			return Crumbs.reuseParticle(s, x, y, r, a, scope);
 		}
+		
+		return new Crumbs.particle(what, x, y, r, a, scope);
 	}
 	Crumbs.particle.prototype.die = function() {
 		this.scope.splice(this.scope.indexOf(this), 1);
@@ -1482,6 +1483,21 @@ const Crumbs_Init_On_Load = function() {
 		if (this.init) { this.init.call(this); }
 		return this;
 	}
+	Crumbs.reusePools = [];
+	Crumbs.newReusePool = function(str) {
+		let a = [];
+		Crumbs.reusePools.push(a);
+		return a;
+	}
+	Crumbs.pruneParticles = function(pool) {
+		pool.splice(0, pool.length);
+	}
+	Game.registerHook('logic', function() {
+		if (Game.T % 120 * Game.fps !== 0) { return; }
+		for (let i in Crumbs.reusePools) {
+			Crumbs.pruneParticles(Crumbs.reusePools[i]);
+		}
+	})
 
 	//below for the actual drawing
 	Crumbs.compileObjects = function(s) {

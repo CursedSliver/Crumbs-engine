@@ -282,7 +282,11 @@ A particle is a simplified version of `Crumbs.object` that uses less memory and 
 | `life`       | number    | `2 * Game.fps`    | Lifespan of the particle in frames.                                         |
 | `init`       | function  | null              | Function called on particle initialization.                                 |
 | `behavior`   | function  | null              | Function called every frame for custom particle logic.                      |
-| `reusePool`  | array     | null              | Pool for reusing particle instances (optional, for optimization).           |
+| `reusePool`  | array     | null              | Pool for reusing particle instances (optional, for optimization); see below.|
+
+## `reusePool` instructions
+
+To use it, assign `Crumbs.newReusePool()` to it in the template (never place the object declaration directly in `Crumbs.spawnParticle`!), which will register it and automatically pull from the pool over creating new objects. The pool is cleaned once every 120 seconds.
 
 ---
 
