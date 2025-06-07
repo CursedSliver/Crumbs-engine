@@ -22,18 +22,7 @@
 		this.x = this.scope.l.offsetWidth / 2;
 		this.y = this.scope.l.offsetHeight * 0.4;
 	};
-	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
-	/*
- 	what it can return:
-  	x, y, scaleX, scaleY, rotation: self explanatory
-    alpha: opacity
-   	filter: an object containing all the CSS filters
-	text: an object containing text parameters
-	imgs: a new array of the images
- 	imgUsing: the img frame selected
-	newChild: an object or an array containing objects for spawning children
- 	behaviorParams: an object to replace the original params for this behavior
-  	*/
+	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff
 	Crumbs.objectBehaviors.idle = new Crumbs.behavior(function() { });
 	Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
 	Crumbs.objectBehaviors.fly = new Crumbs.behavior(function(p) {
@@ -76,7 +65,7 @@
 	Crumbs.objectBehaviors.expireAfter = new Crumbs.behavior(function(p) {
 		//parameters: 't', which is the amount of draw frames to do before it dies
 		//if p.time is undefined, it essentially never expires
-		if ((Crumbs.t - this.t) >= p.t) { return 't'; } else { return {}; }
+		if ((Crumbs.t - this.t) >= p.t) { this.die(); }
 	}, { t: 1e21 });
 	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.offsetWidth / 2; this.y = this.scope.l.offsetHeight * 0.4; });
 	Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound = new Crumbs.behavior(function() {
@@ -442,7 +431,7 @@
 		let alphaMult = 1;
 		if (Game.bgType == 2 || Game.bgType == 4) { alphaMult = 0.5; }
 		if (Game.prefs.particles) {
-            if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; }
+            if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; } else { this.imgUsing = 0; }
         } else {
             this.imgUsing = 0;
         }
@@ -1030,7 +1019,7 @@
 		anchor: 'bottom',
 		behaviors: new Crumbs.behaviorInstance(function() {
 			this.alpha -= 1 / (4 * Game.fps);
-			if (this.alpha <= 0) { return 't'; }
+			if (this.alpha <= 0) { this.die(); return; }
 			this.y -= 2;
 		})
 	}

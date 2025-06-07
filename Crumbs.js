@@ -350,22 +350,45 @@ const Crumbs_Init_On_Load = function() {
 		this.scaleFactorX = 1;
 		this.scaleFactorY = 1;
 	};
+	Crumbs.behaviorSym = Symbol('f');
+	Crumbs.initSym = Symbol('init');
 	Crumbs.behavior = function(func, init) {
-		this.f = func;
+		this[Crumbs.behaviorSym] = func;
 		this.init = init;
-	};
-	Crumbs.behaviorInstance = function(b, init) {
-		this.f = null;
-		if (typeof b === 'object') { 
-			this.f = b.f;
-			const bb = typeof b.init;
-			if (bb === 'object') {
-				for (let i in b.init) { this[i] = b.init[i]; }
-			} 
-			if (bb === 'function') {
-				b.init.call(this);
+		if (typeof init === 'function') { 
+			this[Crumbs.initSym] = init;
+		} else {
+			for (let i in init) {
+				this[i] = init[i];
 			}
-		} else { this.f = b; }
+		}
+	};
+	Crumbs.behavior.prototype.replace = function(original, newCode) {
+		eval('this[Crumbs.behaviorSym]='+this[Crumbs.behaviorSym].toString().replace(original, newCode));
+		return this;
+	};
+	Crumbs.behavior.prototype.inject = function(line, code) {
+		const funcStr = this[Crumbs.behaviorSym].toString();
+		let lines = funcStr.split('\n');
+		lines.splice(line, 0, code);
+		eval('this[Crumbs.behaviorSym]='+lines.join('\n'));
+		return this;
+	}
+	Crumbs.behaviorInstance = function(b, init) {
+		if (typeof b === 'function') {
+			b = new Crumbs.behavior(b);
+		}
+		if (typeof b === 'object') { 
+			const bb = b[Crumbs.initSym] && b[Crumbs.initSym].call(this);
+			if (bb) {
+				for (let i in bb) { this[i] = bb[i]; }
+			} else {
+				for (let i in b) {
+					this[i] = b[i];
+				}
+			}
+		}
+		this[Crumbs.behaviorSym] = b;
 		const t = typeof init;
 		if (t === 'object') {
 			for (let i in init) { this[i] = init[i]; }
@@ -373,6 +396,21 @@ const Crumbs_Init_On_Load = function() {
 		if (t === 'function') {
 			init.call(this);
 		}
+	}
+	Crumbs.behaviorInstance.prototype.reset = function() {
+		const b = this[Crumbs.behaviorSym];
+		const bb = b[Crumbs.initSym] && b[Crumbs.initSym].call(this);
+		if (bb) {
+			for (let i in bb) { this[i] = bb[i]; }
+		} else {
+			for (let i in b) {
+				this[i] = b[i];
+			}
+		}
+		this[Crumbs.behaviorSym] = b;
+	}
+	Crumbs.behaviorInstance.prototype.getBehavior = function() {
+		return this[Crumbs.behaviorSym];
 	}
 	Crumbs.anchor = function(x, y) {
 		this.x = x;
@@ -445,9 +483,9 @@ const Crumbs_Init_On_Load = function() {
 		for (let i in c) { this.addComponent(c[i]); }
 		this.behaviors = [].concat(this.behaviors);
 		for (let i in this.behaviors) {
-			if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
-			else if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
-			else if (typeof this.behaviors[i] === 'function') { const b = new Crumbs.behavior(this.behaviors[i]); this.behaviors[i] = new Crumbs.behaviorInstance(b); }
+			if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
+			else if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
+			else if (typeof this.behaviors[i] === 'function') { this.behaviors[i] = new Crumbs.behaviorInstance(new Crumbs.behavior(this.behaviors[i])); }
 			else { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		}
 
@@ -562,8 +600,7 @@ const Crumbs_Init_On_Load = function() {
 			if (this.components[i].enabled) { this.components[i].logic(this); }
 		}
 		for (let b in this.behaviors) {
-			let e = this.behaviors[b].f.call(this.getInfo(), this.behaviors[b]);
-			if (e == 't') { this.die(); break; }
+			this.behaviors[b][Crumbs.behaviorSym][Crumbs.behaviorSym].call(this.getInfo(), this.behaviors[b]);
 		}
 	};
 	Crumbs.object.prototype.updateChildren = function() {
@@ -1542,7 +1579,7 @@ const Crumbs_Init_On_Load = function() {
 	        return arr;
 	    }
 	    
-		const middle = left + Math.floor((right - left) / 2);
+		const middle = left + parseInt((right - left) / 2);
 	    
 	    Crumbs.mergeSort(arr, left, middle);
 	    Crumbs.mergeSort(arr, middle + 1, right);
@@ -1768,7 +1805,7 @@ const Crumbs_Init_On_Load = function() {
 
     Game.Load(function() { });
 
-	Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Implementation.js');
+	Game.LoadMod('./Implementation.js');
     
 	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
 	if (!App) { 

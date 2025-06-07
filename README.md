@@ -68,7 +68,10 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 - `Crumbs.behaviorInstance(behavior, parameters)`  
     - `behavior`: An instance of `Crumbs.behavior`, containing a function called every frame.
         - To create a `Crumbs.behavior`, simply pass in a function for `new Crumbs.behavior`.
-    - `parameters` (optional): An object passed into the function on every call and can be modified by the function.
+    - `parameters` (optional): An object passed into the function on every call, and is only accessible and modifiable to the function.
+    - Note: if you don't need custom behavior parameters per object, place these in templates. Place as `Crumbs.behavior` if `parameters` is needed, otherwise put as `Crumbs.behaviorInstance`.
+    - If you do need custom behavior parameters, override behavior in `custom` with new `Crumbs.behaviorInstance` from behaviors assigned to variables.
+    - Try not to put your functions directly in your object.
 - If not an array, it will be converted into one.
 
 ---
@@ -285,9 +288,9 @@ A particle is a simplified version of `Crumbs.object` that uses less memory and 
 
 ## Vanilla Implementation
 
-Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects.
-
-For details on how they are implemented and how to refer to them in code, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
+Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects. You can access them with `Crumbs.findObject(id, scope)` or `Crumbs.getObjects(id, scope)` and modify them as you wish.
+- You can also easily modify all instances of a behavior with `Crumbs.behavior.prototype.replace(original, newCode)` or `Crumbs.behavior.prototype.inject(line, code)`, and find their corresponding behavior from their behaviorInstance with `Crumbs.behaviorInstance.prototype.getBehavior()`.
+- For more details on how they are implemented and their IDs, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
 
 ---
 
