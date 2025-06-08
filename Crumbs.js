@@ -1445,8 +1445,8 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.spawnParticle = function(what, x, y, r, a, scope) {
 		if (!Game.visible) { return {}; }
 		if (what.reusePool && what.reusePool.at(-1)) {
-			const s = what.reusePool.splice(what.reusePool.length - 1, 1);
-			return Crumbs.call.reuseParticle(s, x, y, r, a, scope);
+			const s = what.reusePool.splice(what.reusePool.length - 1, 1)[0];
+			return Crumbs.reuseParticle.call(s, x, y, r, a, scope);
 		}
 		
 		return new Crumbs.particle(what, x, y, r, a, scope);
