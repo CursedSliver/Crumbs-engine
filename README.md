@@ -286,7 +286,7 @@ A particle is a simplified version of `Crumbs.object` that uses less memory and 
 
 ## `reusePool` instructions
 
-To use it, assign `Crumbs.newReusePool()` to it in the template (never place the object declaration directly in `Crumbs.spawnParticle`!), which will register it and automatically pull from the pool over creating new objects. The pool is cleaned once every 120 seconds.
+To use it, assign `Crumbs.newReusePool()` to it in the template (never place the object declaration directly in `Crumbs.spawnParticle`!), which will register it and automatically pull from the pool over creating new objects. The pool is cleaned once every 120 seconds. You can do `Crumbs.prunePool(pool)` to clean any pool of your choice.
 
 ---
 
