@@ -231,6 +231,14 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 	}
+	Crumbs.h.pointOnRotatedEllipse = function(cx, cy, rx, ry, rotation, theta) {
+  		const xUnrot = rx * Math.cos(theta);
+  		const yUnrot = ry * Math.sin(theta);
+  		const cosR = Math.cos(rotation);
+  		const sinR = Math.sin(rotation);
+  		return [cx + xUnrot * cosR - yUnrot * sinR, cy + xUnrot * sinR + yUnrot * cosR];
+	}
+
 
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
