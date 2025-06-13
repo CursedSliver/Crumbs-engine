@@ -86,11 +86,11 @@
 	Crumbs.cookieObject = {
 		width: 48,
 		height: 48,
-		imgs: 'icons.png',
+		imgs: ['icons.png'],
 		scope: 'left'
 	}
 	Crumbs.dollarObject = {
-		imgs: 'dollar',
+		imgs: ['dollar'],
 		width: 64,
 		height: 64,
 		sx: Math.floor(Math.random() * 8) * 64,
@@ -98,16 +98,14 @@
 		scope: 'left',
 	}
 
-	Crumbs.wrinklerBit = function(id) {
-		return {
-			imgs: 'wrinklerBits.png',
-			width: 100,
-			height: 200,
-			sx: ((id * 3) % 8) * 100,
-			sy: -10,
-			anchor: 'top-left',
-			scope: 'left'
-		};
+	Crumbs.wrinklerBit = {
+		imgs: ['wrinklerBits.png', 'shinyWrinklerBits.png'],
+		width: 100,
+		height: 200,
+		sx: 0,
+		sy: -10,
+		anchor: 'top-left',
+		scope: 'left'
 	};
 
 	Crumbs.spawnCookieShower = function() {
@@ -145,18 +143,18 @@
 	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Game.mouseX+Math.random()*8-4, Game.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
-		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
-		if (type == 1) { w.imgs = 'shinyWrinklerBits.png'; }
-		w.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})];
 		const o = Crumbs.findObject('wrinkler'+originId);
-		w.x = o.x;
-		w.y = o.y;
-		w.offsetX = o.offsetX - 50;
-		w.offsetY = o.offsetY;
-		w.rotation = o.rotation;
-		w.order = 2;
-		w.id = 'wrinklerBits.png';
-		return Crumbs.spawnVisible(w);
+		return Crumbs.spawnVisible(Crumbs.wrinklerBit, {
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})],
+			imgUsing: type,
+			sx: ((id * 3) % 8) * 100,
+			x: o.x,
+			y: o.y,
+			offsetX: o.offsetX - 50,
+			offsetY: o.offsetY,
+			rotation: o.rotation,
+			order: o.order,
+		});
 	};
 
 	Crumbs.fallingCookieOnclick = function() {

@@ -40,7 +40,7 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 | `scaleX`   | number    | 1       | Scaling multiplier on the x-direction. |
 | `scaleY`   | number    | 1       | Scaling multiplier on the y-direction. |
 | `alpha`    | number    | 1       | The opacity of the image drawn (between 0 and 1 inclusive). |
-| `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of strings. Strings are automatically converted to arrays. |
+| `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of them. If it is not one, it will be automatically converted to arrays. |
 | `imgUsing` | number    | 0       | The image currently displayed, out of all the images listed in `imgs`. |
 | `noDraw`   | boolean   | false   | Prevents the object from being drawn, but its behaviors and components still function. |
 | `offsetX`  | number    | 0       | Offsets the image drawn by that amount on the x axis, which also rotates with its rotation. |
@@ -73,6 +73,14 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
     - If you do need custom behavior parameters, override behavior in `custom` with new `Crumbs.behaviorInstance` from behaviors assigned to variables.
     - Try not to put your functions directly in your object.
 - If not an array, it will be converted into one.
+
+---
+
+## Images
+
+- You can declare images in the `img` property. 
+- Access and change them with the `imgUsing` property.
+- If you place them in templates, MAKE SURE to ALWAYS wrap them in arrays, even if there's only one element!
 
 ---
 
@@ -164,7 +172,17 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `onMouseover`       | function | empty     | Function called when the mouse enters the object's area.                    |
 | `onMouseout`        | function | empty     | Function called when the mouse leaves the object's area.                    |
 | `alwaysInteractable`| boolean  | false     | If true, the object is interactable even if another object with a pointerInteractive component is drawn above it. |
-| `boundingType`      | string   | 'rect'/'oval'    | The shape used for hit detection.                  |
+| `boundingType`      | string   | 'rect'    | The shape used for hit detection.                  |
+
+### Custom bounding boxes
+- You can create your own bounding boxes with `new Crumbs.colliderType(func)`. Pass in a function that determines whether or not a given position is in the box.
+- The function has the following arguments passed into it as individual arguments:
+  - `s`: scope of the object it's attached to
+  - `m`: the object
+  - `pWidth`: the width of the object in pixels, accounting for scaling (so you don't have to calculate that yourself)
+  - `pHeight`: the height of the object in pixels, accounting for scaling
+- You can also pass in a string alongside the function to have it as its name. Once set, you will be able to have instantiations using the string as its bounding type convert the string into its corresponding collider.
+- There are two default boundingTypes available: `rect` and `oval`. You can pass in `'rect'` or `'oval'` to specify them.
 
 ### `Crumbs.component.canvasManipulator`
 - Gives raw control over the canvas, with drawing operations centered on the object itself (discounting offsetX and offsetY).
