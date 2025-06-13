@@ -567,7 +567,7 @@ const Crumbs_Init_On_Load = function() {
 		const c = [].concat(this.components);
 		this.components = [];
 		for (let i in c) { this.addComponent(c[i]); }
-		this.behaviors = [].concat(this.behaviors);
+		if (!Array.isArray(this.behaviors)) { this.behaviors = [].concat(this.behaviors); }
 		for (let i in this.behaviors) {
 			if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
 			else if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
