@@ -1,6 +1,7 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
-var CrumbsEngineLoaded = false;
+let CrumbsEngineLoaded = false;
+var crumbs_load_local = false;
 const Crumbs_Init_On_Load = function() {
 	if (l('topbarFrenzy')) { return; }
 
@@ -1231,7 +1232,7 @@ const Crumbs_Init_On_Load = function() {
 		onMouseover: function() { },
 		onMouseout: function() { },
 		alwaysInteractable: false,
-		boundingType: 'recr'
+		boundingType: 'rect'
 	}
 	Crumbs.component.pointerInteractive.prototype.enable = function() {
 		this.enabled = true;
@@ -1848,7 +1849,7 @@ const Crumbs_Init_On_Load = function() {
 
     Game.Load(function() { });
 
-	Game.LoadMod('./Implementation.js');
+	Game.LoadMod((window.crumbs_load_local)?'./Implementation.js':'https://cursedsliver.github.io/Crumbs-engine/Implementation.js');
     
 	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
 	if (!App) { 
