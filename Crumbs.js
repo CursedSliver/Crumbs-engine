@@ -1,7 +1,7 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
 let CrumbsEngineLoaded = false;
-var crumbs_load_local = false;
+if (typeof crumbs_load_local === 'undefined') { var crumbs_load_local = false; }
 const Crumbs_Init_On_Load = function() {
 	if (l('topbarFrenzy')) { return; }
 
@@ -616,7 +616,7 @@ const Crumbs_Init_On_Load = function() {
 		if (this.parent === null) { this.updateChildren(); }
 	}
 	Crumbs.object.prototype.die = function() {
-		if (this.parent) { this.parent.removeChild(this.index) }
+		if (this.parent) { this.parent.removeChild(this.index); }
 		else { this.scope.objects[this.index] = null; }
 	};
 	Crumbs.h.tempVar = false;
