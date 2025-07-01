@@ -67,7 +67,7 @@
 		//if p.time is undefined, it essentially never expires
 		if ((Crumbs.t - this.t) >= p.t) { this.die(); }
 	}, { t: 1e21 });
-	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.offsetWidth / 2; this.y = this.scope.l.offsetHeight * 0.4; });
+	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.width / 2; this.y = this.scope.l.height * 0.4; });
 	Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound = new Crumbs.behavior(function() {
 		if (this.x > this.scope.l.offsetWidth + 100 || this.x < -100 || this.y > this.scope.l.offsetHeight + 100) { this.die(); }
 	});
@@ -1017,7 +1017,10 @@
 		anchor: 'bottom',
 		behaviors: new Crumbs.behaviorInstance(function() {
 			this.alpha -= 1 / (4 * Game.fps);
-			if (this.alpha <= 0) { this.die(); return; }
+			if (this.alpha <= 0) { 
+				this.die(); 
+				return; 
+			}
 			this.y -= 2;
 		})
 	}
