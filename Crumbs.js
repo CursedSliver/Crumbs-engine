@@ -1309,9 +1309,9 @@ const Crumbs_Init_On_Load = function() {
 			const prevLineWidth = ctx.lineWidth;
 			ctx.lineWidth = 2;
 			ctx.strokeStyle = '#5de2fc';
-			if (this.boundingType == 'rect') {
+			if (this.boundingType.key == 'rect') {
 				ctx.strokeRect(-Crumbs.getOffsetX(m.anchor, pWidth), -Crumbs.getOffsetY(m.anchor, pHeight), pWidth, pHeight);
-			} else if (this.boundingType == 'oval') { 
+			} else if (this.boundingType.key == 'oval') { 
 				ctx.beginPath();
 				ctx.ellipse(-Crumbs.getOffsetX(m.anchor, pWidth) + pWidth / 2, -Crumbs.getOffsetY(m.anchor, pHeight) + pHeight / 2, pWidth / 2, pHeight / 2, 0, 0, Math.PI * 2);
 				ctx.stroke();
@@ -1379,14 +1379,14 @@ const Crumbs_Init_On_Load = function() {
 		this.noDrawStatus = false;
 	}
 	Crumbs.defaultComp.linearFade = {
+		enabled: true,
 		progress: 1, //midpoint of fade
 		distance: 30, //px, total distance, scales
 		sliceWidth: 3, //px between each redraw
 		horizontal: false,
 		initialAlpha: null, //can force opacity set, if not set it uses base opacity of object
 		finalAlpha: null, //if not set uses 0
-
-		enabled: true
+		cutOff: false //whether to stop drawing after the fade is complete
 	}
 	Crumbs.component.linearFade.prototype.enable = function() { this.enabled = true; } 
 	Crumbs.component.linearFade.prototype.disable = function() { this.enabled = false; }
@@ -1406,7 +1406,7 @@ const Crumbs_Init_On_Load = function() {
 		if (this.horizontal) {
 			this.drawHorizontal(m, ctx, pWidth, pHeight);
 		} else {
-			this.drawVertical(m, ctx, pWidth, pHeight)
+			this.drawVertical(m, ctx, pWidth, pHeight);
 		}
 		ctx.globalAlpha = prevAlpha;
 
@@ -1431,7 +1431,7 @@ const Crumbs_Init_On_Load = function() {
 			ctx.drawImage(pic, 0, initOffset + i * this.sliceWidth, pWidth, this.sliceWidth, ox, oy + initOffset + i * this.sliceWidth, dx, Math.ceil(this.sliceWidth * dyM));
 		}
 		ctx.globalAlpha = this.finalAlpha ?? 0;
-		if (initOffset + slicesTotal * this.sliceWidth > pHeight || !ctx.globalAlpha) { return; }
+		if (initOffset + slicesTotal * this.sliceWidth > pHeight || !ctx.globalAlpha || this.cutOff) { return; }
 		ctx.drawImage(pic, 
 			0, 
 			initOffset + slicesTotal * this.sliceWidth, 

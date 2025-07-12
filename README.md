@@ -256,6 +256,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `horizontal`    | boolean  | false   | If true, the fade is applied horizontally; otherwise, it is vertical.                            |
 | `initialAlpha`  | number/null | null | Starting opacity for the fade. If null, uses the object's base opacity.                          |
 | `finalAlpha`    | number/null | null | Ending opacity for the fade. If null, defaults to 0 (fully transparent).                         |
+| `cutOff`        | boolean  | false   | If true, will no longer draw after the gradient is complete                                   |
 
 ---
 
