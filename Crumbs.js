@@ -667,6 +667,15 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return null;
 	};
+	Crumbs.object.prototype.getAllComponents = function(type) {
+		let result = [];
+		for (let i = 0; i < this.components.length; i++) {
+			if (this.components[i] instanceof (Crumbs.component[type] || type)) {
+				result.push(this.components[i]);
+			}
+		}
+		return result;
+	}
 	Crumbs.object.prototype.addBehavior = function(behavior) {
 		if (behavior instanceof Crumbs.behavior) { behavior = new Crumbs.behaviorInstance(behavior); }
 		else if (typeof behavior === 'function') { const b = new Crumbs.behavior(behavior); behavior = new Crumbs.behaviorInstance(b); }
@@ -1383,10 +1392,11 @@ const Crumbs_Init_On_Load = function() {
 		progress: 1, //midpoint of fade
 		distance: 30, //px, total distance, scales
 		sliceWidth: 3, //px between each redraw
-		horizontal: false,
+		horizontal: false, //otherwise vertical
+		flip: false, //whether to flip the fade direction
 		initialAlpha: null, //can force opacity set, if not set it uses base opacity of object
 		finalAlpha: null, //if not set uses 0
-		cutOff: false //whether to stop drawing after the fade is complete
+		cutOff: false //whether to stop drawing BEFORE the fade begins (the fade itself is unaffected)
 	}
 	Crumbs.component.linearFade.prototype.enable = function() { this.enabled = true; } 
 	Crumbs.component.linearFade.prototype.disable = function() { this.enabled = false; }
@@ -1421,17 +1431,17 @@ const Crumbs_Init_On_Load = function() {
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
 		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
 		const slicesTotal = Math.ceil(this.distance / this.sliceWidth);
-		const alphaStep = ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
+		const alphaStep = (this.flip?-1:1) * ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
 
-		ctx.globalAlpha = this.initialAlpha ?? m.alpha;
-		if (initOffset >= 0) { ctx.drawImage(pic, 0, 0, pWidth, initOffset, ox, oy, dx, initOffset * dyM); }
+		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
+		if (initOffset >= 0 && !this.cutOff) { ctx.drawImage(pic, 0, 0, pWidth, initOffset, ox, oy, dx, initOffset * dyM); }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffset + i * this.sliceWidth > pHeight) { return; }
 			ctx.drawImage(pic, 0, initOffset + i * this.sliceWidth, pWidth, this.sliceWidth, ox, oy + initOffset + i * this.sliceWidth, dx, Math.ceil(this.sliceWidth * dyM));
 		}
-		ctx.globalAlpha = this.finalAlpha ?? 0;
-		if (initOffset + slicesTotal * this.sliceWidth > pHeight || !ctx.globalAlpha || this.cutOff) { return; }
+		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
+		if (initOffset + slicesTotal * this.sliceWidth > pHeight || !ctx.globalAlpha) { return; }
 		ctx.drawImage(pic, 
 			0, 
 			initOffset + slicesTotal * this.sliceWidth, 
@@ -1451,16 +1461,16 @@ const Crumbs_Init_On_Load = function() {
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
 		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
 		const slicesTotal = Math.ceil(this.distance / this.sliceWidth);
-		const alphaStep = ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
+		const alphaStep = (this.flip?-1:1) * ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
 
-		ctx.globalAlpha = this.initialAlpha ?? m.alpha;
-		if (initOffset >= 0) { ctx.drawImage(pic, 0, 0, initOffset, pHeight, ox, oy, initOffset * dxM, dy); }
+		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
+		if (initOffset >= 0 && !this.cutOff) { ctx.drawImage(pic, 0, 0, initOffset, pHeight, ox, oy, initOffset * dxM, dy); }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffset + i * this.sliceWidth > pWidth) { return; }
 			ctx.drawImage(pic, initOffset + i * this.sliceWidth, 0, this.sliceWidth, pHeight, ox + initOffset + i * this.sliceWidth, oy, Math.ceil(this.sliceWidth * dxM), dy);
 		}
-		ctx.globalAlpha = this.finalAlpha ?? 0;
+		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
 		if (initOffset + slicesTotal * this.sliceWidth > pWidth || !ctx.globalAlpha) { return; }
 		ctx.drawImage(pic, 
 			initOffset + slicesTotal * this.sliceWidth, 
@@ -1474,7 +1484,7 @@ const Crumbs_Init_On_Load = function() {
 		);
 	}
 	//testing code
-	//Crumbs.spawn({ imgs: 'wrinkler.png', x: 100, y: 100, anchor: 'top', components: new Crumbs.component.linearFade({ progress: 0.5, distance: 40, sliceWidth: 1 }) });
+	//const what = Crumbs.spawn({ imgs: 'wrinkler.png', x: 100, y: 100, anchor: 'top', components: new Crumbs.component.linearFade({ progress: 0.5, distance: 40, sliceWidth: 1 }) });
 	
 	Crumbs.shader = {};
 	Crumbs.shaderDefaults = {};
