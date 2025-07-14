@@ -24,7 +24,7 @@
 	};
 	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff
 	Crumbs.objectBehaviors.idle = new Crumbs.behavior(function() { });
-	Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
+	//Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
 	Crumbs.objectBehaviors.fly = new Crumbs.behavior(function(p) {
 		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through o
 		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through o
@@ -721,6 +721,7 @@
 		Crumbs.spawn({
 			anchor: 'top-left',
 			scope: 'background',
+			id: 'thissomehowgetsaffected',
 			components: new Crumbs.component.canvasManipulator({
 				function: function(m, ctx) {
 					ctx.fillStyle = 'black';
