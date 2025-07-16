@@ -104,6 +104,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `addComponent(comp)` | Adds a component to the object, and calls the component's `init` method if it exists. |
 | `removeComponent(type)` | Removes the first component of the specified type from the object and returns it; returns `null` if not found. |
 | `getComponent(type)` | Returns the first component of the specified type attached to the object, or `null` if not found. |
+| `getAllComponents(type)` | Returns an array of all components of the specified type attached to the object. |
 | `addBehavior(behavior)` | Adds a behavior to the object. Accepts a `Crumbs.behavior`, `Crumbs.behaviorInstance`, or a function. |
 | `findChild(id)` | Recursively searches for a child (or descendant) with the specified `id` and returns it. Returns `null` if not found. |
 | `getChildren(id)` | Returns an array of all direct children, or all children (and descendants) with the specified `id` if provided. |

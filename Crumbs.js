@@ -1449,6 +1449,7 @@ const Crumbs_Init_On_Load = function() {
 		const pWidth = Crumbs.getPWidth(m);
 		const pHeight = Crumbs.getPHeight(m);
 		const prevAlpha = ctx.globalAlpha;
+		ctx.globalCompositeOperation = m.getComponent('settings')?.globalCompositeOperation ?? ctx.globalCompositeOperation;
 		if (this.horizontal) {
 			this.drawHorizontal(m, ctx, pWidth, pHeight);
 		} else {
