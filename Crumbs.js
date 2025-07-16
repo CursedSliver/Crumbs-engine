@@ -729,7 +729,7 @@ const Crumbs_Init_On_Load = function() {
 			if (this.components[i].enabled) { this.components[i].logic(this); }
 		}
 		for (let b in this.behaviors) {
-			this.behaviors[b][Crumbs.behaviorSym][Crumbs.behaviorSym].call(this.getInfo(), this.behaviors[b]);
+			this.behaviors[b][Crumbs.behaviorSym][Crumbs.behaviorSym].call(this, this.behaviors[b]);
 		}
 	};
 	Crumbs.object.prototype.updateChildren = function() {
@@ -1464,6 +1464,7 @@ const Crumbs_Init_On_Load = function() {
 		const dx = pWidth;
 		const dyM = m.scaleY * m.scaleFactorY;
 		const pic = Pic(m.imgs[m.imgUsing]);
+		if (this.progress + this.distance / 2 / pic.height <= 0) { return; }
 		const initOffset = (this.progress * pic.height - this.distance / 2) * dyM;
 		const initOffsetPure = this.progress * pic.height - this.distance / 2;
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
@@ -1474,6 +1475,7 @@ const Crumbs_Init_On_Load = function() {
 
 		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
 		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, 0, 0, pic.width, initOffsetPure, ox, oy, dx, initOffset); }
+		if (this.progress - this.distance / 2 / pic.height > 1) { return; }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffset + i * sliceWidth > pHeight) { return; }
@@ -1496,6 +1498,7 @@ const Crumbs_Init_On_Load = function() {
 		const dxM = m.scaleX * m.scaleFactorX;
 		const dy = pHeight;
 		const pic = Pic(m.imgs[m.imgUsing]);
+		if (this.progress + this.distance / 2 / pic.width <= 0) { return; }
 		const initOffset = (this.progress * pic.width - this.distance / 2) * dxM;
 		const initOffsetPure = this.progress * pic.width - this.distance / 2;
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
@@ -1506,6 +1509,7 @@ const Crumbs_Init_On_Load = function() {
 
 		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
 		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, 0, 0, initOffsetPure / dxM, pic.height, ox, oy, initOffset, dy); }
+		if (this.progress - this.distance / 2 / pic.width > 1) { return; }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffsetPure + i * sliceWidth > pWidth) { return; }
