@@ -119,6 +119,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `Crumbs.findObject(id, scope)` | Returns the first object with the specified `id`. If `scope` is provided, searches only within that canvas scope. Returns `null` if not found. |
 | `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
 | `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
+| `Crumbs.forceDrawObject(o, ctx)` | Forcibly draws the object `o` on that context, ignoring `components`, `noDraw`, and `children`. |
 
 ---
 

@@ -1825,6 +1825,36 @@ const Crumbs_Init_On_Load = function() {
 		
 		ctx.restore(); 
 	}
+	Crumbs.forceDrawObject = function(o, ctx, callback) {
+		//a carbon copy of Crumbs.iterateObject but it doesnt iterate and ignores noDraw and components
+		ctx.save();
+
+		ctx.globalAlpha = o.alpha;
+		let p = null;
+
+		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
+		const pWidth = Crumbs.getPWidth(o); 
+		const pHeight = Crumbs.getPHeight(o);
+		for (let ii = 0; ii < o.components.length; ii++) {
+			if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
+		}
+		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
+		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
+
+		const c = o.parent?Math.cos(-o.parent.rotation):1;
+		const s = o.parent?Math.sin(-o.parent.rotation):0;
+		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
+
+		if (o.rotation) {
+			ctx.rotate(o.rotation);
+		} 
+
+		callback.call(o, ctx);
+
+		ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX * o.scaleFactorX, -oy + o.offsetY * o.scaleFactorY, pWidth, pHeight);
+		
+		ctx.restore();
+	}
 	Crumbs.object.prototype.getTrueX = function() {
 		if (this.parent) {
 			return this.x + this.parent.getTrueX();
