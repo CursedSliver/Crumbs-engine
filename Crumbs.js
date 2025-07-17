@@ -377,6 +377,8 @@ const Crumbs_Init_On_Load = function() {
 
 		this.background = 'none';
 
+		this.redrawPerFrame = true;
+
 		this.mouseX = 0;
 		this.mouseY = 0;
 
@@ -1879,58 +1881,64 @@ const Crumbs_Init_On_Load = function() {
 	}
 
 	Crumbs.drawObjects = function() {
-		for (let c in Crumbs.scopedCanvas) {
-			let list = Crumbs.compileObjects(c);
-			Crumbs.sortedObjectList[c] = list;
-			Crumbs.scopedCanvas[c].sortedObjects = Crumbs.sortedObjectList[c];
-			Crumbs.scopedCanvas[c].objects = Crumbs.objects[c];
-			Crumbs.scopedCanvas[c].l.style.background = Crumbs.scopedCanvas[c].background;
-			let ctx = Crumbs.scopedCanvas[c].c;
-			ctx.globalAlpha = 1;
-			ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); 
-			const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
-			for (let i in Crumbs.settings) {
-				ctx[i] = Crumbs.settings[i];
-			}
-			for (let i = 0; i < list.length; i++) {
-				if (list[i].parent) { continue; }
-				let o = list[i];
-				if (!o.enabled) { continue; }
-				Crumbs.iterateObject(o, ctx);
-			}
-			for (let i in Crumbs.particles[c]) {
-				const p = Crumbs.particles[c][i];
-				if (p.globalCompositeOperation) { ctx.globalCompositeOperation = p.globalCompositeOperation; }
-				ctx.translate(p.x, p.y);
-				ctx.rotate(p.rotation);
-				ctx.globalAlpha = p.alpha;
-				ctx.drawImage(Pic(p.obj.img), -p.width / 2, -p.height / 2, p.width, p.height);
-				ctx.rotate(-p.rotation);
-				ctx.translate(-p.x, -p.y);
-				if (p.globalCompositeOperation) { ctx.globalCompositeOperation = settingObj.globalCompositeOperation; }
-			}
-			ctx.globalAlpha = 1;
-			for (let i in settingObj) {
-				ctx[i] = settingObj[i];
-			}
-			if (Crumbs.preloadRequired) {
-				const prev = ctx.globalAlpha;
-				ctx.globalAlpha = 0;
-				for (let i in Crumbs.preloads) {
-					ctx.drawImage(Pic(Crumbs.preloads[i]), 0, 0);
-				}
-				ctx.globalAlpha = prev;
-				Crumbs.preloadRequired = false;
-			}
-			if (!Crumbs.scopedCanvas[c].shaders.length) { continue; }
-			let data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-			for (let i of Crumbs.scopedCanvas[c].shaders) {
-				data = i.update(data);
-			}
-			ctx.putImageData(data, 0, 0);
+		for (let scope in Crumbs.scopedCanvas) {
+			if (!Crumbs.scopedCanvas[scope].redrawPerFrame) { continue; }
+			Crumbs.drawObject(scope);
 		}
 		if (Crumbs.preloads.length) { Crumbs.preloads = []; }
 	};
+	Crumbs.drawObject = function(scope) {
+		const c = scope;
+
+		let list = Crumbs.compileObjects(c);
+		Crumbs.sortedObjectList[c] = list;
+		Crumbs.scopedCanvas[c].sortedObjects = Crumbs.sortedObjectList[c];
+		Crumbs.scopedCanvas[c].objects = Crumbs.objects[c];
+		Crumbs.scopedCanvas[c].l.style.background = Crumbs.scopedCanvas[c].background;
+		let ctx = Crumbs.scopedCanvas[c].c;
+		ctx.globalAlpha = 1;
+		ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); 
+		const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
+		for (let i in Crumbs.settings) {
+			ctx[i] = Crumbs.settings[i];
+		}
+		for (let i = 0; i < list.length; i++) {
+			if (list[i].parent) { continue; }
+			let o = list[i];
+			if (!o.enabled) { continue; }
+			Crumbs.iterateObject(o, ctx);
+		}
+		for (let i in Crumbs.particles[c]) {
+			const p = Crumbs.particles[c][i];
+			if (p.globalCompositeOperation) { ctx.globalCompositeOperation = p.globalCompositeOperation; }
+			ctx.translate(p.x, p.y);
+			ctx.rotate(p.rotation);
+			ctx.globalAlpha = p.alpha;
+			ctx.drawImage(Pic(p.obj.img), -p.width / 2, -p.height / 2, p.width, p.height);
+			ctx.rotate(-p.rotation);
+			ctx.translate(-p.x, -p.y);
+			if (p.globalCompositeOperation) { ctx.globalCompositeOperation = settingObj.globalCompositeOperation; }
+		}
+		ctx.globalAlpha = 1;
+		for (let i in settingObj) {
+			ctx[i] = settingObj[i];
+		}
+		if (Crumbs.preloadRequired) {
+			const prev = ctx.globalAlpha;
+			ctx.globalAlpha = 0;
+			for (let i in Crumbs.preloads) {
+				ctx.drawImage(Pic(Crumbs.preloads[i]), 0, 0);
+			}
+			ctx.globalAlpha = prev;
+			Crumbs.preloadRequired = false;
+		}
+		if (!Crumbs.scopedCanvas[c].shaders.length) { return; }
+		let data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+		for (let i of Crumbs.scopedCanvas[c].shaders) {
+			data = i.update(data);
+		}
+		ctx.putImageData(data, 0, 0);
+	}
 
     Game.Load(function() { });
 
