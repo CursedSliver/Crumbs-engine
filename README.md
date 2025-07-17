@@ -139,6 +139,15 @@ You can create a new canvas by doing `new Crumbs.canvas(parentEle, key, id, css)
 - `id`: ID of the canvas itself (not the canvas container).
 - `css`: Optional CSS.
 
+Other properties of each `scopedCanvas`:
+- `l`: the element of the canvas.
+- `c`: `l.getContext('2d')`.
+- `objects`: array of objects.
+- `sortedObjects`: objects sorted by draw order; used by components such as `pointerInteractive`.
+- `mouseX`: the x position of the mouse in its coordinate system.
+- `mouseY`: the y position of the mouse in its coordinate system.
+- `redrawPerFrame`: whether to redraw the canvas each frame, default: `true`. To manually redraw a canvas, do `Crumbs.drawObjectsIn(scope)`.
+
 ---
 
 ## Custom anchors

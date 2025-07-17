@@ -1393,7 +1393,6 @@ const Crumbs_Init_On_Load = function() {
 		c.width = m.scope.c.canvas.width;
 		c.height = m.scope.c.canvas.height;
 		let ctx = c.getContext('2d');
-		//Crumbs.drawObject(m, ctx);
 		let data = ctx.getImageData(0, 0, c.width, c.height);
 		const passed = Crumbs.h.grayscaleMap(data);
 		for (let i = 0; i < passed.length; i++) {
@@ -1883,11 +1882,11 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.drawObjects = function() {
 		for (let scope in Crumbs.scopedCanvas) {
 			if (!Crumbs.scopedCanvas[scope].redrawPerFrame) { continue; }
-			Crumbs.drawObject(scope);
+			Crumbs.drawObjectsIn(scope);
 		}
 		if (Crumbs.preloads.length) { Crumbs.preloads = []; }
 	};
-	Crumbs.drawObject = function(scope) {
+	Crumbs.drawObjectsIn = function(scope) {
 		const c = scope;
 
 		let list = Crumbs.compileObjects(c);
