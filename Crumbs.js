@@ -1125,7 +1125,8 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.defaultComp.canvasManipulator = {
 		enabled: true,
-		function: function(m, ctx) { }
+		function: null,
+		before: null
 	};
 	Crumbs.component.canvasManipulator.prototype.enable = function() {
 		this.enabled = true;
@@ -1134,9 +1135,11 @@ const Crumbs_Init_On_Load = function() {
 		this.enabled = false;
 	};
 	Crumbs.component.canvasManipulator.prototype.logic = function(m) { };
-	Crumbs.component.canvasManipulator.prototype.preDraw = function(m, ctx) { };
+	Crumbs.component.canvasManipulator.prototype.preDraw = function(m, ctx) { 
+		if (this.before) { ctx.save(); Crumbs.setupContext(m, ctx); this.before(m, ctx); ctx.restore(); }
+	};
 	Crumbs.component.canvasManipulator.prototype.postDraw = function(m, ctx) {
-		this.function(m, ctx);
+		if (this.function) { this.function(m, ctx); }
 	};
 	
 	Crumbs.component.text = function(obj) {
@@ -1792,8 +1795,7 @@ const Crumbs_Init_On_Load = function() {
 		ctx.save(); 
 		
 		ctx.globalAlpha = o.alpha;
-		let p = null;
-		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
+		const p = o.imgs.length?Pic(o.imgs[o.imgUsing]):null;
 		//pWidth and pHeight basically means actual width and actual height
 		const pWidth = Crumbs.getPWidth(o); 
 		const pHeight = Crumbs.getPHeight(o);
@@ -1835,14 +1837,10 @@ const Crumbs_Init_On_Load = function() {
 		ctx.save();
 
 		ctx.globalAlpha = o.alpha;
-		let p = null;
+		const p = o.imgs.length?Pic(o.imgs[o.imgUsing]):null;
 
-		if (o.imgs.length) { p = Pic(o.imgs[o.imgUsing]); }
 		const pWidth = Crumbs.getPWidth(o); 
 		const pHeight = Crumbs.getPHeight(o);
-		for (let ii = 0; ii < o.components.length; ii++) {
-			if (o.components[ii].enabled) { o.components[ii].preDraw(o, ctx); }
-		}
 		const ox = Crumbs.getOffsetX(o.anchor, pWidth);
 		const oy = Crumbs.getOffsetY(o.anchor, pHeight);
 
@@ -1854,11 +1852,27 @@ const Crumbs_Init_On_Load = function() {
 			ctx.rotate(o.rotation);
 		} 
 
-		callback.call(o, ctx);
+		callback?.call(o, ctx);
 
 		ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX * o.scaleFactorX, -oy + o.offsetY * o.scaleFactorY, pWidth, pHeight);
 		
 		ctx.restore();
+	}
+	//HELPER ONLY
+	Crumbs.setupContext = function(o, ctx) {
+		ctx.globalAlpha = o.alpha;
+
+		const c = o.parent?Math.cos(-o.parent.rotation):1;
+		const s = o.parent?Math.sin(-o.parent.rotation):0;
+		ctx.translate(o.x * c - o.y * s, o.x * s + o.y * c);
+
+		if (o.rotation) {
+			ctx.rotate(o.rotation);
+		} 
+	}
+	Crumbs.drawPure = function(o, ctx, callback) {
+		callback ?? callback.call(o, ctx);
+		ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX * o.scaleFactorX, -oy + o.offsetY * o.scaleFactorY, pWidth, pHeight);
 	}
 	Crumbs.object.prototype.getTrueX = function() {
 		if (this.parent) {

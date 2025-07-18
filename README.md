@@ -205,6 +205,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 |------------|----------|---------|---------------------------------------------------------------------------------------------|
 | `enabled`  | boolean  | true    | Whether the canvasManipulator component is active.                                           |
 | `function` | function | empty   | Function called with the object (`m`) and the canvas context (`ctx`) for custom drawing.     |
+| `before` | function | empty   | Function called with the object (`m`) and the canvas context (`ctx`) for custom drawing, with the difference that this is called right before the object is drawn.     |
 
 ### `Crumbs.component.text`
 - Displays text on the origins of the object.

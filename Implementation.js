@@ -4,23 +4,23 @@
 	Crumbs.objectInits.default = function() { };
 	Crumbs.objectDefaults.init = Crumbs.objectInits.default;
 	Crumbs.objectInits.bottomRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
-		this.y = this.scope.l.offsetHeight;
+		this.x = Math.random() * this.scope.l.width;
+		this.y = this.scope.l.height;
 	};
 	Crumbs.objectInits.topRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
+		this.x = Math.random() * this.scope.l.width;
 	};
 	Crumbs.objectInits.totalRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
-		this.y = Math.random() * this.scope.l.offsetHeight;
+		this.x = Math.random() * this.scope.l.width;
+		this.y = Math.random() * this.scope.l.height;
 	};
 	Crumbs.objectInits.center = function() {
-		this.x = this.scope.l.offsetWidth / 2;
-		this.y = this.scope.l.offsetHeight / 2;
+		this.x = this.scope.l.width / 2;
+		this.y = this.scope.l.height / 2;
 	};
 	Crumbs.objectInits.bigCookie = function() {
-		this.x = this.scope.l.offsetWidth / 2;
-		this.y = this.scope.l.offsetHeight * 0.4;
+		this.x = this.scope.l.width / 2;
+		this.y = this.scope.l.height * 0.4;
 	};
 	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff
 	Crumbs.objectBehaviors.idle = new Crumbs.behavior(function() { });
