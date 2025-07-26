@@ -278,7 +278,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | Property            | Type                | Default   | Description                                                                                      |
 |---------------------|---------------------|-----------|--------------------------------------------------------------------------------------------------|
 | `enabled`           | boolean             | true      | Whether the tooltip component is active and displayed.                                           |
-| `content`           | string/function     | ''        | The tooltip text to display, or a function returning the text (for dynamic tooltips).                                   |
+| `content`           | string/function     | ''        | The tooltip text to display, or a function returning the text (for dynamic tooltips). The function will have the component itself as an argument, and use `this` to access the attached object.  |
 | `origin`            | string              | 'middle'  | The origin point for the tooltip display. Valid values: `left`,   `middle`, `bottom-right`, `bottom`, `this`, `store`. If the tooltip has crate enabled, all values other than `left` do the same thing. |
 | `crate`             | boolean             | false     | If true, tooltip is fixed on the object; if false, follows the mouse.                            |
 | `alwaysInteractable`| boolean             | false     | If true, tooltip is interactable even if another object is above it.                             |

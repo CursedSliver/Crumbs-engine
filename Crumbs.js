@@ -1388,7 +1388,7 @@ const Crumbs_Init_On_Load = function() {
 		enabled: true,
 		content: '', //string or function
 		origin: 'middle',
-		crate: false, //to fix on object or mouse, object if true
+		crate: false,
 		alwaysInteractable: false,
 		hideOnClick: false,
 		boundingType: Crumbs.colliderTypes.rect
@@ -1452,7 +1452,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 		const dynamic = (typeof this.content === 'function');
 		if (dynamic) { 
-			Crumbs.dynamicTooltipFunction = this.content;
+			Crumbs.dynamicTooltipFunction = function(c) { return function() { return c.content.call(m, c); } }(this);
 			Game.tooltip.dynamic = 1;
 		}
 		Game.tooltip.draw(Crumbs.tooltipRegister, dynamic?Crumbs.dynamicTooltipFunction:this.content, this.origin);
