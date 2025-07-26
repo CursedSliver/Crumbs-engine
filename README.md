@@ -183,7 +183,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `onMouseover`       | function | empty     | Function called when the mouse enters the object's area.                    |
 | `onMouseout`        | function | empty     | Function called when the mouse leaves the object's area.                    |
 | `alwaysInteractable`| boolean  | false     | If true, the object is interactable even if another object with a pointerInteractive component is drawn above it. |
-| `boundingType`      | string   | 'rect'    | The shape used for hit detection.                  |
+| `boundingType`      | string   | 'rect' or <br>Crumbs.colliderType    | The shape used for hit detection.                  |
 
 ### Custom bounding boxes
 - You can create your own bounding boxes with `new Crumbs.colliderType(func)`. Pass in a function that determines whether or not a given position is in the box.
@@ -270,6 +270,20 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `initialAlpha`  | number/null | null | Starting opacity for the fade. If null, uses the object's base opacity.                          |
 | `finalAlpha`    | number/null | null | Ending opacity for the fade. If null, defaults to 0 (fully transparent).                         |
 | `cutOff`        | boolean  | false   | If true, will no longer draw the section before the gradient begins (will not affect the gradient itself)                 |
+
+### `Crumbs.component.tooltip`
+- Makes the object display a tooltip when it is hovered over.
+#### `tooltip` Component Properties
+
+| Property            | Type                | Default   | Description                                                                                      |
+|---------------------|---------------------|-----------|--------------------------------------------------------------------------------------------------|
+| `enabled`           | boolean             | true      | Whether the tooltip component is active and displayed.                                           |
+| `content`           | string/function     | ''        | The tooltip text to display, or a function returning the text (for dynamic tooltips).                                   |
+| `origin`            | string              | 'middle'  | The origin point for the tooltip display. Valid values: `left`,   `middle`, `bottom-right`, `bottom`, `this`, `store`. If the tooltip has crate enabled, all values other than `left` do the same thing. |
+| `crate`             | boolean             | false     | If true, tooltip is fixed on the object; if false, follows the mouse.                            |
+| `alwaysInteractable`| boolean             | false     | If true, tooltip is interactable even if another object is above it.                             |
+| `hideOnClick`       | boolean             | false     | If true, hides the tooltip when the left mouse button is held down.                                           |
+| `boundingType`      | string or <br>Crumbs.colliderType | 'rect'     | The collider type used for hit detection (default is rectangle).                                 |
 
 ---
 

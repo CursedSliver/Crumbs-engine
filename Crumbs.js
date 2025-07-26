@@ -99,146 +99,6 @@ const Crumbs_Init_On_Load = function() {
   			return originalRestore.call(ctx);
 		};
 	}
-	Crumbs.h.blend = function(type, data1, data2) {
-		if (data1.width != data2.width || data1.height != data2.height) { throw 'Width and height not matching!'; }
-		let newData = new ImageData(new Uint8ClampedArray(data1.data.length), data1.width, data1.height);
-		let d1 = data1.data;
-		let d2 = data2.data;
-		if (type == 'additive') {
-			for (let i = 0; i < d1.length; i++) {
-				newData.data[i] = d1[i] + d2[i];
-			}
-			return newData;
-		}
-		throw 'Type '+type+'does not match any valid type!';
-	}
-	Crumbs.h.gaussian = function(arr, factor, abyss) {
-		if (!Array.isArray(arr)) { throw 'Argument "arr" is not an array!'; }
-		if (typeof factor !== 'number') { throw 'Argument "factor" should be a number, when it is in fact '+(typeof factor)+'!'; }
-		return Crumbs.h.matrixApply(arr, Crumbs.h.gaussianMatrix(factor), Math.floor(factor * 3) - 1, abyss);
-	}
-	Crumbs.h.gaussianMatrix = function(factor) {
-		//precompute matrix
-		let m = [];
-		for (let i = 0; i < factor * 3; i++) {
-			m.push(Math.exp(-(i ** 2) / (2 * factor)) / Math.sqrt(2 * Math.PI * factor));
-		}
-		for (let i = 1; i < m.length; i += 2) { 
-			m.unshift(m[i]);
-		}
-		return m;
-	}
-	Crumbs.h.matrixApply = function(arr, m, center, abyss) {
-		let arr2 = [];
-		for (let i = 0; i < arr.length; i++) {
-			let val = 0;
-			for (let ii = center + 1; ii < m.length; ii++) {
-				const a = i + ii - center;
-				if (a < arr.length) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
-			}
-			for (let ii = center; ii >= 0; ii--) {
-				const a = i + ii - center;
-				if (a >= 0) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
-			}
-			arr2.push(val);
-		}
-		return arr2;
-	}
-	Crumbs.h.matrixApplyUint8 = function(arr, m, center, abyss) {
-		let arr2 = new Uint8ClampedArray(arr.length);
-		for (let i = 0; i < arr.length; i++) {
-			let val = 0;
-			for (let ii = center + 1; ii < m.length; ii++) {
-				const a = i + ii - center;
-				if (a < arr.length) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
-			}
-			for (let ii = center; ii >= 0; ii--) {
-				const a = i + ii - center;
-				if (a >= 0) { val += arr[a] * m[ii]; } else { val += abyss * m[ii]; }
-			}
-			arr2[i] = val;
-		}
-		return arr2;
-	}
-	Crumbs.h.gaussianBlur = function(Uint8, width, length, factor, abyss) {
-		const m = Crumbs.h.gaussianMatrix(factor);
-		const c = Math.floor(factor * 3 - 1);
-
-		let a = [];
-		for (let i = 0; i < length; i++) {
-			a.push(new Uint8ClampedArray(width));
-		}
-		for (let i = 0; i < length; i++) {
-			for (let ii = 0; ii < width; ii++) {
-				a[i][ii] = Uint8[i * width + ii];
-			}
-		}
-		for (let i = 0; i < length; i++) {
-			a[i] = Crumbs.h.matrixApplyUint8(a[i], m, c, abyss);
-		}
-		Uint8 = new Uint8ClampedArray(Uint8.length);
-		for (let i = 0; i < length; i++) {
-			for (let ii = 0; ii < width; ii++) {
-				Uint8[i * width + ii] = a[i][ii];
-			}
-		}
-
-		a = [];
-		for (let i = 0; i < width; i++) {
-			a.push(new Uint8ClampedArray(length));
-		}
-		for (let i = 0; i < width; i++) {
-			for (let ii = 0; ii < length; ii++) {
-				a[i][ii] = Uint8[i * length + ii];
-			}
-		}
-		for (let i = 0; i < width; i++) {
-			a[i] = Crumbs.h.matrixApplyUint8(a[i], m, c, abyss);
-		}
-		let toReturn = new Uint8ClampedArray(Uint8.length);
-		for (let i = 0; i < width; i++) {
-			for (let ii = 0; ii < length; ii++) {
-				toReturn[i * length + ii] = a[i][ii];
-			}
-		}
-		return toReturn;
-	}
-	Crumbs.h.gaussianBlurColor = function(imageData, factor, abyss) {
-		const data = imageData.data;
-		let r = new Uint8ClampedArray(data.length / 4), g = new Uint8ClampedArray(data.length / 4), b = new Uint8ClampedArray(data.length / 4), a = new Uint8ClampedArray(data.length / 4);
-		const w = imageData.width;
-		const h = imageData.height
-		for (let i = 0; i < imageData.length / 4; i++) {
-			const p = i * 4;
-			r[i] = data[p];
-			g[i] = data[p + 1];
-			b[i] = data[p + 2];
-			a[i] = data[p + 3];
-		}
-		r = Crumbs.h.gaussianBlur(r, w, h, factor, abyss);
-		g = Crumbs.h.gaussianBlur(g, w, h, factor, abyss);
-		b = Crumbs.h.gaussianBlur(b, w, h, factor, abyss);
-		a = Crumbs.h.gaussianBlur(a, w, h, factor, abyss);
-		let newData = new Uint8ClampedArray(data.length);
-		for (let i = 0; i < r.length; i++) {
-			const p = i * 4;
-			newData[p] = r[i];
-			newData[p + 1] = g[i];
-			newData[p + 2] = b[i];
-			newData[p + 3] = a[i];
-		}
-		imageData.data = newData;
-		return imageData;
-	}
-	Crumbs.h.grayscaleMap = function(imageData) {
-		const data = imageData.data;
-		let newData = new Uint8ClampedArray(data.length / 4);
-		for (let i = 0; i < data.length / 4; i++) {
-			const p = i * 4;
-			newData[i] = 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
-		}
-		return newData;
-	}
 	Crumbs.h.fillPattern = function(ctx, img, w, h, dx, dy, dw, dh, sx, sy, sw, sh, offx, offy) {
 		if (img.alt != 'blank') {
 			[dx, dy, dw, dh, sx, sy, sw, sh, offx, offy] = [dx||0, dy||0, dw||img.width, dh||img.height, sx||0, sy||0, sw||img.width, sh||img.height, offx||0, offy||0];
@@ -379,6 +239,8 @@ const Crumbs_Init_On_Load = function() {
 
 		this.redrawPerFrame = true;
 
+		this.boundingClientRect = this.l.getBoundingClientRect();
+
 		this.mouseX = 0;
 		this.mouseY = 0;
 
@@ -395,8 +257,9 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.canvas.prototype.setSelf = function() {
 		this.l.width = this.l.parentNode.offsetWidth;
 		this.l.height = this.l.parentNode.offsetHeight;
-		this.mouseX = Game.mouseX - this.l.getBoundingClientRect().left;
-		this.mouseY = Game.mouseY - this.l.getBoundingClientRect().top + (App?0:32);
+		this.boundingClientRect = this.l.getBoundingClientRect();
+		this.mouseX = Game.mouseX - this.boundingClientRect.left;
+		this.mouseY = Game.mouseY - this.boundingClientRect.top + (App?0:32);
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {
@@ -687,11 +550,21 @@ const Crumbs_Init_On_Load = function() {
 			}
 		} }
 		if (comp.init) { comp.init(this); }
+		for (let i in this.components) {
+			if (this.components[i].onComponentsChange) {
+				this.components[i].onComponentsChange(this);
+			}
+		}
 		this.components.push(comp);
 	};
 	Crumbs.object.prototype.removeComponent = function(type) {
 		for (let i in this.components) {
 			if (this.components[i] instanceof Crumbs.component[type]) {
+				for (let ii in this.components) {
+					if (this.components[ii].onComponentsChange) {
+						this.components[ii].onComponentsChange(this);
+					}
+				}
 				return this.components.splice(i, 1);
 			}
 		}
@@ -1371,51 +1244,6 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 
-	Crumbs.component.bloom = function(obj) {
-		obj = obj||{};
-		for (let i in Crumbs.defaultComp.bloom) {
-			this[i] = Crumbs.defaultComp.bloom[i];
-		}
-		for (let i in obj) {
-			this[i] = obj[i];
-		}
-
-		this.data = null;
-		this.lastUpdate = 0;
-	}
-	Crumbs.defaultComp.bloom = {
-		enabled: true,
-		threshold: 128, //minimum brightness to pass filter
-		factor: 5, //gaussian blur factor
-		updateRate: 0 //minimum amount of ticks to wait before each update
-	}
-	Crumbs.component.bloom.prototype.enable = function() { this.enabled = true; } 
-	Crumbs.component.bloom.prototype.disable = function() { this.enabled = false; }
-	Crumbs.component.bloom.prototype.update = function(m) {
-		let c = document.createElement('canvas');
-		c.width = m.scope.c.canvas.width;
-		c.height = m.scope.c.canvas.height;
-		let ctx = c.getContext('2d');
-		let data = ctx.getImageData(0, 0, c.width, c.height);
-		const passed = Crumbs.h.grayscaleMap(data);
-		for (let i = 0; i < passed.length; i++) {
-			if (passed[i] < this.threshold) {
-				const p = i * 4;
-				data.data[p] = 0;
-				data.data[p + 1] = 0;
-				data.data[p + 2] = 0;
-				data.data[p + 3] = 0;
-			}
-		}
-		data = Crumbs.h.gaussianBlurColor(data, this.factor, 0);
-		this.data = data;
-	};
-	Crumbs.component.bloom.prototype.logic = function(m) { };
-	Crumbs.component.bloom.prototype.preDraw = function(m) { if (Crumbs.t - this.lastUpdate > this.updateRate) { this.update(m); } };
-	Crumbs.component.bloom.prototype.postDraw = function(m, ctx) {
-		ctx.putImageData(Crumbs.h.blend('additive', ctx.getImageData(0, 0, m.scope.c.canvas.width, m.scope.c.canvas.height), this.data), 0, 0);
-	};
-
 	Crumbs.component.linearFade = function(obj) {
 		obj = obj||{};
 		for (let i in Crumbs.defaultComp.linearFade) {
@@ -1468,6 +1296,8 @@ const Crumbs_Init_On_Load = function() {
 		const dx = pWidth;
 		const dyM = m.scaleY * m.scaleFactorY;
 		const pic = Pic(m.imgs[m.imgUsing]);
+		const width = m.width ?? pic.width;
+		const height = m.height ?? pic.height;
 		if (this.progress + this.distance / 2 / pic.height <= 0) { return; }
 		const initOffset = (this.progress * pic.height - this.distance / 2) * dyM;
 		const initOffsetPure = this.progress * pic.height - this.distance / 2;
@@ -1478,20 +1308,20 @@ const Crumbs_Init_On_Load = function() {
 		const alphaStep = (this.flip?-1:1) * ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
 
 		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
-		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, 0, 0, pic.width, initOffsetPure, ox, oy, dx, initOffset); }
+		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, m.sx, m.sy, width, initOffsetPure, ox, oy, dx, initOffset); }
 		if (this.progress - this.distance / 2 / pic.height > 1) { return; }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffset + i * sliceWidth > pHeight) { return; }
-			ctx.drawImage(pic, 0, initOffsetPure + i * sliceWidth / dyM, pic.width, sliceWidth, ox, oy + initOffset + i * sliceWidth, dx, sliceWidth);
+			ctx.drawImage(pic, 0, initOffsetPure + i * sliceWidth / dyM, width, sliceWidth, ox, oy + initOffset + i * sliceWidth, dx, sliceWidth);
 		}
 		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
 		if (initOffset + slicesTotal * sliceWidth > pHeight || !ctx.globalAlpha || (this.cutOff && this.flip)) { return; }
 		ctx.drawImage(pic, 
 			0, 
 			initOffset + slicesTotal * sliceWidth, 
-			pic.width, 
-			pic.height - slicesTotal * sliceWidth - initOffset, 
+			width, 
+			height - slicesTotal * sliceWidth - initOffset, 
 			ox, 
 			oy + initOffset + slicesTotal * sliceWidth,
 			dx,
@@ -1502,6 +1332,8 @@ const Crumbs_Init_On_Load = function() {
 		const dxM = m.scaleX * m.scaleFactorX;
 		const dy = pHeight;
 		const pic = Pic(m.imgs[m.imgUsing]);
+		const width = m.width ?? pic.width;
+		const height = m.height ?? pic.height;
 		if (this.progress + this.distance / 2 / pic.width <= 0) { return; }
 		const initOffset = (this.progress * pic.width - this.distance / 2) * dxM;
 		const initOffsetPure = this.progress * pic.width - this.distance / 2;
@@ -1512,20 +1344,20 @@ const Crumbs_Init_On_Load = function() {
 		const alphaStep = (this.flip?-1:1) * ((this.initialAlpha ?? m.alpha) - (this.finalAlpha ?? 0)) / slicesTotal;
 
 		ctx.globalAlpha = this.flip?(this.finalAlpha ?? 0):(this.initialAlpha ?? m.alpha);
-		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, 0, 0, initOffsetPure / dxM, pic.height, ox, oy, initOffset, dy); }
+		if (initOffset >= 0 && (!this.cutOff && !this.flip)) { ctx.drawImage(pic, 0, 0, initOffsetPure / dxM, height, ox, oy, initOffset, dy); }
 		if (this.progress - this.distance / 2 / pic.width > 1) { return; }
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffsetPure + i * sliceWidth > pWidth) { return; }
-			ctx.drawImage(pic, initOffsetPure + i * sliceWidth / dxM, 0, sliceWidth / dxM, pic.height, ox + initOffsetPure + i * sliceWidth, oy, sliceWidth, dy);
+			ctx.drawImage(pic, initOffsetPure + i * sliceWidth / dxM, 0, sliceWidth / dxM, height, ox + initOffsetPure + i * sliceWidth, oy, sliceWidth, dy);
 		}
 		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
 		if (initOffset + slicesTotal * sliceWidth > pWidth || !ctx.globalAlpha || (this.cutOff && this.flip)) { return; }
 		ctx.drawImage(pic, 
 			initOffset + slicesTotal * sliceWidth, 
 			0,
-			pic.width - slicesTotal * sliceWidth - initOffset, 
-			pic.height, 
+			width - slicesTotal * sliceWidth - initOffset, 
+			height, 
 			ox + initOffset + slicesTotal * sliceWidth, 
 			oy,
 			(pHeight - slicesTotal * sliceWidth - initOffset) * dxM,
@@ -1534,6 +1366,136 @@ const Crumbs_Init_On_Load = function() {
 	}
 	//testing code
 	//const what = Crumbs.spawn({ imgs: 'wrinkler.png', x: 100, y: 100, scope: 'left', anchor: 'top', components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' }), new Crumbs.component.linearFade({ progress: 0.5, distance: 40, sliceWidth: 1 })] }); what.scaleX = 1; what.scaleY = 1;
+
+	Crumbs.component.tooltip = function(obj) {
+		obj = obj||{};
+		for (let i in Crumbs.defaultComp.tooltip) {
+			this[i] = Crumbs.defaultComp.tooltip[i];
+		}
+		for (let i in obj) {
+			this[i] = obj[i];
+		}
+
+		if (Crumbs.colliderTypes[this.boundingType]) { 
+			this.boundingType = Crumbs.colliderTypes[this.boundingType];
+		}
+
+		this.pointerInteractiveCache = null;
+		this.hovered = false;
+		this.click = false;
+	}
+	Crumbs.defaultComp.tooltip = {
+		enabled: true,
+		content: '', //string or function
+		origin: 'middle',
+		crate: false, //to fix on object or mouse, object if true
+		alwaysInteractable: false,
+		hideOnClick: false,
+		boundingType: Crumbs.colliderTypes.rect
+	}
+	Crumbs.component.tooltip.prototype.enable = function() {
+		this.enabled = true;
+	}
+	Crumbs.component.tooltip.prototype.disable = function() {
+		this.enabled = false;
+	}
+	Crumbs.component.tooltip.prototype.onComponentsChange = function(m) {
+		this.pointerInteractiveCache = m.getComponent('pointerInteractive');
+	}
+	Crumbs.component.tooltip.prototype.init = function(m) {
+		this.onComponentsChange(m);
+	}
+	Crumbs.component.tooltip.prototype.logic = function(m) {
+		let b = false;
+		if (this.pointerInteractiveCache && this.pointerInteractiveCache.boundingType == this.boundingType) {
+			b = this.pointerInteractiveCache.hovered;
+		} else {
+			const pWidth = Crumbs.getPWidth(m);
+			const pHeight = Crumbs.getPHeight(m);
+			b = this.getHoverStatus(m, pWidth, pHeight);
+			if (b && !this.alwaysInteractable) {
+				const scope = m.scope.sortedObjects;
+				for (let i = scope.indexOf(m) + 1; i < scope.length; i++) {
+					const o = scope[i];
+					if (!o) { continue; }
+					const comp = o.getComponent('tooltip') || o.getComponent('pointerInteractive');
+					if (!comp) { continue; }
+					if (!comp.getHoverStatus(o, Crumbs.getPWidth(o), Crumbs.getPHeight(o))) { continue; }
+					b = false;
+					break;
+				}
+			}
+		}
+		if (b && !this.hovered) { this.hovered = true; this.triggerTooltip(m, Crumbs.getPWidth(m), Crumbs.getPHeight(m)); }
+		else if (!b && this.hovered) { this.hovered = false; this.hideTooltip(); }
+		if (this.hideOnClick && this.hovered) { 
+			if (!this.click && Crumbs.pointerHold) { this.click = true; this.hideTooltip(); }
+			if (this.click && !Crumbs.pointerHold) { this.click = false; this.triggerTooltip(); }
+		}
+	}
+	Crumbs.component.tooltip.prototype.getHoverStatus = function(m, pWidth, pHeight) {
+		return this.boundingType.checkFunc(m.scope, m, pWidth, pHeight);
+	}
+	Crumbs.component.tooltip.prototype.triggerTooltip = function(m, pWidth, pHeight) {
+		if (Crumbs.pointerHold && this.hideOnClick) { return; }
+
+		Game.tooltip.shouldHide = 0;
+		Crumbs.tooltipRegister.style.display = '';
+		if (this.crate) { 
+			Crumbs.tooltipRegister.style.width = pWidth + 'px';
+			Crumbs.tooltipRegister.style.height = pHeight + 'px';
+			Game.setOnCrate(Crumbs.tooltipRegister); 
+			Crumbs.onCrate = m;
+		} else {
+			Crumbs.tooltipRegister.style.width = '';
+			Crumbs.tooltipRegister.style.height = '';
+		}
+		const dynamic = (typeof this.content === 'function');
+		if (dynamic) { 
+			Crumbs.dynamicTooltipFunction = this.content;
+			Game.tooltip.dynamic = 1;
+		}
+		Game.tooltip.draw(Crumbs.tooltipRegister, dynamic?Crumbs.dynamicTooltipFunction:this.content, this.origin);
+		Game.tooltip.wobble();
+	}
+	const follower = document.createElement('div');
+	Crumbs.h.injectCSS('#tooltipRegister { display: block; position: fixed; pointer-events: none; z-index: 2147483647; left: 0px; top: 0px; width: 1000px; height: 1000px; border-radius: 500px; }')
+	follower.id = 'tooltipRegister';
+	follower.style.display = 'none';
+	document.body.appendChild(follower);
+	Crumbs.onCrate = null;
+	Crumbs.tooltipRegister = follower;
+	AddEvent(document, 'mousemove', function(e) {
+		if (Game.onCrate || Crumbs.onCrate) { return; } 
+
+		Crumbs.tooltipRegister.style.left = (e.clientX - 8) + 'px';
+		Crumbs.tooltipRegister.style.top = (e.clientY - 8) + 'px';		
+	});
+	Game.registerHook('draw', function() {
+		if (Game.onCrate && Crumbs.onCrate) {
+			Crumbs.tooltipRegister.style.left = (Crumbs.onCrate.getTrueX() - Crumbs.getOffsetX(Crumbs.onCrate.anchor, Crumbs.getPWidth(Crumbs.onCrate)) + Crumbs.onCrate.scope.boundingClientRect.left) + 'px';
+			Crumbs.tooltipRegister.style.top = (Crumbs.onCrate.getTrueY() - Crumbs.getOffsetY(Crumbs.onCrate.anchor, Crumbs.getPHeight(Crumbs.onCrate)) + Crumbs.onCrate.scope.boundingClientRect.top) + 'px';
+		}
+	})
+	Crumbs.component.tooltip.prototype.hideTooltip = function() {
+		Game.tooltip.shouldHide = 1;
+		if (this.crate) {
+			Game.setOnCrate(0);
+			Crumbs.onCrate = null;
+		}
+		Crumbs.tooltipRegister.style.display = 'none';
+		Game.tooltip.dynamic = 0;
+		Game.tooltip.update();
+	}
+	Crumbs.dynamicTooltipFunction = function() {
+
+	}
+	Crumbs.component.tooltip.prototype.preDraw = function() {
+
+	}
+	Crumbs.component.tooltip.prototype.postDraw = function() {
+
+	}
 	
 	Crumbs.shader = {};
 	Crumbs.shaderDefaults = {};
