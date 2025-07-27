@@ -120,7 +120,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
 | `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
 | `Crumbs.forceDrawObject(o, ctx)` | Forcibly draws the object `o` on that context, ignoring `components`, `noDraw`, and `children`. |
-| `Crumbs.manipLoadedImg(old, newPropertyName, width, height, filters, drawCallback)` | Creates a new copy of an existing loaded image at `Game.Loader.assets[newPropertyName]` with new width and height (scaling), optional css filters, and an optional callback that overrides the drawing step. Set `old` and `newPropertyName` to be the same to enable direct application. |
+| `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` | Creates a new copy of an image at `Game.Loader.assets[newPropertyName]` with new width and height (scaling), optional css filters, and an optional callback that overrides the drawing step. Set `old` and `newPropertyName` to be the same to enable direct application. |
 
 ---
 
@@ -235,7 +235,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 |---------------------------|-----------|-----------|-----------------------------------------------------------------------------------------------|
 | `enabled`  | boolean | true    | Whether the setting changes are active.                                                          |
 | `globalCompositeOperation`| string    | 'source-over' | Sets how new drawings are composited onto the existing canvas. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation) for options. |
-| `filter` | string   | ''      | Adds filters to the draw. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter) for options. Will lag, ues in moderation. Not available in all browsers. |
+| `filter` | string   | ''      | Adds filters to the draw. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter) for options. Will lag, ues in moderation. Not available in all browsers. If the shader parameters do not need to be changed often during runtime, consider using `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` instead. |
 | `imageSmoothingEnabled`   | boolean   | true      | Enables or disables image smoothing when scaling images.                                       |
 | `imageSmoothingQuality`   | string    | 'low'     | Sets the quality of image smoothing. Possible values: 'low', 'medium', 'high'.                |
 

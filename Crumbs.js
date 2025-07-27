@@ -177,6 +177,10 @@ const Crumbs_Init_On_Load = function() {
             if (this.doneLoading == 0 && this.loadingN <= 0 && this.loaded != 0) {
                 this.doneLoading=1;
                 this.loaded();
+				if (Crumbs.imagesToManip[e.target.alt]) {
+					Crumbs.manipLoadedImg(e.target.alt, ...Crumbs.imagesToManip[e.target.alt]);
+					delete Crumbs.imagesToManip[e.target.alt];
+				}
             }
         }
         this.waitForLoad=function(assets,callback)
@@ -202,6 +206,12 @@ const Crumbs_Init_On_Load = function() {
         return Game.Loader.assetsLoaded.has(what) ? Game.Loader.assets[what] : (what && !Game.Loader.assetsLoading.has(what) && Game.Loader.Load([what]), Game.Loader.blank);
     }
 
+	Crumbs.imagesToManip = {};
+	Crumbs.manipImage = function(old, newPropertyName, width, height, filters, drawCallback) {
+		if (Game.Loader.assetsLoaded.has(old)) { Crumbs.manipLoadedImg(old, newPropertyName, width, height, filters, drawCallback); return; }
+
+		Crumbs.imagesToManip[old] = [newPropertyName, width, height, filters, drawCallback];
+	}
 	Crumbs.manipLoadedImg = function(old, newPropertyName, width, height, filters, drawCallback) {
 		//basically allows easily applying filters to a loaded image to avoid redrawing with shaders 
 		if (!Game.Loader.assetsLoaded.has(old)) { console.warn('"' + old + '" is not a loaded image!'); return; }
