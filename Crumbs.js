@@ -202,6 +202,23 @@ const Crumbs_Init_On_Load = function() {
         return Game.Loader.assetsLoaded.has(what) ? Game.Loader.assets[what] : (what && !Game.Loader.assetsLoading.has(what) && Game.Loader.Load([what]), Game.Loader.blank);
     }
 
+	Crumbs.manipLoadedImg = function(old, newPropertyName, width, height, filters, drawCallback) {
+		//basically allows easily applying filters to a loaded image to avoid redrawing with shaders 
+		if (!Game.Loader.assetsLoaded.has(old)) { console.warn('"' + old + '" is not a loaded image!'); return; }
+
+		const c = document.createElement('canvas');
+		c.width = width;
+		c.height = height; 
+		const ctx = c.getContext('2d');
+		ctx.filter = filters || '';
+		if (drawCallback) {
+			drawCallback(ctx, Game.Loader.assets[old]);
+		} else {
+			ctx.drawImage(Game.Loader.assets[old], 0, 0, width, height);
+		}
+		Game.Loader.assets[newPropertyName] = c;
+	}
+
 
 	Crumbs.t = 0; //saved
 	Game.registerHook('logic', function() { Crumbs.t++; });
@@ -305,6 +322,7 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.settings = {
 		globalCompositeOperation: 'source-over',
+		filter: '',
 		imageSmoothingEnabled: true,
 		imageSmoothingQuality: 'low'
 	};
@@ -965,7 +983,7 @@ const Crumbs_Init_On_Load = function() {
 		obj = obj||{};
 		const def = Crumbs.defaultComp.settings;
 		this.enabled = obj.enabled||def.enabled;
-		const globals = ['globalCompositeOperation', 'imageSmoothingEnabled', 'imageSmoothingQuality'];
+		const globals = ['globalCompositeOperation', 'filter', 'imageSmoothingEnabled', 'imageSmoothingQuality'];
 		for (let i in obj) {
 			if (!globals.includes(i)) { throw '"'+i+'" is not a valid setting for a settings component!'; }
 		} 
@@ -1873,15 +1891,14 @@ const Crumbs_Init_On_Load = function() {
 		let ctx = Crumbs.scopedCanvas[c].c;
 		ctx.globalAlpha = 1;
 		ctx.clearRect(0, 0, Crumbs.scopedCanvas[c].l.width, Crumbs.scopedCanvas[c].l.height); 
-		const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
+		const settingObj = {globalCompositeOperation: ctx.globalCompositeOperation, filter: ctx.filter, imageSmoothingEnabled: ctx.imageSmoothingEnabled, imageSmoothingQuality: ctx.imageSmoothingQuality};
 		for (let i in Crumbs.settings) {
 			ctx[i] = Crumbs.settings[i];
 		}
 		for (let i = 0; i < list.length; i++) {
 			if (list[i].parent) { continue; }
-			let o = list[i];
-			if (!o.enabled) { continue; }
-			Crumbs.iterateObject(o, ctx);
+			if (!list[i].enabled) { continue; }
+			Crumbs.iterateObject(list[i], ctx);
 		}
 		for (let i in Crumbs.particles[c]) {
 			const p = Crumbs.particles[c][i];
