@@ -120,7 +120,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
 | `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
 | `Crumbs.forceDrawObject(o, ctx)` | Forcibly draws the object `o` on that context, ignoring `components`, `noDraw`, and `children`. |
-| `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` | Creates a new copy of an image at `Game.Loader.assets[newPropertyName]` with new width and height (scaling), optional css filters, and an optional callback that overrides the drawing step. Set `old` and `newPropertyName` to be the same to enable direct application. |
+| `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` | Creates a new copy of an image at `Game.Loader.assets[newPropertyName]` with new width and height (scaling), optional css filters, and an optional callback with arguments `ctx` and `Game.Loader.assets[old]` that overrides the drawing step. Set `old` and `newPropertyName` to be the same to enable direct application. |
 
 ---
 
