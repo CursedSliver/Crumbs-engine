@@ -1,6 +1,6 @@
 if (typeof Crumbs !== 'object') { var Crumbs = {}; }
 
-let CrumbsEngineLoaded = false;
+var CrumbsEngineLoaded = false;
 if (typeof crumbs_load_local === 'undefined') { var crumbs_load_local = false; }
 const Crumbs_Init_On_Load = function() {
 	if (l('topbarFrenzy')) { return; }
@@ -71,7 +71,9 @@ const Crumbs_Init_On_Load = function() {
 			AddEvent(bigCookie,'click',Game.ClickCookie);
 			AddEvent(bigCookie,'mousedown',function(event){ Game.BigCookieState=1; if (Game.prefs.cookiesound) {Game.playCookieClickSound();}if (event) event.preventDefault();});
 			AddEvent(bigCookie,'mouseup',function(event){ Game.BigCookieState=2; if (event) event.preventDefault();});
+			// @ts-ignore
 			AddEvent(bigCookie,'mouseout',function(event){ Game.BigCookieState=0; });
+			// @ts-ignore
 			AddEvent(bigCookie,'mouseover',function(event){ Game.BigCookieState=2; });
 		}
 	}
@@ -124,8 +126,9 @@ const Crumbs_Init_On_Load = function() {
   		return [cx + xUnrot * cosR - yUnrot * sinR, cy + xUnrot * sinR + yUnrot * cosR];
 	}
 
+	// @ts-ignore
 	Loader = function() {
-        this.loadingN=0;
+        this.loadingN=0; 
         this.assetsN=0;
         this.assets = { };
         this.assetsLoading = new Set();
@@ -137,8 +140,10 @@ const Crumbs_Init_On_Load = function() {
         this.blank = document.createElement('canvas');
         this.blank.width = 8;
         this.blank.height = 8;
+        // @ts-ignore
         this.blank.alt = 'blank';
 
+		// @ts-ignore
 		this[undefined] = this.blank;
 
         this.Load=function(assets) {
@@ -166,10 +171,15 @@ const Crumbs_Init_On_Load = function() {
             if (newer.indexOf('/') != -1) img.src = newer;
             else img.src = this.domain + newer;
             img.alt = newer;
+			// @ts-ignore
             img.onload = bind(this, this.onLoad);
             this.assets[old] = img;
         }
         this.onLoadReplace = function() { }
+		/**
+		 * @param {*} e 
+		 * @this any
+		 */
         this.onLoad = function(e) {
             this.assetsLoaded.add(e.target.alt);
             this.assetsLoading.delete(e.target.alt);
@@ -177,11 +187,11 @@ const Crumbs_Init_On_Load = function() {
             if (this.doneLoading == 0 && this.loadingN <= 0 && this.loaded != 0) {
                 this.doneLoading=1;
                 this.loaded();
-				if (Crumbs.imagesToManip[e.target.alt]) {
-					Crumbs.manipLoadedImg(e.target.alt, ...Crumbs.imagesToManip[e.target.alt]);
-					delete Crumbs.imagesToManip[e.target.alt];
-				}
             }
+			if (Crumbs.imagesToManip[e.target.alt]) {
+				Crumbs.manipLoadedImg(e.target.alt, ...Crumbs.imagesToManip[e.target.alt]);
+				delete Crumbs.imagesToManip[e.target.alt];
+			}
         }
         this.waitForLoad=function(assets,callback)
         {
@@ -202,36 +212,44 @@ const Crumbs_Init_On_Load = function() {
         }
     }
 
+	// @ts-ignore
     Pic = function(what) {
+		// @ts-ignore
         return Game.Loader.assetsLoaded.has(what) ? Game.Loader.assets[what] : (what && !Game.Loader.assetsLoading.has(what) && Game.Loader.Load([what]), Game.Loader.blank);
     }
 
 	Crumbs.imagesToManip = {};
 	Crumbs.manipImage = function(old, newPropertyName, width, height, filters, drawCallback) {
+		// @ts-ignore
 		if (Game.Loader.assetsLoaded.has(old)) { Crumbs.manipLoadedImg(old, newPropertyName, width, height, filters, drawCallback); return; }
 
 		Crumbs.imagesToManip[old] = [newPropertyName, width, height, filters, drawCallback];
 	}
+
 	Crumbs.manipLoadedImg = function(old, newPropertyName, width, height, filters, drawCallback) {
 		//basically allows easily applying filters to a loaded image to avoid redrawing with shaders 
 		if (!Game.Loader.assetsLoaded.has(old)) { console.warn('"' + old + '" is not a loaded image!'); return; }
 
 		const c = document.createElement('canvas');
-		c.width = width;
-		c.height = height; 
+		c.width = width || Game.Loader.assets[old].width;
+		c.height = height || Game.Loader.assets[old].height; 
 		const ctx = c.getContext('2d');
 		ctx.filter = filters || '';
 		if (drawCallback) {
-			drawCallback(ctx, Game.Loader.assets[old]);
+			drawCallback(ctx, Game.Loader.assets[old], c);
 		} else {
 			ctx.drawImage(Game.Loader.assets[old], 0, 0, width, height);
 		}
 		Game.Loader.assets[newPropertyName] = c;
+		if (!Game.Loader.assetsLoaded.has(newPropertyName)) { Game.Loader.assetsLoaded.add(newPropertyName); }
 	}
 
 
 	Crumbs.t = 0; //saved
-	Game.registerHook('logic', function() { Crumbs.t++; });
+	Game.registerHook('logic', function() { 
+		const p = window.PForPause;
+		Crumbs.t += p?p.timeFactor:1; 
+	});
 
 	Crumbs.objects = {};
 	Crumbs.sortedObjectList = {};
@@ -323,6 +341,7 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.updateCanvas();
+	// @ts-ignore
 	window.addEventListener('resize',function(event) {
 		Crumbs.updateCanvas();
 	});
@@ -337,6 +356,7 @@ const Crumbs_Init_On_Load = function() {
 		imageSmoothingQuality: 'low'
 	};
 	Crumbs.unfocusedSpawn = true;
+	// @ts-ignore
 	Crumbs.object = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
 		if (typeof obj === 'undefined') { obj = {}; }
@@ -500,7 +520,9 @@ const Crumbs_Init_On_Load = function() {
 		if (!Array.isArray(this.behaviors) || !this.behaviors.length) { this.behaviors = [].concat(this.behaviors); }
 		for (let i in this.behaviors) {
 			if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
+			// @ts-ignore
 			else if (this.behaviors[i] instanceof Crumbs.behavior) { this.behaviors[i] = new Crumbs.behaviorInstance(this.behaviors[i]); }
+			// @ts-ignore
 			else if (typeof this.behaviors[i] === 'function') { this.behaviors[i] = new Crumbs.behaviorInstance(new Crumbs.behavior(this.behaviors[i])); }
 			else { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		}
@@ -616,9 +638,11 @@ const Crumbs_Init_On_Load = function() {
 		return result;
 	}
 	Crumbs.object.prototype.addBehavior = function(behavior) {
+		// @ts-ignore
 		if (behavior instanceof Crumbs.behavior) { behavior = new Crumbs.behaviorInstance(behavior); }
+		// @ts-ignore
 		else if (typeof behavior === 'function') { const b = new Crumbs.behavior(behavior); behavior = new Crumbs.behaviorInstance(b); }
-		else if (!behavior instanceof Crumbs.behaviorInstance) { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
+		else if (!(behavior instanceof Crumbs.behaviorInstance)) { throw 'Object behavior must be an instance of Crumbs.behavior, Crumbs.behaviorInstance, or is a function!'; }
 		this.behaviors.push(behavior);
 	};
 	Crumbs.object.prototype.reorder = function(at) {
@@ -723,10 +747,11 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.sleepDetectionBuffer = 1000 * (30 / Game.fps); //equal to 30 draw frames
 	
 	Crumbs.findObject = function(id, scope) {
+		if (typeof scope == 'string') { scope = Crumbs.scopedCanvas[scope]; }
 		if (scope) {
-			for (let i in Crumbs.objects[scope]) {
-				if (Crumbs.objects[scope][i] !== null && Crumbs.objects[scope][i].id == id) {
-					return Crumbs.objects[scope][i];
+			for (let i in scope.objects) {
+				if (scope.objects[i] !== null && scope.objects[i].id == id) {
+					return scope.objects[i];
 				}
 			}
 		} else {
@@ -800,8 +825,10 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.rect.prototype.disable = function() {
 		this.enabled = false;
 	};
+	// @ts-ignore
 	Crumbs.component.rect.prototype.logic = function(m) {
 	};
+	// @ts-ignore
 	Crumbs.component.rect.prototype.preDraw = function(m, ctx) {
 		ctx.fillStyle = this.color;
 		ctx.lineWidth = this.outline;
@@ -841,6 +868,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.path.prototype.logic = function() {
 		return {};
 	};
+	// @ts-ignore
 	Crumbs.component.path.prototype.preDraw = function(m, ctx) {
 		ctx.lineWidth = Crumbs.defaultPathConfigs.lineWidth;
 		ctx.strokeStyle = Crumbs.defaultPathConfigs.strokeStyle;
@@ -851,6 +879,7 @@ const Crumbs_Init_On_Load = function() {
 		ctx.setLineDash(Crumbs.defaultPathConfigs.lineDash);
 		return {};
 	};
+	// @ts-ignore
 	Crumbs.component.path.prototype.postDraw = function(m, ctx) {
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
@@ -1009,13 +1038,18 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.settings.prototype.disable = function() {
 		this.enabled = false;
 	};
+	// @ts-ignore
 	Crumbs.component.settings.prototype.logic = function(m) { };
+	// @ts-ignore
 	Crumbs.component.settings.prototype.preDraw = function(m, ctx) {
 		for (let i in this.obj) {
 			ctx[i] = this.obj[i];
 		}
 	};
-	Crumbs.component.settings.prototype.postDraw = function(m, ctx) { };
+	// @ts-ignore
+	Crumbs.component.settings.prototype.postDraw = function(m, ctx) { 
+		//if (this.obj.filter) { ctx.filter = 'none'; }
+	};
 
 	Crumbs.component.canvasManipulator = function(obj) {
 		//USE WITH CAUTION
@@ -1035,6 +1069,7 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.canvasManipulator.prototype.disable = function() {
 		this.enabled = false;
 	};
+	// @ts-ignore
 	Crumbs.component.canvasManipulator.prototype.logic = function(m) { };
 	Crumbs.component.canvasManipulator.prototype.preDraw = function(m, ctx) { 
 		if (this.before) { ctx.save(); Crumbs.setupContext(m, ctx); this.before(m, ctx); ctx.restore(); }
@@ -1071,7 +1106,9 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.disable = function() {
 		this.enabled = false;
 	};
+	// @ts-ignore
 	Crumbs.component.text.prototype.logic = function(m) { };
+	// @ts-ignore
 	Crumbs.component.text.prototype.preDraw = function(m, ctx) {
 		ctx.font = this.size+'px '+this.font;
 		ctx.textAlign = this.align;
@@ -1124,8 +1161,10 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.patternFill.prototype.disable = function() {
 		this.enabled = false;
 	};
+	// @ts-ignore
 	Crumbs.component.patternFill.prototype.logic = function(m) {
 	};
+	// @ts-ignore
 	Crumbs.component.patternFill.prototype.preDraw = function(m, ctx) {
 		this.noDrawStatus = m.noDraw;
 		m.noDraw = true;
@@ -1141,7 +1180,7 @@ const Crumbs_Init_On_Load = function() {
 		m.noDraw = this.noDrawStatus;
 	};
 
-	Crumbs.component.tCounter = function() {
+	Crumbs.component.tCounter = function(obj) {
 		obj = obj||{};
 		for (let i in Crumbs.defaultComp.tCounter) {
 			this[i] = Crumbs.defaultComp.tCounter[i];
@@ -1214,6 +1253,7 @@ const Crumbs_Init_On_Load = function() {
 			if (this.click && !Crumbs.pointerHold) { this.click = false; this.onRelease.call(m); }
 		}
 	};
+	// @ts-ignore
 	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
 	Crumbs.pointerHold = false;
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
@@ -1296,6 +1336,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.component.linearFade.prototype.enable = function() { this.enabled = true; } 
 	Crumbs.component.linearFade.prototype.disable = function() { this.enabled = false; }
+	// @ts-ignore
 	Crumbs.component.linearFade.prototype.logic = function(m) {
 
 	}
@@ -1326,9 +1367,9 @@ const Crumbs_Init_On_Load = function() {
 		const pic = Pic(m.imgs[m.imgUsing]);
 		const width = m.width ?? pic.width;
 		const height = m.height ?? pic.height;
-		if (this.progress + this.distance / 2 / pic.height <= 0) { return; }
-		const initOffset = (this.progress * pic.height - this.distance / 2) * dyM;
-		const initOffsetPure = this.progress * pic.height - this.distance / 2;
+		if (this.progress + this.distance / 2 / height <= 0) { return; }
+		const initOffset = (this.progress * height - this.distance / 2) * dyM;
+		const initOffsetPure = this.progress * height - this.distance / 2;
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
 		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
 		const sliceWidth = this.sliceWidth;
@@ -1341,13 +1382,13 @@ const Crumbs_Init_On_Load = function() {
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffset + i * sliceWidth > pHeight) { return; }
-			ctx.drawImage(pic, 0, initOffsetPure + i * sliceWidth / dyM, width, sliceWidth, ox, oy + initOffset + i * sliceWidth, dx, sliceWidth);
+			ctx.drawImage(pic, m.sx, (m.sy || 0) + initOffsetPure + i * sliceWidth / dyM, width, sliceWidth, ox, oy + initOffset + i * sliceWidth, dx, sliceWidth);
 		}
 		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
 		if (initOffset + slicesTotal * sliceWidth > pHeight || !ctx.globalAlpha || (this.cutOff && this.flip)) { return; }
 		ctx.drawImage(pic, 
-			0, 
-			initOffset + slicesTotal * sliceWidth, 
+			m.sx, 
+			(m.sy || 0) + initOffset + slicesTotal * sliceWidth, 
 			width, 
 			height - slicesTotal * sliceWidth - initOffset, 
 			ox, 
@@ -1362,9 +1403,9 @@ const Crumbs_Init_On_Load = function() {
 		const pic = Pic(m.imgs[m.imgUsing]);
 		const width = m.width ?? pic.width;
 		const height = m.height ?? pic.height;
-		if (this.progress + this.distance / 2 / pic.width <= 0) { return; }
-		const initOffset = (this.progress * pic.width - this.distance / 2) * dxM;
-		const initOffsetPure = this.progress * pic.width - this.distance / 2;
+		if (this.progress + this.distance / 2 / width <= 0) { return; }
+		const initOffset = (this.progress * width - this.distance / 2) * dxM;
+		const initOffsetPure = this.progress * width - this.distance / 2;
 		const ox = -Crumbs.getOffsetX(m.anchor, pWidth) + m.offsetX;
 		const oy = -Crumbs.getOffsetY(m.anchor, pHeight) + m.offsetY;
 		const sliceWidth = this.sliceWidth;
@@ -1377,13 +1418,13 @@ const Crumbs_Init_On_Load = function() {
 		for (let i = 0; i < slicesTotal; i++) {
 			ctx.globalAlpha -= alphaStep;
 			if (initOffsetPure + i * sliceWidth > pWidth) { return; }
-			ctx.drawImage(pic, initOffsetPure + i * sliceWidth / dxM, 0, sliceWidth / dxM, height, ox + initOffsetPure + i * sliceWidth, oy, sliceWidth, dy);
+			ctx.drawImage(pic, (m.sx || 0) + initOffsetPure + i * sliceWidth / dxM, m.sy, sliceWidth / dxM, height, ox + initOffsetPure + i * sliceWidth, oy, sliceWidth, dy);
 		}
 		ctx.globalAlpha = this.flip?(this.initalAlpha ?? m.alpha):(this.finalAlpha ?? 0);
 		if (initOffset + slicesTotal * sliceWidth > pWidth || !ctx.globalAlpha || (this.cutOff && this.flip)) { return; }
 		ctx.drawImage(pic, 
-			initOffset + slicesTotal * sliceWidth, 
-			0,
+			(m.sx || 0) + initOffset + slicesTotal * sliceWidth, 
+			m.sy,
 			width - slicesTotal * sliceWidth - initOffset, 
 			height, 
 			ox + initOffset + slicesTotal * sliceWidth, 
@@ -1545,6 +1586,7 @@ const Crumbs_Init_On_Load = function() {
 		return Crumbs.h.gaussianBlurColor(data, this.factor, 0);
 	}
 
+	// @ts-ignore
 	Crumbs.shader.allWhite = function(obj) {
 		for (let i in Crumbs.shaderDefaults.allWhite) {
 			this[i] = Crumbs.shaderDefaults.allWhite[i];
@@ -1566,6 +1608,7 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.preloadRequired = true;
 	}
 	
+	// @ts-ignore
 	Crumbs.particle = function(obj, x, y, r, a, scope) {
 		//a super-lightweight variant of Crumbs.object
 		//is always drawn on top of other objects and has no sense of order
@@ -1585,11 +1628,14 @@ const Crumbs_Init_On_Load = function() {
 		this.scope = Crumbs.particles[scope];
 		if (this.scope) { this.scope.push(this); } else { throw scope+' is not a valid particle scope!'; }
 
+		// @ts-ignore
 		if (this.init) { this.init.call(this); }
 	}
 	Crumbs.particleDefaults = {
 		width: 1,
 		height: 1,
+		sx: 0,
+		sy: 0,
 		//img: '',
 		life: 2 * Game.fps,
 		init: null,
@@ -1610,7 +1656,7 @@ const Crumbs_Init_On_Load = function() {
 		if (this.reusePool) { this.reusePool.push(this); }
 	}
 	Crumbs.particle.prototype.update = function() {
-		this.life--;
+		this.life -= window.PForPause?window.PForPause.timeFactor:1;
 		if (this.life <= 0) { this.die(); return; }
 		if (this.behavior) { 
 			this.behavior.call(this); 
@@ -1625,6 +1671,14 @@ const Crumbs_Init_On_Load = function() {
 		}
 	}
 	Game.registerHook('draw', Crumbs.updateParticles);
+	/**
+	 * @x {number}
+	 * @y {number}
+	 * @r {number}
+	 * @a {number}
+	 * @scope {string}
+	 * @this Crumbs.particle refers to the particle object being reused
+	 */
 	Crumbs.reuseParticle = function(x, y, r, a, scope) {
 		for (let i in this.obj) { this[i] = this.obj[i]; }
 		this.x = x;
@@ -1638,6 +1692,7 @@ const Crumbs_Init_On_Load = function() {
 		return this;
 	}
 	Crumbs.reusePools = [];
+	// @ts-ignore
 	Crumbs.newReusePool = function(str) {
 		let a = [];
 		Crumbs.reusePools.push(a);
@@ -1749,6 +1804,7 @@ const Crumbs_Init_On_Load = function() {
 	        return arr;
 	    }
 	    
+		// @ts-ignore
 		const middle = left + parseInt((right - left) / 2);
 	    
 	    Crumbs.mergeSort(arr, left, middle);
@@ -1772,7 +1828,8 @@ const Crumbs_Init_On_Load = function() {
 		return (o.height??Pic(o.imgs[o.imgUsing]).height) * o.scaleY * o.scaleFactorY; 
 	};
 
-	Crumbs.drawAnchorDisplay = function(o, ctx, p) {
+	// @ts-ignore
+	Crumbs.drawAnchorDisplay = function(o, ctx) {
 		ctx.save();
 		if (o.anchorDisplayColor) { ctx.fillStyle = o.anchorDisplayColor; } else if (o.parent) { ctx.fillStyle = '#57d2f2'; } else { ctx.fillstyle = '#ccfffb'; }
 		ctx.globalAlpha = 1;
@@ -1862,6 +1919,11 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.drawPure = function(o, ctx, callback) {
 		callback ?? callback.call(o, ctx);
+		const p = o.imgs.length?Pic(o.imgs[o.imgUsing]):null;
+		const ox = Crumbs.getOffsetX(o.anchor, Crumbs.getPWidth(o));
+		const oy = Crumbs.getOffsetY(o.anchor, Crumbs.getPHeight(o));
+		const pWidth = Crumbs.getPWidth(o); 
+		const pHeight = Crumbs.getPHeight(o);
 		ctx.drawImage(p, o.sx, o.sy, o.width ?? p.width, o.height ?? p.height, -ox + o.offsetX * o.scaleFactorX, -oy + o.offsetY * o.scaleFactorY, pWidth, pHeight);
 	}
 	Crumbs.object.prototype.getTrueX = function() {
