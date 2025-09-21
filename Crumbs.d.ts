@@ -227,7 +227,7 @@ declare global { declare namespace Crumbs {
         [key: string]: any;
     }
     export let object: {
-        new(obj: Object, parent?: Crumbs.object): Crumbs.object;
+        new(obj: Partial<Crumbs.object>, parent?: Crumbs.object): Crumbs.object;
     }
     export let behaviorSym: symbol;
     export let initSym: symbol;
@@ -306,7 +306,7 @@ declare global { declare namespace Crumbs {
      */
     export function newReusePool(): Array<Crumbs.particle>;
     export let particle: {
-        new(obj: Object, x: number, y: number, r: number, a: number, scope: string | Crumbs.canvas): particle;
+        new(obj: Partial<Crumbs.particle>, x: number, y: number, r: number, a: number, scope: string | Crumbs.canvas): particle;
     }
     export let objectDefaults: Object;
     export namespace component {
