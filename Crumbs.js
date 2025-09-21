@@ -5,7 +5,7 @@ if (typeof crumbs_load_local === 'undefined') { var crumbs_load_local = false; }
 const Crumbs_Init_On_Load = function() {
 	if (l('topbarFrenzy')) { return; }
 
-	Crumbs.version = 'v1.0';
+	Crumbs.version = 'v2.0';
 	
 	Crumbs.h = {};
 	Crumbs.h.CSSInjects = [];
