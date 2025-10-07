@@ -312,6 +312,9 @@ const Crumbs_Init_On_Load = function() {
 		this.mouseX = 0;
 		this.mouseY = 0;
 
+		this.left = 0;
+		this.top = 0;
+
 		Crumbs.scopedCanvas[key] = this;
 		Crumbs.objects[key] = [];
 		this.objects = Crumbs.objects[key];
@@ -321,13 +324,17 @@ const Crumbs_Init_On_Load = function() {
 		Crumbs.validScopes.push(key);
 		Crumbs.prefs.objects[key] = 1;
 		Crumbs.prefs.particles[key] = 1;
+
+		this.setSelf();
 	}
 	Crumbs.canvas.prototype.setSelf = function() {
 		this.l.width = this.l.parentNode.offsetWidth;
 		this.l.height = this.l.parentNode.offsetHeight;
 		this.boundingClientRect = this.l.getBoundingClientRect();
-		this.mouseX = Game.mouseX - this.boundingClientRect.left;
-		this.mouseY = Game.mouseY - this.boundingClientRect.top + (App?0:32);
+		this.left = this.boundingClientRect.left;
+		this.top = this.boundingClientRect.top - (App?0:32);
+		this.mouseX = Game.mouseX - this.left;
+		this.mouseY = Game.mouseY - this.top;
 	}
 	Crumbs.canvas.prototype.getShader = function(type) {
 		for (let i of this.shaders) {

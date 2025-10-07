@@ -74,6 +74,8 @@ declare global { declare namespace Crumbs {
         boundingClientRect: DOMRect;
         mouseX: number;
         mouseY: number;
+        left: number;
+        top: number;
         objects: Crumbs.object[];
         sortedObjects: Crumbs.object[];
         setSelf(): void;
@@ -91,6 +93,8 @@ declare global { declare namespace Crumbs {
     export let anchor: {
         new(x: number, y: number): anchor;
     }
+    export let objects: Object<string, Crumbs.canvas[]>;
+    export let sortedObjectList: Object<string, Crumbs.canvas[]>;
     export interface object {
         enabled: boolean;
         parent: null | Crumbs.object;
@@ -274,6 +278,7 @@ declare global { declare namespace Crumbs {
          */
         new(b: ((this: Crumbs.object, instance?: behaviorInstance) => void) | Crumbs.behavior, init?: Object): behaviorInstance;
     }
+    export let particles: Object<string, Crumbs.particle[]>;
     export interface particle {
         x: number;
         y: number;
@@ -472,6 +477,35 @@ declare global { declare namespace Crumbs {
     }
     export const objectBehaviors: objectBehaviors;
 
+    export let version: string;
+    export let h: typeof Crumbs.h;
+    export let imagesToManip: { [key: string]: any[] };
+    /**
+     * Amount of time that has passed in frames; saved per run and never resets
+     */
+    export let t: number;
+    export let validScopes: string[];
+    export let nonQuickSettable: string[];
+    export let nonValidProperties: string[];
+    export let allProperties: string[];
+    export let defaultAnchors: { [key: string]: Crumbs.anchor };
+    export let sleepDetectionBuffer: number;
+    export let unfocusedSpawn: boolean;
+    export let lastUpdate: number;
+    export let defaultPathConfigs: { [key: string]: any };
+    export let validPathConfigs: string[];
+    export let validPathFuncs: string[];
+    export let subPathsLogic: { [key: string]: Function };
+    export let shader: typeof Crumbs.shader;
+    export let shaderDefaults: typeof Crumbs.shaderDefaults;
+    export let preloads: string[];
+    export let preloadRequired: boolean;
+    export let pointerHold: boolean;
+    export let onCrate: Crumbs.object | null;
+    export let tooltipRegister: HTMLDivElement;
+    export let dynamicTooltipFunction: Function;
+    export let reusePools: Crumbs.particle[][];
+
     /**
      * Spawns a Crumbs object
      * @param template Javascript object defining the properties of the object, usually a reused object with the base parameters
@@ -538,6 +572,8 @@ declare global { declare namespace Crumbs {
      * @param o the Crumbs object
      */
     export function getPHeight(o: Crumbs.object): number;
+    export function updateCanvas(): void;
+    export function getCanvasByScope(s: string): Crumbs.canvas;
     export function globalSearch(id: any): Crumbs.object[];
     export function killAllObjects(): void;
     export function reorderAllObjects(): void;
@@ -546,6 +582,7 @@ declare global { declare namespace Crumbs {
     export function merge(arr: Crumbs.object[], left: number, middle: number, right: number): Crumbs.object[];
     export function mergeSort(arr: Crumbs.object[], left: number, right: number): Crumbs.object[];
     export function drawAnchorDisplay(o: Crumbs.object, ctx: CanvasRenderingContext2D): void;
+    export function manipLoadedImg(old: string, newPropertyName: string, width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement, canvas: HTMLCanvasElement) => void): void;
     export function iterateObject(o: Crumbs.object, ctx: CanvasRenderingContext2D): void;
     /**
      * Draws an object onto some canvas

@@ -1,3 +1,4 @@
+
 	//template objects inits and behaviors
     Crumbs.objectInits = {}; //inits return array containing x, y, scaleX, scaleY, and rotation, and takes in one variable for scope
 	Crumbs.objectInits.default = function() { };
@@ -123,8 +124,8 @@
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)}),
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound)
 			],
-			x: (onMouse?Game.mouseX:x),
-			y: (onMouse?Game.mouseY:y),
+			x: (onMouse?Crumbs.scopedCanvas.left.mouseX:x),
+			y: (onMouse?Crumbs.scopedCanvas.left.mouseY:y),
 			scaleX: sc ?? 1,
 			scaleY: sc ?? 1,
 			order: order ?? -2,
@@ -139,7 +140,7 @@
 	};
 	Game.registerHook('logic', function() { Crumbs.spawnCookieShower(); });
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
-	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Game.mouseX+Math.random()*8-4, Game.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Crumbs.scopedCanvas.left.mouseX+Math.random()*8-4, Crumbs.scopedCanvas.left.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
 		const o = Crumbs.findObject('wrinkler'+originId);
