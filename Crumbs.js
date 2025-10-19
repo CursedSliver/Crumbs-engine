@@ -211,9 +211,13 @@ const Crumbs_Init_On_Load = function() {
                 this.doneLoading=1;
                 this.loaded();
             }
-			if (Crumbs.imagesToManip[e.target.alt]) {
-				Crumbs.manipLoadedImg(e.target.alt, ...Crumbs.imagesToManip[e.target.alt]);
-				delete Crumbs.imagesToManip[e.target.alt];
+			for (let i = 0; i < Crumbs.imagesToManip.length; i++) {
+				const item = Crumbs.imagesToManip[i];
+				if (item[0] === e.target.alt) {
+					Crumbs.manipLoadedImg(item[0], ...item.slice(1));
+					Crumbs.imagesToManip.splice(i, 1);
+					break;
+				}
 			}
         }
         this.waitForLoad=function(assets,callback)
@@ -241,12 +245,12 @@ const Crumbs_Init_On_Load = function() {
         return Game.Loader.assetsLoaded.has(what) ? Game.Loader.assets[what] : (what && !Game.Loader.assetsLoading.has(what) && Game.Loader.Load([what]), Game.Loader.blank);
     }
 
-	Crumbs.imagesToManip = {};
+	Crumbs.imagesToManip = [];
 	Crumbs.manipImage = function(old, newPropertyName, width, height, filters, drawCallback) {
 		// @ts-ignore
 		if (Game.Loader.assetsLoaded.has(old)) { Crumbs.manipLoadedImg(old, newPropertyName, width, height, filters, drawCallback); return; }
 
-		Crumbs.imagesToManip[old] = [newPropertyName, width, height, filters, drawCallback];
+		Crumbs.imagesToManip.push([old, newPropertyName, width, height, filters, drawCallback]);
 	}
 
 	Crumbs.manipLoadedImg = function(old, newPropertyName, width, height, filters, drawCallback) {
@@ -399,18 +403,6 @@ const Crumbs_Init_On_Load = function() {
 			this[i] = obj[i];
 		}
 		if (parent) { this.parent = parent; }
-
-		/*Object.defineProperty(this, 'scaleX', {
-			get() {
-				return this._scaleX;
-			}, 
-			set(value) {
-				if (value == 4 && !this.parent && this.id != 'thissomehowgetsaffected') { console.log(this); console.trace(); }
-				this._scaleX = value;
-			},
-			configurable: true,
-			enumerable: true
-		})*/
 		
 		this.t = Crumbs.t; //the time when it was created
 		this.scaleFactorX = 1;
@@ -547,7 +539,7 @@ const Crumbs_Init_On_Load = function() {
 		const c = [].concat(this.components);
 		this.components = [];
 		for (let i in c) { this.addComponent(c[i]); }
-		if (!Array.isArray(this.behaviors) || !this.behaviors.length) { this.behaviors = [].concat(this.behaviors); }
+		this.behaviors = [].concat(this.behaviors);
 		for (let i in this.behaviors) {
 			if (this.behaviors[i] instanceof Crumbs.behaviorInstance) { continue; }
 			// @ts-ignore
