@@ -600,5 +600,35 @@ declare global { declare namespace Crumbs {
     export function drawPure(o: Crumbs.object, ctx: CanvasRenderingContext2D, callback?: (this: Crumbs.object, ctx: CanvasRenderingContext2D) => void): void;
     export function drawObjects(): void;
     export function drawObjectsIn(scope: string): void;
-} }
+} 
+declare namespace CrumbsEngineModObj {
+    export function init(): void;
+    export function header(): void;
+    export function loadBridge(id: string, order: number): void;
+    export function loadAllViableBridges(): void;
+    export function declareBridgeLoaded(): void;
+
+    export let bridgesSource: string;
+    export let bridges: { [key: string]: [string | null, string | null] };
+    export let bridgesToLoad: number;
+    export let bridgesLoaded: number;
+    export let bridgesPendingCoreReady: Array;
+
+    export let ready: boolean;
+    export let coreReady: boolean;
+    export function setReady(): void;
+
+    export function save(): string;
+    export function load(str: string): void;
+}
+export let CrumbsEngineLoaded: boolean; 
+/**
+ * Loads assets locally, namely Implementation.js and bridgesList.json
+ */
+export let crumbs_load_local: undefined | boolean;
+/**
+ * Will not fetch bridges and will keep default bridges as defined in Crumbs.js
+ */
+export let crumbs_nofetch_bridges: undefined | boolean;
+}
 export {};

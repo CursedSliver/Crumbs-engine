@@ -1541,4 +1541,5 @@
 
     Crumbs.unfocusedSpawn = false;
 	
-	CrumbsEngineLoaded = true;
+	CrumbsEngineModObj.setReady();
+	CrumbsEngineModObj.loadAllViableBridges();

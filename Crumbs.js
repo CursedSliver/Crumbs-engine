@@ -2048,7 +2048,102 @@ const Crumbs_Init_On_Load = function() {
 };
 
 Game.registerMod('Crumbs engine', {
-	init: Crumbs_Init_On_Load,
+	init: function() {
+		const self = this;
+
+		if (window.crumbs_nofetch_bridges) { 
+			this.header.call(this);
+			return;
+		}
+		fetch(this.bridgesSource, { credentials: 'omit' })
+			.then(resp => {
+				if (!resp.ok) throw new Error('Failed to fetch bridges JSON: ' + resp.status);
+				return resp.json();
+			})
+			.then(json => {
+				if (json && typeof json === 'object') {
+					self.bridges = json;
+				} else {
+					console.warn('Bridges JSON did not contain an object, keeping defaults.');
+				}
+			})
+			.catch(err => {
+				console.error('Error loading bridges JSON:', err);
+				Game.Notify('Critical error', 'An error occurred with Crumbs engine bridge loading: <br>' + err.toString(), [1, 7]);
+			})
+			.finally(() => {
+				self.header.call(self);
+			}); 
+	},
+	header: function() { 
+		for (let i in this.bridges) {
+			if (Game.mods[i]) { 
+				if (!this.bridges[i]) { continue; }
+				if (typeof this.bridges[i] == 'string') { this.bridges[i] = [].concat(this.bridges[i]).concat(null); }
+				if (this.bridges[i][0]) { this.bridgesToLoad++; } 
+				if (this.bridges[i][1]) { this.bridgesToLoad++; } 
+			}
+		}
+
+		Crumbs_Init_On_Load();
+
+		window.CrumbsEngineModObj = this;
+
+		eval('Game.registerMod='+Game.registerMod.toString().replace('mod.init();', 'window.CrumbsEngineModObj.loadBridge(id, 1); mod.init(); window.CrumbsEngineModObj.loadBridge(id, 0);'));
+	},
+	loadBridge: function(id, order) {
+		if (!this.bridges[id]) { return; }
+		if (this.bridges[id][order]) { 
+			this.bridgesToLoad++; 
+			window.CrumbsEngineLoaded = false;
+		}
+		if (!this.coreReady) {
+			this.bridgesPendingCoreReady.push(this.bridges[id][order]);
+			return;
+		}
+		if (this.bridges[id][order]) { Game.LoadMod(this.bridges[id][order]); }
+	},
+	loadAllViableBridges: function() {
+		console.log('debug')
+		for (let i in this.bridges) {
+			if (Game.mods[i]) { 
+				if (!this.bridges[i]) { continue; }
+				if (this.bridges[i][0]) { Game.LoadMod(this.bridges[i][0]); } //after target mod init
+				if (this.bridges[i][1]) { Game.LoadMod(this.bridges[i][1]); } //before target mod init
+			}
+		}
+	},
+	declareBridgeLoaded: function() {
+		this.bridgesLoaded++;
+		if (!this.coreReady) { return; }
+		if (this.bridgesLoaded == this.bridgesToLoad) { 
+			window.CrumbsEngineLoaded = true;
+			this.ready = true;
+		} else {
+			window.CrumbsEngineLoaded = false;
+			this.ready = false;
+		}
+	},
+	bridgesSource: (window.crumbs_load_local?'./bridgesList.json':'https://cursedsliver.github.io/crumbs-engine/bridgesList.json'),
+	bridgesPendingCoreReady: [],
+	bridges: {
+        'P for Pause': [(window.crumbs_load_local?'.':'https://cursedsliver.github.io/crumbs-engine/bridges')+'/PForPauseBridge.js', null]
+    },
+	bridgesToLoad: 0,
+	bridgesLoaded: 0,
+	ready: false,
+	coreReady: false,
+	setReady: function() {
+		this.coreReady = true;
+		for (let i in this.bridgesPendingCoreReady) {
+			Game.LoadMod(this.bridgesPendingCoreReady[i]);
+		}
+		this.bridgesPendingCoreReady = [];
+		if (this.bridgesLoaded == this.bridgesToLoad) { 
+			this.ready = true;
+			window.CrumbsEngineLoaded = true;
+		}
+	},
 	save: function() { return Crumbs.t + ''; },
 	load: function(str) { Crumbs.t = parseInt(str); }
 });
