@@ -2104,7 +2104,6 @@ Game.registerMod('Crumbs engine', {
 		if (this.bridges[id][order]) { Game.LoadMod(this.bridges[id][order]); }
 	},
 	loadAllViableBridges: function() {
-		console.log('debug')
 		for (let i in this.bridges) {
 			if (Game.mods[i]) { 
 				if (!this.bridges[i]) { continue; }
