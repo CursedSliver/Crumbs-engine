@@ -824,6 +824,22 @@ const Crumbs_Init_On_Load = function() {
 		return toReturn;
 	};
 
+	Crumbs.changeScopeOf = function(o, scope) {
+		scope = (scope instanceof Crumbs.canvas)?scope:Crumbs.scopedCanvas[scope];
+
+		o.die();
+		o.scope = scope;
+		for (let i in scope.objects) {
+			if (scope.objects[i] === null) { 
+				scope.objects[i] = o;
+				o.index = parseInt(i);
+				return;
+			}
+		}
+		scope.objects.push(o);
+		o.index = scope.objects.length - 1;
+	}
+
 	Crumbs.component = {};
 	Crumbs.defaultComp = {};
 

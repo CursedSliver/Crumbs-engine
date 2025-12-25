@@ -86,11 +86,11 @@ AddEvent(document, 'keydown', function(e) {
                 2 * Game.fps,
                 'starClickCookie',
                 false,
-                null,
-                null,
+                1,
+                0,
                 true
             );
-            cookie.scope = Crumbs.scopedCanvas.foreground;
+            Crumbs.changeScopeOf(cookie, 'foreground');
         }
     }
 

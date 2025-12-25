@@ -600,6 +600,7 @@ declare global { declare namespace Crumbs {
      * @param o object
      * @param ctx canvas
      */
+    export function changeScopeOf(o: Crumbs.object, scope: string | Crumbs.canvas)
     export function setupContext(o: Crumbs.object, ctx: CanvasRenderingContext2D): void;
     export function drawPure(o: Crumbs.object, ctx: CanvasRenderingContext2D, callback?: (this: Crumbs.object, ctx: CanvasRenderingContext2D) => void): void;
     export function drawObjects(): void;
