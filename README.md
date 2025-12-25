@@ -5,7 +5,7 @@ Crumbs Engine allows you to easily manipulate and change canvas-based elements, 
 ## Integration
 Load the mod with `Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Crumbs.js');`.
 
-If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of Steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the global variable `CrumbsEngineLoaded` becomes `true`.
+If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of Steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the flag `CrumbsEngineModObj?.ready` becomes `true`.
 
 # Documentation
 To get a better understanding of the mod, it may be helpful to look at the examples provided in `/examples` alongside reading the documentation. Below is a list of roughly what they cover.
@@ -354,6 +354,17 @@ A particle is a simplified version of `Crumbs.object` that uses less memory and 
 ## `reusePool` instructions
 
 To use it, assign `Crumbs.newReusePool()` to it in the template (never place the object declaration directly in `Crumbs.spawnParticle`!), which will register it and automatically pull from the pool over creating new objects. The pool is cleaned once every 120 seconds. You can do `Crumbs.prunePool(pool)` to clean any pool of your choice.
+
+---
+
+## Bridges
+
+Bridges are small integration scripts that adapt Crumbs engine to other mods. They let Crumbs load compatibility shims either before or after a target mod initializes, so both ordering-sensitive fixes and post-init hooks are possible. This feature is designed for mods that do not necessarily require Crumbs; if a mod requires Crumbs engine to function, one should simply set it as a prerequisite to load before loading the mod itself.
+
+How to use
+- To register a bridge, pull request to `bridgesList.json` with your bridge script. It can be within the `/bridges` folder, or it can be hosted elsewhere.
+- Crumbs engine watches Game.registerMod, so your mod must include that in order for the corresponding bridges to activate. Therefore, put your mod id as the key in the JSON, and URL as its value.
+- You can have just one URL or an array of two. By default, the URL will be loaded after both your mod and Crumbs engine finish loading. If you use an array, the second URL will be load before your mod is ready, only in case that your mod is loaded after Crumbs engine. 
 
 ---
 
