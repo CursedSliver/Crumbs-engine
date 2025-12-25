@@ -1,11 +1,23 @@
 # Crumbs Engine
 
-Crumbs Engine allows you to easily manipulate and change canvas-based elements, including any that were present in vanilla. Traditionally, canvas elements are created through large functions that redraw the canvas every frame based on various factors, making them clunky to edit and difficult to mod. Crumbs Engine solves this by abstracting much of that complexity away, leaving the user with core functionalities designed for creating more content.
+Crumbs Engine allows you to easily manipulate and change canvas-based elements, including any that were present in vanilla. Traditionally, canvas elements are created through large functions that redraw the canvas every frame based on various factors, making them clunky to edit and difficult to mod. Crumbs Engine solves this by abstracting much of that complexity away, leaving you with core functionalities designed for creating more content.
 
 ## Integration
 Load the mod with `Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Crumbs.js');`.
 
 If you wish to have this as a strict prerequisite, consider forcing your users to load this mod before yours (in the case of Steam) or wrap the rest of your code in a function to wait until this mod loads completely before calling it. You'll know when it is loaded completely when the global variable `CrumbsEngineLoaded` becomes `true`.
+
+# Documentation
+To get a better understanding of the mod, it may be helpful to look at the examples provided in `/examples` alongside reading the documentation. Below is a list of roughly what they cover.
+
+- MouseTrail.js: object basics
+- StarCursor.js: children objects
+- TinyWrinklers.js: modifying base game objects
+- GlitchedCookie.js: settings and pointerInteractive components
+- StarCursor2.js: canvasManipulator and text components
+- ??: cheap filters, particles
+
+There are even more examples covering the vanilla objects in `Implementation.js`.
 
 ---
 
@@ -40,7 +52,7 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 | `scaleX`   | number    | 1       | Scaling multiplier on the x-direction. |
 | `scaleY`   | number    | 1       | Scaling multiplier on the y-direction. |
 | `alpha`    | number    | 1       | The opacity of the image drawn (between 0 and 1 inclusive). |
-| `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of strings. Strings are automatically converted to arrays. |
+| `imgs`     | array/string | [0x0 empty image] | The images of the object. Can be a string or an array of them. If it is not one, it will be automatically converted to arrays. |
 | `imgUsing` | number    | 0       | The image currently displayed, out of all the images listed in `imgs`. |
 | `noDraw`   | boolean   | false   | Prevents the object from being drawn, but its behaviors and components still function. |
 | `offsetX`  | number    | 0       | Offsets the image drawn by that amount on the x axis, which also rotates with its rotation. |
@@ -53,7 +65,7 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 | `sx`       | number    | 0       | The x-coordinate of the top-left corner of the rectangle to draw the image provided. |
 | `sy`       | number    | 0       | The y-coordinate of the top-left corner of the rectangle to draw the image provided. |
 | `id`       | any       | null    | An identifier of the object. Can be used to find objects via `Crumbs.findObject`, `Crumbs.getObjects`, `Crumbs.object.prototype.findChild`, and `Crumbs.object.prototype.getChildren`. |
-| `init`     | function  | empty   | A function to be called on object initialization, with `this` being the object. |
+| `init`     | function  | empty   | A function to be called on object initialization, with `this` being the object. Does not support arrow functions. |
 | `behaviors`| array/function/<br>`Crumbs.behavior`/<br>`Crumbs.behaviorInstance`<br>instance(s) | [] | Instances of `Crumbs.behaviorInstance`, containing a function called every logic frame. Non-arrays are converted to arrays. |
 | `components`| array/component | [] | Instances of objects listed in `Crumbs.component`. Non-arrays are converted to arrays. |
 | `children` | array     | []      | Child objects to create upon initialization. Not stored in the resulting object; converted to an array of children `Crumbs.object` instead. |
@@ -67,9 +79,21 @@ Instantiate a `Crumbs.object` with the function `Crumbs.spawn(template, custom)`
 - **Behaviors** are instances of `Crumbs.behaviorInstance`, containing a function called every logic frame with `this` set to the object and an object passed in for local variables.
 - `Crumbs.behaviorInstance(behavior, parameters)`  
     - `behavior`: An instance of `Crumbs.behavior`, containing a function called every frame.
-        - To create a `Crumbs.behavior`, simply pass in a function for `new Crumbs.behavior`.
-    - `parameters` (optional): An object passed into the function on every call and can be modified by the function.
+        - To create a `Crumbs.behavior`, simply pass in a function for `new Crumbs.behavior`. 
+        - DO NOT USE ARROW FUNCTIONS. Keyword `this` will not work. Use `function() { }`.
+    - `parameters` (optional): An object passed into the function on every call, and is only accessible and modifiable to the function.
+    - Note: if you don't need custom behavior parameters per object, place these in templates. Place as `Crumbs.behavior` if `parameters` is needed, otherwise put as `Crumbs.behaviorInstance`.
+    - If you do need custom behavior parameters, override behavior in `custom` with new `Crumbs.behaviorInstance` from behaviors assigned to variables.
+    - Try not to put your functions directly in your object.
 - If not an array, it will be converted into one.
+
+---
+
+## Images
+
+- You can declare images in the `img` property. 
+- Access and change them with the `imgUsing` property.
+- If you place them in templates, MAKE SURE to ALWAYS wrap them in arrays, even if there's only one element!
 
 ---
 
@@ -93,6 +117,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `addComponent(comp)` | Adds a component to the object, and calls the component's `init` method if it exists. |
 | `removeComponent(type)` | Removes the first component of the specified type from the object and returns it; returns `null` if not found. |
 | `getComponent(type)` | Returns the first component of the specified type attached to the object, or `null` if not found. |
+| `getAllComponents(type)` | Returns an array of all components of the specified type attached to the object. |
 | `addBehavior(behavior)` | Adds a behavior to the object. Accepts a `Crumbs.behavior`, `Crumbs.behaviorInstance`, or a function. |
 | `findChild(id)` | Recursively searches for a child (or descendant) with the specified `id` and returns it. Returns `null` if not found. |
 | `getChildren(id)` | Returns an array of all direct children, or all children (and descendants) with the specified `id` if provided. |
@@ -107,6 +132,8 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `Crumbs.findObject(id, scope)` | Returns the first object with the specified `id`. If `scope` is provided, searches only within that canvas scope. Returns `null` if not found. |
 | `Crumbs.getObjects(id, scopes)` | Returns an array of all objects with the specified `id`. If `scopes` is provided (string or array), searches only within those scopes. |
 | `Crumbs.globalSearch(id)` | Returns an array of all objects and their descendants with the specified `id` across all scopes. Not recommended for frequent use due to performance. |
+| `Crumbs.forceDrawObject(o, ctx)` | Forcibly draws the object `o` on that context, ignoring `components`, `noDraw`, and `children`. |
+| `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` | Creates a new copy of an image at `Game.Loader.assets[newPropertyName]` with new width and height (scaling), optional css filters, and an optional callback with arguments `ctx` and `Game.Loader.assets[old]` that overrides the drawing step. Set `old` and `newPropertyName` to be the same to enable direct application. |
 
 ---
 
@@ -125,6 +152,15 @@ You can create a new canvas by doing `new Crumbs.canvas(parentEle, key, id, css)
 - `key`: Its key in `Crumbs.scopedCanvas`.
 - `id`: ID of the canvas itself (not the canvas container).
 - `css`: Optional CSS.
+
+Other properties of each `scopedCanvas`:
+- `l`: the element of the canvas.
+- `c`: `l.getContext('2d')`.
+- `objects`: array of objects.
+- `sortedObjects`: objects sorted by draw order; used by components such as `pointerInteractive`.
+- `mouseX`: the x position of the mouse in its coordinate system.
+- `mouseY`: the y position of the mouse in its coordinate system.
+- `redrawPerFrame`: whether to redraw the canvas each frame, default: `true`. To manually redraw a canvas, do `Crumbs.drawObjectsIn(scope)`.
 
 ---
 
@@ -150,6 +186,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 - Handles interaction with the mouse, allowing for hover detection and click detection.
 - Always maximally fits the width and height of the object it's attached to.
 - The `this` keyword refers to the object that it's attached to.
+  - DO NOT USE ARROW FUNCTIONS. Keyword `this` will not work. Use `function() { }`.
 - Helpful tip: You can see the collider boxes of objects with this component by setting `Crumbs.prefs.colliderDisplay` to 1.
 #### `pointerInteractive` Component Properties
 
@@ -161,11 +198,24 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `onMouseover`       | function | empty     | Function called when the mouse enters the object's area.                    |
 | `onMouseout`        | function | empty     | Function called when the mouse leaves the object's area.                    |
 | `alwaysInteractable`| boolean  | false     | If true, the object is interactable even if another object with a pointerInteractive component is drawn above it. |
-| `boundingType`      | string   | 'rect'/'oval'    | The shape used for hit detection.                  |
+| `boundingType`      | string   | 'rect' or <br>Crumbs.colliderType    | The shape used for hit detection.                |
+| `hovered`           | boolean  | false     | Whether the mouse is hovering over the object. Updates automatically.       |
+| `click`             | boolean  | false     | Whether the mouse is holding down click over the object. Updates automatically.|
+
+### Custom bounding boxes
+- You can create your own bounding boxes with `new Crumbs.colliderType(func)`. Pass in a function that determines whether or not a given position is in the box.
+- The function has the following arguments passed into it as individual arguments:
+  - `s`: scope of the object it's attached to
+  - `m`: the object
+  - `pWidth`: the width of the object in pixels, accounting for scaling (so you don't have to calculate that yourself)
+  - `pHeight`: the height of the object in pixels, accounting for scaling
+- You can also pass in a string alongside the function to have it as its name. Once set, you will be able to have instantiations using the string as its bounding type convert the string into its corresponding collider.
+- There are two default boundingTypes available: `rect` and `oval`. You can pass in `'rect'` or `'oval'` to specify them.
 
 ### `Crumbs.component.canvasManipulator`
 - Gives raw control over the canvas, with drawing operations centered on the object itself (discounting offsetX and offsetY).
 - The `this` keyword refers to the component object itself, not the object it's attached to.
+  - DO NOT USE ARROW FUNCTIONS. Keyword `this` will not work. Use `function() { }`.
 - Be careful! Make sure that you have an equal amount of `ctx.save();` and `ctx.restore();` in each canvasManipulator, otherwise things will break horribly.
 #### `canvasManipulator` Component Properties
 
@@ -173,6 +223,7 @@ You can create your own anchors by assigning something to a new instance of `Cru
 |------------|----------|---------|---------------------------------------------------------------------------------------------|
 | `enabled`  | boolean  | true    | Whether the canvasManipulator component is active.                                           |
 | `function` | function | empty   | Function called with the object (`m`) and the canvas context (`ctx`) for custom drawing.     |
+| `before` | function | empty   | Function called with the object (`m`) and the canvas context (`ctx`) for custom drawing, with the difference that this is called right before the object is drawn.     |
 
 ### `Crumbs.component.text`
 - Displays text on the origins of the object.
@@ -195,12 +246,15 @@ You can create your own anchors by assigning something to a new instance of `Cru
 ### `Crumbs.component.settings`
 - Adjusts global canvas drawing properties for this object.
 - Inherits all of its properties from canvas itself.
+- Note: to modify, you need to find the properties via the `.obj` object first.
 #### `settings` Component Properties
 
 | Property                  | Type      | Default   | Description                                                                                   |
 |---------------------------|-----------|-----------|-----------------------------------------------------------------------------------------------|
 | `enabled`  | boolean | true    | Whether the setting changes are active.                                                          |
+| `obj` | object | {} | Container for all the properties AFTER the setting is created using the properties below. Access them with this, but when creating them simply put the below properties in the constructor. |
 | `globalCompositeOperation`| string    | 'source-over' | Sets how new drawings are composited onto the existing canvas. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation) for options. |
+| `filter` | string   | ''      | Adds filters to the draw. See [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter) for options. Will lag, ues in moderation. Not available in all browsers. If the shader parameters do not need to be changed often during runtime, consider using `Crumbs.manipImage(old, newPropertyName, width, height, filters, drawCallback)` instead. |
 | `imageSmoothingEnabled`   | boolean   | true      | Enables or disables image smoothing when scaling images.                                       |
 | `imageSmoothingQuality`   | string    | 'low'     | Sets the quality of image smoothing. Possible values: 'low', 'medium', 'high'.                |
 
@@ -233,8 +287,24 @@ You can create your own anchors by assigning something to a new instance of `Cru
 | `distance`      | number   | 30      | Total distance of the fade in pixels; scales with the object.                                    |
 | `sliceWidth`    | number   | 3       | Width in pixels between each redraw slice.                                                       |
 | `horizontal`    | boolean  | false   | If true, the fade is applied horizontally; otherwise, it is vertical.                            |
+| `flip`          | boolean  | false   | If true, reverses the fade direction.                                                     |
 | `initialAlpha`  | number/null | null | Starting opacity for the fade. If null, uses the object's base opacity.                          |
 | `finalAlpha`    | number/null | null | Ending opacity for the fade. If null, defaults to 0 (fully transparent).                         |
+| `cutOff`        | boolean  | false   | If true, will no longer draw the section before the gradient begins (will not affect the gradient itself)                 |
+
+### `Crumbs.component.tooltip`
+- Makes the object display a tooltip when it is hovered over.
+#### `tooltip` Component Properties
+
+| Property            | Type                | Default   | Description                                                                                      |
+|---------------------|---------------------|-----------|--------------------------------------------------------------------------------------------------|
+| `enabled`           | boolean             | true      | Whether the tooltip component is active and displayed.                                           |
+| `content`           | string/function     | ''        | The tooltip text to display, or a function returning the text (for dynamic tooltips). The function will have the component itself as an argument, and use `this` to access the attached object.  |
+| `origin`            | string              | 'middle'  | The origin point for the tooltip display. Valid values: `left`,   `middle`, `bottom-right`, `bottom`, `this`, `store`. If the tooltip has crate enabled, all values other than `left` do the same thing. |
+| `crate`             | boolean             | false     | If true, tooltip is fixed on the object; if false, follows the mouse.                            |
+| `alwaysInteractable`| boolean             | false     | If true, tooltip is interactable even if another object is above it.                             |
+| `hideOnClick`       | boolean             | false     | If true, hides the tooltip when the left mouse button is held down.                                           |
+| `boundingType`      | string or <br>Crumbs.colliderType | 'rect'     | The collider type used for hit detection (default is rectangle).                                 |
 
 ---
 
@@ -279,15 +349,19 @@ A particle is a simplified version of `Crumbs.object` that uses less memory and 
 | `life`       | number    | `2 * Game.fps`    | Lifespan of the particle in frames.                                         |
 | `init`       | function  | null              | Function called on particle initialization.                                 |
 | `behavior`   | function  | null              | Function called every frame for custom particle logic.                      |
-| `reusePool`  | array     | null              | Pool for reusing particle instances (optional, for optimization).           |
+| `reusePool`  | array     | null              | Pool for reusing particle instances (optional, for optimization); see below.|
+
+## `reusePool` instructions
+
+To use it, assign `Crumbs.newReusePool()` to it in the template (never place the object declaration directly in `Crumbs.spawnParticle`!), which will register it and automatically pull from the pool over creating new objects. The pool is cleaned once every 120 seconds. You can do `Crumbs.prunePool(pool)` to clean any pool of your choice.
 
 ---
 
 ## Vanilla Implementation
 
-Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects.
-
-For details on how they are implemented and how to refer to them in code, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
+Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects. You can access them with `Crumbs.findObject(id, scope)` or `Crumbs.getObjects(id, scope)` and modify them as you wish.
+- You can also easily modify all instances of a behavior with `Crumbs.behavior.prototype.replace(original, newCode)` or `Crumbs.behavior.prototype.inject(line, code)`, and find their corresponding behavior from their behaviorInstance with `Crumbs.behaviorInstance.prototype.getBehavior()`.
+- For more details on how they are implemented and their IDs, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
 
 ---
 

@@ -4,38 +4,27 @@
 	Crumbs.objectInits.default = function() { };
 	Crumbs.objectDefaults.init = Crumbs.objectInits.default;
 	Crumbs.objectInits.bottomRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
-		this.y = this.scope.l.offsetHeight;
+		this.x = Math.random() * this.scope.l.width;
+		this.y = this.scope.l.height;
 	};
 	Crumbs.objectInits.topRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
+		this.x = Math.random() * this.scope.l.width;
 	};
 	Crumbs.objectInits.totalRandom = function() {
-		this.x = Math.random() * this.scope.l.offsetWidth;
-		this.y = Math.random() * this.scope.l.offsetHeight;
+		this.x = Math.random() * this.scope.l.width;
+		this.y = Math.random() * this.scope.l.height;
 	};
 	Crumbs.objectInits.center = function() {
-		this.x = this.scope.l.offsetWidth / 2;
-		this.y = this.scope.l.offsetHeight / 2;
+		this.x = this.scope.l.width / 2;
+		this.y = this.scope.l.height / 2;
 	};
 	Crumbs.objectInits.bigCookie = function() {
-		this.x = this.scope.l.offsetWidth / 2;
-		this.y = this.scope.l.offsetHeight * 0.4;
+		this.x = this.scope.l.width / 2;
+		this.y = this.scope.l.height * 0.4;
 	};
-	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff. Return 't' to terminate the particle
-	/*
- 	what it can return:
-  	x, y, scaleX, scaleY, rotation: self explanatory
-    alpha: opacity
-   	filter: an object containing all the CSS filters
-	text: an object containing text parameters
-	imgs: a new array of the images
- 	imgUsing: the img frame selected
-	newChild: an object or an array containing objects for spawning children
- 	behaviorParams: an object to replace the original params for this behavior
-  	*/
+	Crumbs.objectBehaviors = {}; //behaviors return object to modify stuff
 	Crumbs.objectBehaviors.idle = new Crumbs.behavior(function() { });
-	Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
+	//Crumbs.objectDefaults.behaviors = [Crumbs.objectBehaviors.idle];
 	Crumbs.objectBehaviors.fly = new Crumbs.behavior(function(p) {
 		//parameters: 'direction', which is direction to fly to in radians; can be a function, in which case it tries to pass through o
 		//'speed', which is the amount of pixels traveled per draw tick; can be a function, in which case it tries to pass through o
@@ -76,9 +65,9 @@
 	Crumbs.objectBehaviors.expireAfter = new Crumbs.behavior(function(p) {
 		//parameters: 't', which is the amount of draw frames to do before it dies
 		//if p.time is undefined, it essentially never expires
-		if ((Crumbs.t - this.t) >= p.t) { return 't'; } else { return {}; }
+		if ((Crumbs.t - this.t) >= p.t) { this.die(); }
 	}, { t: 1e21 });
-	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.offsetWidth / 2; this.y = this.scope.l.offsetHeight * 0.4; });
+	Crumbs.objectBehaviors.centerOnBigCookie = new Crumbs.behavior(function() { this.x = this.scope.l.width / 2; this.y = this.scope.l.height * 0.4; });
 	Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound = new Crumbs.behavior(function() {
 		if (this.x > this.scope.l.offsetWidth + 100 || this.x < -100 || this.y > this.scope.l.offsetHeight + 100) { this.die(); }
 	});
@@ -97,11 +86,11 @@
 	Crumbs.cookieObject = {
 		width: 48,
 		height: 48,
-		imgs: 'icons.png',
+		imgs: ['icons.png'],
 		scope: 'left'
 	}
 	Crumbs.dollarObject = {
-		imgs: 'dollar',
+		imgs: ['dollar'],
 		width: 64,
 		height: 64,
 		sx: Math.floor(Math.random() * 8) * 64,
@@ -109,16 +98,14 @@
 		scope: 'left',
 	}
 
-	Crumbs.wrinklerBit = function(id) {
-		return {
-			imgs: 'wrinklerBits.png',
-			width: 100,
-			height: 200,
-			sx: ((id * 3) % 8) * 100,
-			sy: -10,
-			anchor: 'top-left',
-			scope: 'left'
-		};
+	Crumbs.wrinklerBit = {
+		imgs: ['wrinklerBits.png', 'shinyWrinklerBits.png'],
+		width: 100,
+		height: 200,
+		sx: 0,
+		sy: -10,
+		anchor: 'top-left',
+		scope: 'left'
 	};
 
 	Crumbs.spawnCookieShower = function() {
@@ -137,8 +124,8 @@
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (t * Game.fps)}),
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound)
 			],
-			x: (onMouse?Game.mouseX:x),
-			y: (onMouse?Game.mouseY:y),
+			x: (onMouse?Crumbs.scopedCanvas.left.mouseX:x),
+			y: (onMouse?Crumbs.scopedCanvas.left.mouseY:y),
 			scaleX: sc ?? 1,
 			scaleY: sc ?? 1,
 			order: order ?? -2,
@@ -149,25 +136,25 @@
 		};
 		if (!onMouse && !noInit) { c.init = Crumbs.objectInits.topRandom; }
 		if (icon[2]) { c.imgs = icon[2]; }
-		return Crumbs.spawnVisible((Game.season=='fools'?Crumbs.dollarObject:Crumbs.cookieObject), c);
+		return Crumbs.spawn((Game.season=='fools'?Crumbs.dollarObject:Crumbs.cookieObject), c);
 	};
 	Game.registerHook('logic', function() { Crumbs.spawnCookieShower(); });
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
-	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Game.mouseX+Math.random()*8-4, Game.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Crumbs.scopedCanvas.left.mouseX+Math.random()*8-4, Crumbs.scopedCanvas.left.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
-		let w = Crumbs.wrinklerBit(id + Crumbs.objects.left.length); //id in order to mostly prevent it from shedding the same particle 2 or 3 times in a row
-		if (type == 1) { w.imgs = 'shinyWrinklerBits.png'; }
-		w.behaviors = [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})];
 		const o = Crumbs.findObject('wrinkler'+originId);
-		w.x = o.x;
-		w.y = o.y;
-		w.offsetX = o.offsetX - 50;
-		w.offsetY = o.offsetY;
-		w.rotation = o.rotation;
-		w.order = 2;
-		w.id = 'wrinklerBits.png';
-		return Crumbs.spawnVisible(w);
+		return Crumbs.spawnVisible(Crumbs.wrinklerBit, {
+			behaviors: [new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), new Crumbs.behaviorInstance(Crumbs.objectBehaviors.fadeout, {speed: 1 / (1 * Game.fps)})],
+			imgUsing: type,
+			sx: ((id * 3) % 8) * 100,
+			x: o.x,
+			y: o.y,
+			offsetX: o.offsetX - 50,
+			offsetY: o.offsetY,
+			rotation: o.rotation,
+			order: o.order,
+		});
 	};
 
 	Crumbs.fallingCookieOnclick = function() {
@@ -315,7 +302,7 @@
 			y*=1-Math.pow(1-(Game.ReincarnateTimer/Game.ReincarnateDuration),2)*2;
 			a*=1-Math.pow(1-(Game.ReincarnateTimer/Game.ReincarnateDuration),2)*2;
 		}
-		toReturn.alpha = a;
+		toReturn.alpha = 0.95 * a;
 		toReturn.y = Crumbs.scopedCanvas.left.l.height - y;
 		this.getComponent('patternFill').width = Crumbs.scopedCanvas.left.l.width + 480;
 		this.getComponent('patternFill').offX = Math.floor((Game.T*2-(Game.milkH-Game.milkHd)*2000+480*2)%480);
@@ -442,7 +429,7 @@
 		let alphaMult = 1;
 		if (Game.bgType == 2 || Game.bgType == 4) { alphaMult = 0.5; }
 		if (Game.prefs.particles) {
-            if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; }
+            if (goodBuff) { this.imgUsing = 1; alphaMult = 1; } else if (badBuff) { this.imgUsing = 2; alphaMult = 1; } else { this.imgUsing = 0; }
         } else {
             this.imgUsing = 0;
         }
@@ -707,6 +694,29 @@
 			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieShowerBackground)
 		});
 	};
+    Crumbs.objectBehaviors.seasonalShowerBackground = new Crumbs.behavior(function() {
+        if (Game.season != 'christmas' && Game.season != 'valentines') { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
+        
+        let settings = this.getComponent('settings').obj;
+        if (Game.season == 'christmas') { this.imgUsing = 0; this.alpha = 0.75; settings.globalCompositeOperation = 'lighter'; }
+        else if (Game.season == 'valentines') { this.imgUsing = 1; this.alpha = 1; settings.globalCompositeOperation = 'source-over'; }
+
+        const p = this.getComponent('patternFill');
+		p.width = Crumbs.scopedCanvas.left.l.width;
+		p.height = Crumbs.scopedCanvas.left.l.height;
+		p.offY = (Math.floor(Game.T*2)%512);
+    });
+    Crumbs.initSeasonalShower = function() {
+        Crumbs.spawn({
+			anchor: 'top-left',
+			scope: 'left',
+			id: 'seasonalShower',
+			order: -3.5,
+			imgs: ['img/snow2.jpg', 'img/heartStorm.png'],
+			components: [new Crumbs.component.patternFill(), new Crumbs.component.settings()],
+			behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.seasonalShowerBackground)
+		});
+    };
 	Crumbs.objectBehaviors.background = new Crumbs.behavior(function() {
 		if (Game.OnAscend) { this.noDraw = true; return; } else { this.noDraw = false; }
 		this.imgs[0] = 'img/'+Game.bg+'.jpg';
@@ -734,6 +744,7 @@
 		Crumbs.spawn({
 			anchor: 'top-left',
 			scope: 'background',
+			id: 'thissomehowgetsaffected',
 			components: new Crumbs.component.canvasManipulator({
 				function: function(m, ctx) {
 					ctx.fillStyle = 'black';
@@ -1023,16 +1034,20 @@
 		});
 	}
 
+	Crumbs.objectBehaviors.cookieClickPopupBehavior = new Crumbs.behavior(function() {
+		this.alpha -= 1 / (4 * Game.fps);
+		if (this.alpha <= 0) { 
+			this.die(); 
+			return; 
+		}
+		this.y -= 60 / Game.fps;
+	});
 	Crumbs.cookieClickPopup = {
 		order: 8,
 		id: 'cookieClickText',
 		scope: 'left',
 		anchor: 'bottom',
-		behaviors: new Crumbs.behaviorInstance(function() {
-			this.alpha -= 1 / (4 * Game.fps);
-			if (this.alpha <= 0) { return 't'; }
-			this.y -= 2;
-		})
+		behaviors: new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieClickPopupBehavior)
 	}
 	Crumbs.spawnCookieClickPopup = function(x, y, text) {
 		if (!Game.prefs.numbers) { return; }
@@ -1047,7 +1062,132 @@
 			})]
 		});
 	}
-	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.initBrokenCookie(); Crumbs.unfocusedSpawn = false; }
+
+    Crumbs.toy = {
+        id: 'toy',
+        imgs: ['smallCookies.png', 'icons.png'],
+        scope: 'left',
+        order: 0.25
+    }
+    Crumbs.objectBehaviors.toySkins = new Crumbs.behavior(function(p) {
+        this.imgUsing = Game.toysType - 1;
+        if (Game.toysType == 2) {
+            this.sx = 48 * p.icon[0];
+            this.sy = 48 * p.icon[1];
+        }
+        else {
+            this.sx = (p.id % 8) * 64
+        }
+    }, { id: 0, icon: [0, 0] })
+    Crumbs.objectBehaviors.toyPhysics = new Crumbs.behavior(function(p) {
+        this.noDraw = false;
+        for (let other of Game.toys) {
+            let otherP = other.behaviors.find(behavior => behavior[Crumbs.behaviorSym] == Crumbs.objectBehaviors.toyPhysics);
+            if (otherP.id == p.id) continue;
+
+            let targetX = this.x + p.xd;
+            let targetY = this.y + p.yd;
+            let targetX2 = other.x + otherP.xd;
+            let targetY2 = other.y + otherP.yd;
+            let dist = Math.sqrt(Math.pow((targetX - targetX2), 2) + Math.pow((targetY - targetY2), 2)) / (p.s / 2 + otherP.s / 2);
+            if (dist < (Game.toysType == 1 ? 0.95 : 0.75))  {
+                let angle = Math.atan2(targetY - targetY2, targetX - targetX2);
+                let v1 = Math.sqrt(Math.pow(p.xd, 2) + Math.pow(p.yd, 2));
+                let v2 = Math.sqrt(Math.pow(otherP.xd, 2) + Math.pow(otherP.yd, 2));
+                let v = ((v1 + v2) / 2 + dist) * 0.75;
+                let ratio = otherP.s / p.s;
+                
+                p.xd += Math.sin(-angle + Math.PI / 2) * v * ratio;
+                p.yd += Math.cos(-angle + Math.PI / 2) * v * ratio;
+                
+                otherP.xd += Math.sin(-angle - Math.PI / 2) * v * (1 / ratio);
+                otherP.yd += Math.cos(-angle - Math.PI / 2) * v * (1 / ratio);
+                
+                p.rd += (Math.random() * 1 - 0.5) * 0.1 * ratio;
+                otherP.rd += (Math.random() * 1 - 0.5) * 0.1 * (1 / ratio);
+                p.rd *= Math.min(1, v);
+                otherP.rd *= Math.min(1, v);
+            }
+        }
+        let height = this.scope.c.canvas.height;
+        let width = this.scope.c.canvas.width;
+        if (this.y >= height - (Game.milkHd * height) + 8) {
+            p.xd *= 0.85;
+            p.yd *= 0.85;
+            p.rd *= 0.85;
+            p.yd -= 1;
+            p.xd += (Math.random() - 0.5) * 0.3;
+            p.yd += (Math.random() - 0.5) * 0.05;
+            p.rd += (Math.random() - 0.5) * 0.02;
+        } else {
+            p.xd *= 0.99;
+            p.rd *= 0.99;
+            p.yd += 1;
+        }
+        p.yd *= Math.min(1, Math.abs(this.y - (height - (Game.milkHd) * height) / 16));
+        p.rd += p.xd * 0.01 / (p.s / (Game.toysType == 1 ? 64 : 48));
+        
+        if (this.x < p.s / 2 && p.xd < 0) p.xd = Math.max(0.1, -p.xd * 0.6);
+        else if (this.x < p.s / 2) { p.xd = 0; this.x = p.s / 2; }
+        
+        if (this.x > width - p.s / 2 && p.xd > 0) p.xd = Math.min(-0.1, -p.xd * 0.6);
+        else if (this.x > width - p.s / 2) { p.xd = 0; this.x = width - p.s / 2; }
+        
+        p.xd = Math.min(Math.max(p.xd, -30), 30);
+        p.yd = Math.min(Math.max(p.yd, -30), 30);
+        p.rd = Math.min(Math.max(p.rd, -0.5), 0.5);
+        
+        this.x += p.xd;
+        this.y += p.yd;
+        this.rotation += p.rd;
+
+        p.s += (p.st - p.s) * 0.5;
+        
+        let comp = this.getComponent('pointerInteractive');
+        if (Game.toysType == 2 && !comp.click && Math.random() < 0.003) {
+            p.st = choose([48, 48, 48, 48, 96]);
+        }
+        if (comp.click) {
+            this.x = Game.mouseX;
+            this.y = Game.mouseY;
+            p.xd += ((Game.mouseX - Game.mouseX2) * 3 - p.xd) * 0.5;
+            p.yd += ((Game.mouseY - Game.mouseY2) * 3 - p.yd) * 0.5
+        }
+        this.width = this.height = Game.toysType == 1 ? 64 : 48;
+        this.scaleX = this.scaleY = p.s / this.width;
+    }, { xd: 0, yd: 0, rd: 0, st: 1, s: 1, id: 0 });
+    Crumbs.spawnToy = function(x, y, id) {
+        let xd = Math.random() * 10 - 5;
+        let yd = Math.random() * 10 - 5;
+        let r = Math.random() * Math.PI * 2;
+        let rd = Math.random() * 0.1 - 0.05;
+        let v = Math.random();
+        if (v <= 0.5) v = 0.5 - 0.5 * Math.pow(1 - v * 2, 3); else v=0.5 + 0.5 * Math.pow((v - 0.5) * 2, 3);
+        let s = (Game.toysType == 1 ? 64 : 48) * (0.1 + v * 1.9);
+        if (Game.toysType == 2) s = (this.id % 10 == 1) ? 96 : 48;
+        
+        let icon = choose(Object.values(Game.Upgrades).filter(upgrade => upgrade.pool == 'cookie')).icon;
+        let obj = {
+            x: x,
+            y: y,
+            rotation: r,            
+            behaviors: [
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.toySkins, { id: id, icon: icon }),
+                new Crumbs.behaviorInstance(Crumbs.objectBehaviors.toyPhysics, { xd: xd, yd: yd, rd: rd, st: s, s: 0, id: id })
+            ],
+            components: new Crumbs.component.pointerInteractive()
+        };
+        return Crumbs.spawn(Crumbs.toy, obj);
+    }
+    Crumbs.initToys = function(width, height) {
+        Game.toys=[];
+        Game.toysType=choose([1,2]);
+        for (let i = 0; i < Math.floor(Math.random() * 15+ (Game.toysType == 1 ? 5 : 30)); i++) {
+            Game.toys.push(Crumbs.spawnToy(Math.random() * width, Math.random() * height * 0.3, i));
+        }
+    }
+
+	Crumbs.initAll = function() { Crumbs.unfocusedSpawn = true; Crumbs.initWrinklers(); Crumbs.initMilk(); Crumbs.initCursors(); Crumbs.initCookie(); Crumbs.initCookieWall(); Crumbs.initSeasonalShower(); Crumbs.initBackground(); Crumbs.initShadedBorders(); Crumbs.initPets(); Crumbs.initNebula(); Crumbs.initEyeOfTheWrinkler(); Crumbs.initBrokenCookie(); Crumbs.unfocusedSpawn = false; }
 	if (Game.ready) { Crumbs.initAll(); } else { Game.registerHook('create', Crumbs.initAll); }
 	
 	//extreme unfunniness intensifies
@@ -1360,136 +1500,9 @@
 					if (Game.TOYS)
 					{
 						//golly
-						if (!Game.Toy)
+						if (!Game.toys)
 						{
-							Game.toys=[];
-							Game.toysType=choose([1,2]);
-							Game.Toy=function(x,y)
-							{
-								this.id=Game.toys.length;
-								this.x=x;
-								this.y=y;
-								this.xd=Math.random()*10-5;
-								this.yd=Math.random()*10-5;
-								this.r=Math.random()*Math.PI*2;
-									this.rd=Math.random()*0.1-0.05;
-									var v=Math.random();var a=0.5;var b=0.5;
-									if (v<=a) v=b-b*Math.pow(1-v/a,3); else v=b+(1-b)*Math.pow((v-a)/(1-a),3);
-								this.s=(Game.toysType==1?64:48)*(0.1+v*1.9);
-								if (Game.toysType==2) this.s=(this.id%10==1)?96:48;
-								this.st=this.s;this.s=0;
-									var cookies=[[10,0]];
-									for (var i in Game.Upgrades)
-									{
-										var cookie=Game.Upgrades[i];
-										if (cookie.bought>0 && cookie.pool=='cookie') cookies.push(cookie.icon);
-									}
-								this.icon=choose(cookies);
-								this.dragged=false;
-								this.l=document.createElement('div');
-								this.l.innerHTML=this.id;
-								this.l.style.cssText='cursor:pointer;border-radius:'+(this.s/2)+'px;opacity:0;width:'+this.s+'px;height:'+this.s+'px;background:#999;position:absolute;left:0px;top:0px;z-index:10000000;transform:translate(-1000px,-1000px);';
-								l('sectionLeft').appendChild(this.l);
-								AddEvent(this.l,'mousedown',function(what){return function(){what.dragged=true;};}(this));
-								AddEvent(this.l,'mouseup',function(what){return function(){what.dragged=false;};}(this));
-								Game.toys.push(this);
-								return this;
-							}
-							for (var i=0;i<Math.floor(Math.random()*15+(Game.toysType==1?5:30));i++)
-							{
-								new Game.Toy(Math.random()*width,Math.random()*height*0.3);
-							}
-						}
-						ctx.globalAlpha=0.5;
-						for (var i in Game.toys)
-						{
-							var me=Game.toys[i];
-							ctx.save();
-							ctx.translate(me.x,me.y);
-							ctx.rotate(me.r);
-							if (Game.toysType==1) ctx.drawImage(Pic('smallCookies.png'),(me.id%8)*64,0,64,64,-me.s/2,-me.s/2,me.s,me.s);
-							else ctx.drawImage(Pic('icons.png'),me.icon[0]*48,me.icon[1]*48,48,48,-me.s/2,-me.s/2,me.s,me.s);
-							ctx.restore();
-						}
-						ctx.globalAlpha=1;
-						for (var i in Game.toys)
-						{
-							var me=Game.toys[i];
-							//psst... not real physics
-							for (var ii in Game.toys)
-							{
-								var it=Game.toys[ii];
-								if (it.id!=me.id)
-								{
-									var x1=me.x+me.xd;
-									var y1=me.y+me.yd;
-									var x2=it.x+it.xd;
-									var y2=it.y+it.yd;
-									var dist=Math.sqrt(Math.pow((x1-x2),2)+Math.pow((y1-y2),2))/(me.s/2+it.s/2);
-									if (dist<(Game.toysType==1?0.95:0.75))
-									{
-										var angle=Math.atan2(y1-y2,x1-x2);
-										var v1=Math.sqrt(Math.pow((me.xd),2)+Math.pow((me.yd),2));
-										var v2=Math.sqrt(Math.pow((it.xd),2)+Math.pow((it.yd),2));
-										var v=((v1+v2)/2+dist)*0.75;
-										var ratio=it.s/me.s;
-										me.xd+=Math.sin(-angle+Math.PI/2)*v*(ratio);
-										me.yd+=Math.cos(-angle+Math.PI/2)*v*(ratio);
-										it.xd+=Math.sin(-angle-Math.PI/2)*v*(1/ratio);
-										it.yd+=Math.cos(-angle-Math.PI/2)*v*(1/ratio);
-										me.rd+=(Math.random()*1-0.5)*0.1*(ratio);
-										it.rd+=(Math.random()*1-0.5)*0.1*(1/ratio);
-										me.rd*=Math.min(1,v);
-										it.rd*=Math.min(1,v);
-									}
-								}
-							}
-							if (me.y>=height-(Game.milkHd)*height+8)
-							{
-								me.xd*=0.85;
-								me.yd*=0.85;
-								me.rd*=0.85;
-								me.yd-=1;
-								me.xd+=(Math.random()*1-0.5)*0.3;
-								me.yd+=(Math.random()*1-0.5)*0.05;
-								me.rd+=(Math.random()*1-0.5)*0.02;
-							}
-							else
-							{
-								me.xd*=0.99;
-								me.rd*=0.99;
-								me.yd+=1;
-							}
-							me.yd*=(Math.min(1,Math.abs(me.y-(height-(Game.milkHd)*height)/16)));
-							me.rd+=me.xd*0.01/(me.s/(Game.toysType==1?64:48));
-							if (me.x<me.s/2 && me.xd<0) me.xd=Math.max(0.1,-me.xd*0.6); else if (me.x<me.s/2) {me.xd=0;me.x=me.s/2;}
-							if (me.x>width-me.s/2 && me.xd>0) me.xd=Math.min(-0.1,-me.xd*0.6); else if (me.x>width-me.s/2) {me.xd=0;me.x=width-me.s/2;}
-							me.xd=Math.min(Math.max(me.xd,-30),30);
-							me.yd=Math.min(Math.max(me.yd,-30),30);
-							me.rd=Math.min(Math.max(me.rd,-0.5),0.5);
-							me.x+=me.xd;
-							me.y+=me.yd;
-							me.r+=me.rd;
-							me.r=me.r%(Math.PI*2);
-							me.s+=(me.st-me.s)*0.5;
-							if (Game.toysType==2 && !me.dragged && Math.random()<0.003) me.st=choose([48,48,48,48,96]);
-							if (me.dragged)
-							{
-								me.x=Game.mouseX;
-								me.y=Game.mouseY;
-								me.xd+=((Game.mouseX-Game.mouseX2)*3-me.xd)*0.5;
-								me.yd+=((Game.mouseY-Game.mouseY2)*3-me.yd)*0.5
-								me.l.style.transform='translate('+(me.x-me.s/2)+'px,'+(me.y-me.s/2)+'px) scale(50)';
-							}
-							else me.l.style.transform='translate('+(me.x-me.s/2)+'px,'+(me.y-me.s/2)+'px)';
-							me.l.style.width=me.s+'px';
-							me.l.style.height=me.s+'px';
-							ctx.save();
-							ctx.translate(me.x,me.y);
-							ctx.rotate(me.r);
-							if (Game.toysType==1) ctx.drawImage(Pic('smallCookies.png'),(me.id%8)*64,0,64,64,-me.s/2,-me.s/2,me.s,me.s);
-							else ctx.drawImage(Pic('icons.png'),me.icon[0]*48,me.icon[1]*48,48,48,-me.s/2,-me.s/2,me.s,me.s);
-							ctx.restore();
+							Crumbs.initToys(width, height);
 						}
 					}
 					
@@ -1549,4 +1562,5 @@
 
     Crumbs.unfocusedSpawn = false;
 	
-	CrumbsEngineLoaded = true;
+	CrumbsEngineModObj.setReady();
+	CrumbsEngineModObj.loadAllViableBridges();
