@@ -12,6 +12,7 @@
 		Crumbs.objectBehaviors.petDisplayMove.replace('Game.T', 'Game.animT').replace('Game.T', 'Game.animT');
 		Crumbs.objectBehaviors.cookieClickPopupBehavior.replace('-= 60 / Game.fps', '-= 60 / PForPause.fFps').replace('4 * Game.fps', '4 * PForPause.fFps');
         Crumbs.objectBehaviors.cookieShowerBackground.replace('(Math.floor(Game.T*2)%512)', '(Math.floor(Game.animT*2)%512)');
+        Crumbs.objectBehaviors.seasonalShowerBackground.replace('(Math.floor(Game.T*2)%512)', '(Math.floor(Game.animT*2)%512)');
         eval('Crumbs.cursorDraw=' + Crumbs.cursorDraw.toString().replace(/Game\.T(?![A-Za-z0-9_])/g, 'Game.animT'));
 		Crumbs.findObject('cursors').getComponent('canvasManipulator').function = Crumbs.cursorDraw;
 
