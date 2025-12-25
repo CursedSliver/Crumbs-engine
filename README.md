@@ -2,6 +2,36 @@
 
 Crumbs Engine allows you to easily manipulate and change canvas-based elements, including any that were present in vanilla. Traditionally, canvas elements are created through large functions that redraw the canvas every frame based on various factors, making them clunky to edit and difficult to mod. Crumbs Engine solves this by abstracting much of that complexity away, leaving you with core functionalities designed for creating more content.
 
+## Table of contents
+- [Integration](#integration)
+- [Documentation](#documentation)
+- [Object](#object)
+  - [Class: Crumbs.object](#class-crumbsobject)
+  - [Instantiation](#instantiation)
+  - [Properties](#properties)
+  - [Behaviors](#behaviors)
+  - [Images](#images)
+  - [Children](#children)
+  - [Methods & Helpers](#methods--helpers)
+    - [Crumbs.object.prototype methods](#crumbsobjectprototype-methods)
+    - [Global methods](#global-methods)
+- [Canvas Scopes & Custom Canvases](#canvas-scopes--custom-canvases)
+- [Custom anchors](#custom-anchors)
+- [Notable Components](#notable-components)
+  - [Crumbs.component.pointerInteractive](#crumbscomponentpointerinteractive)
+  - [Custom bounding boxes](#custom-bounding-boxes)
+  - [Crumbs.component.canvasManipulator](#crumbscomponentcanvasmanipulator)
+  - [Crumbs.component.text](#crumbscomponenttext)
+  - [Crumbs.component.settings](#crumbscomponentsettings)
+  - [Crumbs.component.patternFill](#crumbscomponentpatternfill)
+  - [Crumbs.component.linearFade](#crumbscomponentlinearfade)
+  - [Crumbs.component.tooltip](#crumbscomponenttooltip)
+- [Particles](#particles)
+  - [reusePool instructions](#reusepool-instructions)
+- [Bridges](#bridges)
+- [Vanilla Implementation](#vanilla-implementation)
+- [Source / Further Reading](#for-more-details)
+
 ## Integration
 Load the mod with `Game.LoadMod('https://cursedsliver.github.io/Crumbs-engine/Crumbs.js');`.
 
@@ -25,7 +55,7 @@ There are even more examples covering the vanilla objects in `Implementation.js`
 
 ### Class: `Crumbs.object`
 
-The core of the mod’s functionality, an object is exactly what it sounds like.
+The core of the mod’s functionality; each object represents something to be drawn on the canvas, and has properties that can be manipulated and changed. 
 
 ---
 
