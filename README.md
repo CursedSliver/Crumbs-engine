@@ -15,7 +15,7 @@ To get a better understanding of the mod, it may be helpful to look at the examp
 - TinyWrinklers.js: modifying base game objects
 - GlitchedCookie.js: settings and pointerInteractive components
 - StarCursor2.js: canvasManipulator and text components
-- ??: cheap filters, particles
+- glowingCookieRain.js: cheap filters, particles
 
 There are even more examples covering the vanilla objects in `Implementation.js`.
 
