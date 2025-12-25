@@ -308,27 +308,6 @@ You can create your own anchors by assigning something to a new instance of `Cru
 
 ---
 
-## Example
-
-```js
-const myBehavior = new Crumbs.behavior(function(p) { 
-    this.x += 10 / Game.fps;
-    this.y -= p.rate;
-    p.rate += 1 / Game.fps;
-}, { rate: 0 })
-const myObject = Crumbs.spawn({
-    x: 100,
-    y: 200,
-    scaleX: 3,
-    scaleY: 2,
-    imgs: "glint.png",
-    behaviors: [new Crumbs.behaviorInstance(myBehavior)],
-    components: [new Crumbs.component.settings({ globalCompositeOperation: 'lighter' })]
-});
-```
-
----
-
 ## Particles
 
 A particle is a simplified version of `Crumbs.object` that uses less memory and less computing power, but with reduced functionality. They are always drawn on top of all objects and does not support drawing order, components, or stacking images and behaviors. Declare a particle with `Crumbs.spawnParticle(template, x, y, r, a, scope);`, where:

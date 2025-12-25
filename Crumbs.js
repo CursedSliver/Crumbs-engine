@@ -2106,7 +2106,7 @@ Game.registerMod('Crumbs engine', {
 		window.CrumbsEngineModObj = this;
 
 		eval('Game.registerMod='+Game.registerMod.toString().replace('mod.init=0;', '').replace('if (mod.load && Game.modSaveData[id]) mod.load(Game.modSaveData[id]);', '').replace('mod.init();', 
-			'if (window.CrumbsEngineModObj.loadBridge(id, 1)) { mod.init(); mod.init = 0; if (mod.load && Game.modSaveData[id]) mod.load(Game.modSaveData[id]); setTimeout(window.CrumbsEngineModObj.loadBridge(id, 0), 200); } else { const int = setInterval(function(mod) { if (!CrumbsEngineModObj.ready) { return; } mod.init(); mod.init = 0; if (mod.load && Game.modSaveData[id]) mod.load(Game.modSaveData[id]); setTimeout(window.CrumbsEngineModObj.loadBridge(id, 0), 200); clearInterval(int); }, 10, mod); }'));
+			'if (!window.CrumbsEngineModObj.loadBridge(id, 1)) { mod.init(); mod.init = 0; if (mod.load && Game.modSaveData[id]) mod.load(Game.modSaveData[id]); setTimeout(window.CrumbsEngineModObj.loadBridge(id, 0), 200); } else { const int = setInterval(function(mod) { if (!CrumbsEngineModObj.ready) { return; } mod.init(); mod.init = 0; if (mod.load && Game.modSaveData[id]) mod.load(Game.modSaveData[id]); setTimeout(window.CrumbsEngineModObj.loadBridge(id, 0), 200); clearInterval(int); }, 10, mod); }'));
 	},
 	loadBridge: function(id, order) {
 		if (!this.bridges[id] || !this.bridges[id][order]) { return true; }
