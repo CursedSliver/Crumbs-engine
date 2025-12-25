@@ -2089,7 +2089,7 @@ Game.registerMod('Crumbs engine', {
 
 		window.CrumbsEngineModObj = this;
 
-		eval('Game.registerMod='+Game.registerMod.toString().replace('mod.init();', 'window.CrumbsEngineModObj.loadBridge(id, 1); mod.init(); window.CrumbsEngineModObj.loadBridge(id, 0);'));
+		eval('Game.registerMod='+Game.registerMod.toString().replace('mod.init();', 'window.CrumbsEngineModObj.loadBridge(id, 1); mod.init(); setTimeout(window.CrumbsEngineModObj.loadBridge(id, 0), 200);'));
 	},
 	loadBridge: function(id, order) {
 		if (!this.bridges[id]) { return; }
@@ -2123,10 +2123,10 @@ Game.registerMod('Crumbs engine', {
 			this.ready = false;
 		}
 	},
-	bridgesSource: (window.crumbs_load_local?'./bridgesList.json':'https://cursedsliver.github.io/crumbs-engine/bridgesList.json'),
+	bridgesSource: (window.crumbs_load_local?'./bridgesList.json':'https://cursedsliver.github.io/Crumbs-engine/bridgesList.json'),
 	bridgesPendingCoreReady: [],
 	bridges: {
-        'P for Pause': [(window.crumbs_load_local?'.':'https://cursedsliver.github.io/crumbs-engine/bridges')+'/PForPauseBridge.js', null]
+        'P for Pause': [(window.crumbs_load_local?'.':'https://cursedsliver.github.io/Crumbs-engine/bridges')+'/PForPauseBridge.js', null]
     },
 	bridgesToLoad: 0,
 	bridgesLoaded: 0,

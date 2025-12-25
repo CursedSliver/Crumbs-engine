@@ -64,6 +64,10 @@ declare global { declare namespace Crumbs {
          */
 		export let warnDuplicateComponents: 0 | 1;
     }
+    /**
+     * Contains all the Crumbs.canvas declared.
+     */
+    export let scopedCanvas: Object;
     export interface canvas {
         l: HTMLCanvasElement;
         c: CanvasRenderingContext2D;
