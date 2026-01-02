@@ -38,7 +38,6 @@ const glitchBehavior = new Crumbs.behavior(function() {
         const glitchMap = [
             'source-in',
             'source-atop',
-            'destination-in',
             'lighter',
             'xor',
             'multiply',

@@ -10,7 +10,6 @@ declare global { declare namespace Crumbs {
          * @param r rotation in radian
          * @param x x of vector
          * @param y y of vector
-         * @returns array of two numbers representing new vector
          */
         export function rv(r: number, x: number, y: number): [number, number];
         export function isTouchDevice(): boolean;
@@ -72,7 +71,6 @@ declare global { declare namespace Crumbs {
         l: HTMLCanvasElement;
         c: CanvasRenderingContext2D;
         key: string;
-        shaders: any[];
         background: string;
         redrawPerFrame: boolean;
         boundingClientRect: DOMRect;
@@ -83,12 +81,60 @@ declare global { declare namespace Crumbs {
         objects: Crumbs.object[];
         sortedObjects: Crumbs.object[];
         setSelf(): void;
-        getShader(type: string): any;
-        getAllShaders(type: string): any[];
-        addShader(shader: any, index?: number): void;
     }
     export let canvas: {
         new(parentEle: HTMLElement, key: string, id: any, css: undefined | string): canvas;
+    }
+    export interface image {
+        img: HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData;
+        ready: boolean;
+        toCompress?: boolean;
+        afterReady?: Array<(img: HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData) => void> | null;
+
+        /**
+         * Marks the module as ready and invokes any registered callbacks.
+         */
+        declareReady(): void;
+
+        /**
+         * Register a callback to be invoked when the image becomes ready.
+         */
+        registerAfterReady(func: (img: HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData) => void): void;
+
+        /**
+         * Compress the internal canvas/image (if applicable) and replace img with the compressed Image.
+         */
+        compress(): Promise<void>;
+
+        /**
+         * Replace this image's image with another image (or immediate image).
+         */
+        replace(image: Crumbs.image | string | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData): void;
+
+        /**
+         * Create a manipulated version of this image (cropping / filters / custom draw).
+         * Returns this for chaining.
+         */
+        manipulate(width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData, canvas: HTMLCanvasElement) => void): this;
+
+        /**
+         * Apply a shader (or other transform) to the image. 
+         * Returns this for chaining.
+         */
+        applyShader(shader: Crumbs.shader, scale?: number): this;
+
+        /**
+         * Compress and register this module's image into the game's Loader under the given key.
+         */
+        registerInLoader(key: string): void;
+
+        /**
+         * Creates a new instance with the same image, for chaining purposes.
+         */
+        duplicate(): image
+    }
+    export let image: {
+        new(img: string | HTMLCanvasElement | OffscreenCanvas | ImageBitmap | ImageData): Crumbs.image
     }
     export interface anchor {
         x: number;
@@ -328,18 +374,6 @@ declare global { declare namespace Crumbs {
         export let rect: {
             new(obj: Partial<rect>): rect;
         }
-        /**
-         * @deprecated
-         */
-        export interface path {
-            enabled: boolean;
-            paths: any[];
-            cx: number;
-            cy: number;
-        }
-        export let path: {
-            new(obj: Partial<path>): path;
-        }
         export interface settings {
             enabled: boolean;
             obj: {
@@ -476,6 +510,12 @@ declare global { declare namespace Crumbs {
     export let colliderType: {
         new(func: (s: Crumbs.canvas, m: Crumbs.object, pWidth: number, pHeight: number) => boolean, str: string): colliderType;
     }
+    export interface shader {
+
+    }
+    export let shader: {
+        new(fs: string): shader;
+    }
     export interface objectBehaviors {
         [key: string]: any;
     }
@@ -500,8 +540,6 @@ declare global { declare namespace Crumbs {
     export let validPathConfigs: string[];
     export let validPathFuncs: string[];
     export let subPathsLogic: { [key: string]: Function };
-    export let shader: typeof Crumbs.shader;
-    export let shaderDefaults: typeof Crumbs.shaderDefaults;
     export let preloads: string[];
     export let preloadRequired: boolean;
     export let pointerHold: boolean;
@@ -533,15 +571,16 @@ declare global { declare namespace Crumbs {
      */
     export function spawnParticle(template: Object, x: number, y: number, r: number, a: number, scope: string): Crumbs.particle;
     /**
-     * Manipulates an image, including cropping and/or applying images
-     * @param old Key of the image in Loader (usually the url)
-     * @param newPropertyName New key (can be the old, in which case the image is replaced)
+     * Manipulates an image, including cropping and/or applying css filters.
+     * For advanced webGL effects, use alterImage
+     * @param old Key of the image in Loader (usually the url), does not have to be loaded
+     * @param newPropertyName New key; if null, does not push to name (can be the old, in which case the image is replaced)
      * @param width width to draw to scale the image (assuming drawCallback is not defined)
      * @param height height to draw to scale the image (assuming drawCallback is not defined)
      * @param filters CSS filters
      * @param drawCallback function that lets you draw the image yourself
      */
-    export function manipImage(old: string, newPropertyName: string, width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement, canvas: HTMLCanvasElement) => void): void;
+    export function manipImage(old: string, newPropertyName?: string, width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement, canvas: HTMLCanvasElement) => void): Crumbs.image | Promise<Crumbs.image>;
     /**
      * Finds the first object with the given id and returns it; returns null if not found
      * @param id the id of the object you want to find
@@ -586,7 +625,7 @@ declare global { declare namespace Crumbs {
     export function merge(arr: Crumbs.object[], left: number, middle: number, right: number): Crumbs.object[];
     export function mergeSort(arr: Crumbs.object[], left: number, right: number): Crumbs.object[];
     export function drawAnchorDisplay(o: Crumbs.object, ctx: CanvasRenderingContext2D): void;
-    export function manipLoadedImg(old: string, newPropertyName: string, width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement, canvas: HTMLCanvasElement) => void): void;
+    export function manipLoadedImg(old: string, newPropertyName?: string, width?: number, height?: number, filters?: string, drawCallback?: (ctx: CanvasRenderingContext2D, img: HTMLImageElement, canvas: HTMLCanvasElement) => void, resolver?: function): HTMLCanvasElement | OffscreenCanvas | Promise<HTMLCanvasElement>;
     export function iterateObject(o: Crumbs.object, ctx: CanvasRenderingContext2D): void;
     /**
      * Draws an object onto some canvas

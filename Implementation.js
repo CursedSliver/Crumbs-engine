@@ -140,7 +140,9 @@
 	};
 	Game.registerHook('logic', function() { Crumbs.spawnCookieShower(); });
 	eval('Game.Logic='+Game.Logic.toString().replace(`if (Game.prefs.particles && Game.cookies && Game.T%Math.ceil(Game.fps/Math.min(10,Game.cookiesPs))==0) Game.particleAdd();//cookie shower`, ''));
-	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '').replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Crumbs.scopedCanvas.left.mouseX+Math.random()*8-4, Crumbs.scopedCanvas.left.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
+	eval('Game.ClickCookie='+Game.ClickCookie.toString().replace('Game.particleAdd();', '').replace('Game.particleAdd(Game.mouseX,Game.mouseY,Math.random()*4-2,Math.random()*-2-2,Math.random()*0.5+0.75,1,2);', '')
+	.replace('if (Game.prefs.numbers)', 'Crumbs.spawnCookieClickPopup(Crumbs.scopedCanvas.left.mouseX+Math.random()*8-4, Crumbs.scopedCanvas.left.mouseY-8+Math.random()*8-4, "+"+Beautify(amount,1)); if (false)'));
+	eval('Game.ClickSpecialPic='+Game.ClickSpecialPic.toString().replace(`Game.particleAdd(Game.mouseX,Game.mouseY-32,Math.random()*4-2,Math.random()*-2-4,Math.random()*0.2+0.5,1,2,[20,3]);`, `Crumbs.spawnFallingCookie(Game.mouseX,Game.mouseY-32,Math.random()*4-2,Math.random()*-2-4,Math.random()*0.2+0.5,'',true,2,100,true,[20,3])`));
 
 	Crumbs.spawnWrinklerBits = function(type, originId, id) {
 		const o = Crumbs.findObject('wrinkler'+originId);
@@ -692,7 +694,7 @@
 		});
 	};
     Crumbs.objectBehaviors.seasonalShowerBackground = new Crumbs.behavior(function() {
-        if (!(Game.season == 'christmas' || Game.season == 'valentines') || Game.AscendTimer != 0) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
+        if (!(Game.season == 'christmas' || Game.season == 'valentines') || Game.AscendTimer != 0 || !Game.prefs.particles) { this.noDraw = true; this.getComponent('patternFill').disable(); return; } else { this.noDraw = false; this.getComponent('patternFill').enable(); }
         
         let settings = this.getComponent('settings').obj;
         if (Game.season == 'christmas') { this.imgUsing = 0; this.alpha = 0.75; settings.globalCompositeOperation = 'lighter'; }

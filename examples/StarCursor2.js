@@ -49,6 +49,9 @@ Game.registerHook('click', function() {
 AddEvent(document, 'keydown', function(e) {
     // Expend the star ring on pressing C.
     // You can check Game.keys instead, but I don't really like it that much.
+    if (!Crumbs.findObject('cursorStarGen') || Crumbs.findObject('cursorStarGen').power <= 0) { 
+        return; 
+    }
     if (e.key.toLowerCase() == 'c') {
         const amount = Crumbs.findObject('cursorStarGen').power;
         Crumbs.findObject('cursorStarGen').power = 0;

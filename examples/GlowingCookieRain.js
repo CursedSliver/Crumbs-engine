@@ -3,12 +3,15 @@
 // First, we need to create the glowing cookie sprite.
 // Crumbs engine allows you to manipulate an image in the loader
 // and create a new composite image out of css filters and other canvas actions.
+// You can also use Crumbs.shader to create more advanced shaders, but 
+// we won't be need that for this, since it requires webGL which is a headache.
 
 // Before loading this make sure that icons.png is loaded by having particles on and at least 
 // a few hundred CpS.
 
 // We increase the scale of the image so that the glow will develop a gradient.
-Crumbs.manipImage('icons.png', 'basicCookie.png', 240, 240, '', function(ctx, image, c) {
+let glowingCookie1 = new Crumbs.imageModule('icons.png');
+glowingCookie1.manipulate(240, 240, '', function(ctx, image, c) {
     // NOTE: will NOT work on Safari and older browsers
 
     // Crop the image to only include the cookie sprite we want.
@@ -35,9 +38,11 @@ Crumbs.manipImage('icons.png', 'basicCookie.png', 240, 240, '', function(ctx, im
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = 0.25;
     ctx.drawImage(image, sx, sy, 48, 48, 0, 0, c.width, c.height);
-});
+}).compress(); // Reduces memory usage by turning it into an <img>.
 
-Crumbs.manipImage('icons.png', 'basicCookie2.png', 240, 240, '', function(ctx, image, c) {
+// Let's also make a blue version.
+let glowingCookie2 = new Crumbs.imageModule('icons.png');
+glowingCookie2.manipulate(240, 240, '', function(ctx, image, c) {
     // Let's also make a blue version.
     const [sx, sy] = [10 * 48, 0 * 48];
 
@@ -58,7 +63,7 @@ Crumbs.manipImage('icons.png', 'basicCookie2.png', 240, 240, '', function(ctx, i
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = 0.25;
     ctx.drawImage(image, sx, sy, 48, 48, 0, 0, c.width, c.height);
-});
+}).compress();
 
 // Now we create the cookie rain.
 // Below, we have a way to do it with normal objects commented out
@@ -77,7 +82,7 @@ let rainCookieBehavior = new Crumbs.behavior(function(p) {
     }
 }, { xd: 0, yd: 0, ydd: 0 });
 let rainCookie = {
-    imgs: ['basicCookie.png', 'basicCookie2.png'],
+    imgs: [glowingCookie1, glowingCookie2],
     scope: 'background',
     init: rainCookieInit,
     scaleX: 0.2,
@@ -113,7 +118,7 @@ let rainCookieBehavior = function() {
 let rainCookie = {
     width: 30,
     height: 30,
-    img: 'basicCookie.png',
+    img: glowingCookie1, // You can put imageModules in place of strings
     life: 5 * Game.fps,
     init: rainCookieInit,
     behavior: rainCookieBehavior,
@@ -122,7 +127,7 @@ let rainCookie = {
 let rainCookie2 = {
     width: 30,
     height: 30,
-    img: 'basicCookie2.png',
+    img: glowingCookie2,
     life: 5 * Game.fps,
     init: rainCookieInit,
     behavior: rainCookieBehavior,
