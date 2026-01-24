@@ -79,6 +79,7 @@
 		Game.cookieOriginX = Crumbs.scopedCanvas.left.l.width / 2;
 		Game.cookieOriginY = Crumbs.scopedCanvas.left.l.height * 0.4;
 	} 
+	Game.registerHook('logic', Crumbs.setCookieOrigin);
 
     Crumbs.cookieIcons = [[10, 0]];
 	Crumbs.compileCookieIcons = function() {
