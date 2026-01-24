@@ -75,10 +75,10 @@
 		if (this.x > this.scope.l.offsetWidth + 100 || this.x < -100 || this.y > this.scope.l.offsetHeight + 100) { this.die(); }
 	});
 
-	Game.registerHook('logic', function() {
+	Crumbs.setCookieOrigin = function() {
 		Game.cookieOriginX = Crumbs.scopedCanvas.left.l.width / 2;
 		Game.cookieOriginY = Crumbs.scopedCanvas.left.l.height * 0.4;
-	});
+	} 
 
     Crumbs.cookieIcons = [[10, 0]];
 	Crumbs.compileCookieIcons = function() {
@@ -237,7 +237,6 @@
 		this.scaleX = sw / 100;
 		this.scaleY = sh / 200;
 		this.x = me.x;
-		this.x = me.y;
 		this.y = me.y;
 		this.offsetX = -sw/2 + 50;
 		this.rotation = -(me.r)*Math.PI/180;
@@ -1213,6 +1212,7 @@
 
 	Crumbs.h.rebuildBigCookieButton();
 	Crumbs.overwriteDraw();
+	eval('Game.DrawBackground='+Game.DrawBackground.toString().replaceAll('ctx.canvas', 'Crumbs.scopedCanvas.left.l'));
 	CrumbsEngineModObj.setReady();
 	CrumbsEngineModObj.loadAllViableBridges();
 })();
