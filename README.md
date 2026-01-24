@@ -381,7 +381,7 @@ How to use
 
 Almost all vanilla elements that rely on canvas (with the exception of building displays) are converted into Crumbs Engine objects. You can access them with `Crumbs.findObject(id, scope)` or `Crumbs.getObjects(id, scope)` and modify them as you wish.
 - You can also easily modify all instances of a behavior with `Crumbs.behavior.prototype.replace(original, newCode)` or `Crumbs.behavior.prototype.inject(line, code)`, and find their corresponding behavior from their behaviorInstance with `Crumbs.behaviorInstance.prototype.getBehavior()`.
-- For more details on how they are implemented and their IDs, refer to [Implementation.js](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementation.js).
+- For more details on how they are implemented and their IDs, refer to [this folder](https://github.com/CursedSliver/Crumbs-engine/blob/main/Implementations). Find the js file corresponding to your game version of interest.
 
 ---
 

@@ -21,10 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-if (typeof Crumbs !== 'object') { var Crumbs = {}; }
+(function() {
+if (typeof Crumbs === 'undefined') { var Crumbs = {}; }
+else { return; }
 
-var CrumbsEngineLoaded = false;
-if (typeof crumbs_load_local === 'undefined') { var crumbs_load_local = false; }
+if (typeof window.crumbsEngineLoaded === 'undefined') { window.CrumbsEngineLoaded = false; }
+if (typeof window.crumbs_load_local === 'undefined') { window.crumbs_load_local = false; }
 const Crumbs_Init_On_Load = function() {
 	if (l('topbarFrenzy')) { return; }
 
@@ -448,12 +450,12 @@ const Crumbs_Init_On_Load = function() {
 
 	new Crumbs.canvas(l('game'), 'foreground', 'foregroundCanvas', 'z-index: 2147483647; ');
 	new Crumbs.canvas(l('sectionLeft'), 'left', 'leftCanvas', 'position: absolute; top: 0; left: 0; z-index: 5;'); l('backgroundLeftCanvas').style.display = 'none';
-	Game.LeftBackground = Crumbs.scopedCanvas.left.c;
+	Game.LeftBackground = Crumbs.scopedCanvas.left.c; //removal breaks older versions
 	new Crumbs.canvas(l('rows'), 'middle', 'middleCanvas', 'z-index: 2147483647; position: absolute; top: 0; left: 0;');
 	new Crumbs.canvas(l('store'), 'right', 'rightCanvas', 'z-index: 2147483647; position: absolute; top: 0; left: 0;');
 	l('backgroundCanvas').remove(); 
 	new Crumbs.canvas(l('game'), 'background', 'backgroundCanvas', 'z-index: -1000000000'); 
-	Game.Background = Crumbs.scopedCanvas.background.c;
+	Game.Background = Crumbs.scopedCanvas.background.c; //removal breaks older versions
 
 	Crumbs.updateCanvas = function() {
 		for (let i in Crumbs.scopedCanvas) {
@@ -479,7 +481,7 @@ const Crumbs_Init_On_Load = function() {
 		imageSmoothingEnabled: true,
 		imageSmoothingQuality: 'low'
 	};
-	Crumbs.unfocusedSpawn = true;
+	Crumbs.unfocusedSpawn = false;
 	// @ts-ignore
 	Crumbs.object = function(obj, parent) {
 		//idk what would happen if I used the traditional class structure in here and honestly im too lazy to find out
@@ -512,7 +514,9 @@ const Crumbs_Init_On_Load = function() {
 		}
 	};
 	Crumbs.behavior.prototype.replace = function(original, newCode) {
-		eval('this[Crumbs.behaviorSym]='+this[Crumbs.behaviorSym].toString().replace(original, newCode));
+		if (this[Crumbs.behaviorSym].toString().includes(original)) {
+			eval('this[Crumbs.behaviorSym]='+this[Crumbs.behaviorSym].toString().replace(original, newCode));
+		}
 		return this;
 	};
 	Crumbs.behavior.prototype.inject = function(line, code) {
@@ -2403,7 +2407,86 @@ const Crumbs_Init_On_Load = function() {
 
     Game.Load(function() { });
 
-	Game.LoadMod((window.crumbs_load_local)?'./Implementation.js':'https://cursedsliver.github.io/Crumbs-engine/Implementation.js');
+	Crumbs.__disposalCanvas = new OffscreenCanvas(1, 1);
+	Crumbs.__disposalCtx = Crumbs.__disposalCanvas.getContext('2d');
+	Crumbs.overwriteDraw = function() {
+		if (!Game.DrawBackground) { 
+			Game.Notify('Fatal error', 'Crumbs engine: some mods are being extremely unfunny, or the game is straight up broken', [1, 7]);
+			console.error('Game.DrawBackground not found!');
+			return;
+		}
+		let str = Game.DrawBackground.toString();
+		const injectPoints = [['var ctx=Game.LeftBackground;', 'after'], ['if (Game.OnAscend)', 'before']];
+		Game.LeftBackground = Crumbs.__disposalCtx;
+		Game.Background = Crumbs.__disposalCtx;
+		//the below is kinda unnecessary but anyways
+		for (let i in injectPoints) {
+			if (!str.includes(injectPoints[i][0])) { continue; }
+			if (injectPoints[i][1] == 'after') {
+				str = str.replace(injectPoints[i][0], injectPoints[i][0] + 'ctx = Crumbs.__disposalCtx; Crumbs.drawObjects();');
+			} else if (injectPoints[i][1] == 'before') { 
+				str = str.replace(injectPoints[i][0], 'ctx = Crumbs.__disposalCtx; Crumbs.drawObjects();' + injectPoints[i][0]);
+			}
+			eval('Game.DrawBackground='+str);
+			return;
+		}
+		//fallback: inject at the start of function, try to remove "var ctx=Game.LeftBackground;" if possible
+		let regex = /\bvar\s+ctx\s*=\s*[^;]+;/;
+		if (regex.test(str)) {
+			str = str.replace(regex, '');
+		} 
+			
+		const i = str.indexOf('{');
+		str = str.slice(0, i + 1) + 'var ctx = Crumbs.__disposalCtx; Crumbs.drawObjects();' + str.slice(i + 1);
+
+		if (str !== Game.DrawBackground.toString()) { 
+			eval('Game.DrawBackground=' + str);
+		}
+	};
+	Crumbs.hijackCtx = function() {
+
+	}
+
+	const implementationsParentFolderURL = (window.crumbs_load_local)?'./Implementations/':'https://cursedsliver.github.io/Crumbs-engine/Implementations/';
+	
+	const base = implementationsParentFolderURL;
+	const url = base + 'versionsList.json';
+	let receivedJson = null;
+	Crumbs.implementationIntendedVer = null;
+	fetch(url, { credentials: 'omit' })
+		.then(resp => {
+			if (!resp.ok) { throw new Error('Failed to fetch versions list: ' + resp.status); }
+			return resp.json();
+		})
+		.then(json => {
+			const keys = Object.keys(json).filter(k => k !== 'fallback' && !isNaN(parseFloat(k)));
+			const entries = keys.map(k => ({ key: k, num: parseFloat(k) })).sort((a,b) => a.num - b.num);
+			if (!entries.length) { throw new Error('No implementations available'); }
+			receivedJson = json;
+			let pick = null;
+			for (let i = entries.length - 1; i >= 0; i--) {
+				if (entries[i].num <= Game.version) { pick = entries[i].key; break; }
+			}
+			if (!pick) {
+				if (json.fallback && json[parseFloat(json.fallback)]) { 
+					pick = parseFloat(json.fallback); 
+					Game.Notify('Version warning', 'Your game (v' + Game.version.toFixed(4) + ') is too outdated, fetching implementation for earliest possible version (v' + json.fallback + ')!<br>Some things may seem unusual or break.', [1, 7]);
+				}
+				else { throw new Error('Unknown error'); }
+			}
+			Crumbs.implementationIntendedVer = pick;
+			const file = json[pick];
+			if (!file) { throw new Error('Missing implementation directory for chosen version: v' + pick); }
+			try { Game.LoadMod(base + file); } catch(e) {
+				throw new Error('No implementation file found for chosen version: v' + pick);
+			}
+		})
+		.catch(err => {
+			console.error(err);
+			Game.Notify('Crumbs engine failed to start!', 'Fatal: could not load a suitable implementations: <br>' + err?.message, [0, 1]);
+			
+			try { Game.LoadMod((base) + 'v' + Game.version + '.js'); } catch(e) {}
+		});
     
 	l('versionNumber').innerHTML='<div id="gameVersionText" style="display: inline; pointer-events: none;">v. '+Game.version+'</div>'+(!App?('<div id="httpsSwitch" style="cursor:pointer;display:inline-block;background:url(img/'+(Game.https?'lockOn':'lockOff')+'.png);width:16px;height:16px;position:relative;top:4px;left:0px;margin:0px -2px;"></div>'):'')+(Game.beta?' <span style="color:#ff0;">beta</span>':'');
 	if (!App) { 
@@ -2422,7 +2505,7 @@ const Crumbs_Init_On_Load = function() {
 	Game.registerHook('check', Crumbs.h.resolveInjects);
 };
 
-Game.registerMod('Crumbs engine', {
+if (typeof Game !== 'undefined' && Game.registerMod) { Game.registerMod('Crumbs engine', {
 	init: function() {
 		const self = this;
 
@@ -2521,4 +2604,4 @@ Game.registerMod('Crumbs engine', {
 	},
 	save: function() { return Crumbs.t + ''; },
 	load: function(str) { Crumbs.t = parseInt(str); }
-});
+}); } })();
