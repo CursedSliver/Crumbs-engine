@@ -75,6 +75,11 @@
 		if (this.x > this.scope.l.offsetWidth + 100 || this.x < -100 || this.y > this.scope.l.offsetHeight + 100) { this.die(); }
 	});
 
+	Game.registerHook('logic', function() {
+		Game.cookieOriginX = Crumbs.scopedCanvas.left.l.width / 2;
+		Game.cookieOriginY = Crumbs.scopedCanvas.left.l.height * 0.4;
+	});
+
     Crumbs.cookieIcons = [[10, 0]];
 	Crumbs.compileCookieIcons = function() {
 		Crumbs.cookieIcons=[[10,0]];
@@ -231,8 +236,8 @@
 		const me = Game.wrinklers[this.wId];
 		this.scaleX = sw / 100;
 		this.scaleY = sh / 200;
-		this.x = me.x + this.scope.l.width * 0.5;
-		this.x = me.y + this.scope.l.height * 0.4;
+		this.x = me.x;
+		this.x = me.y;
 		this.y = me.y;
 		this.offsetX = -sw/2 + 50;
 		this.rotation = -(me.r)*Math.PI/180;
