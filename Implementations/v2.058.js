@@ -43,7 +43,7 @@
 		this.alpha *= 1 - p.speed;
 	}, { speed: 0.05 });
 	Crumbs.objectBehaviors.cookieFadeout = new Crumbs.behavior(function(p) {
-		this.alpha = Math.pow((Crumbs.t - this.t) / p.speed, 0.5);
+		this.alpha = 1 - Math.pow((Crumbs.t - this.t) / p.speed, 0.5);
 	}, { speed: 1 / 0.05 });
 	Crumbs.objectBehaviors.fadeout = new Crumbs.behavior(function(p) {
 		//fade but not multiplicative

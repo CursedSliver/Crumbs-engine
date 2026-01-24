@@ -1704,49 +1704,42 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.component.dynamicShader.prototype.overrideDraw = true;
 	Crumbs.bufferEffectsCanva = new OffscreenCanvas(Math.max(512, l('game').offsetWidth), Math.max(512, l('game').offsetHeight));
-	Crumbs.bufferGL = Crumbs.bufferEffectsCanva.getContext('webgl');
-	Crumbs.buffersList = new Map();
+	Crumbs.bufferGL = Crumbs.bufferEffectsCanva.getContext('webgl2');
+	Crumbs.bufferGLVAO = null;
 	Crumbs.setupBufferEffectsCanva = function(buffer, program) {
-		return;
 		/**
 		 * @type WebGLRenderingContext
 		 */
 		const gl = Crumbs.bufferGL;
 
-		const posBuf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-			-1, -1,
-			1, -1,
-			-1, 1,
-			-1, 1,
-			1, -1,
-			1, 1
-		]), gl.DYNAMIC_DRAW);
+		const quad = new Float32Array([
+			0, 0, 0, 0,
+			1, 0, 1, 0,
+			0, 1, 0, 1,
 
-		const aPos = gl.getAttribLocation(program, 'a_pos');
-		gl.enableVertexAttribArray(aPos);
-		gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+			0, 1, 0, 1,
+			1, 0, 1, 0,
+			1, 1, 1, 1,
+		]);
 
-		const uvBuf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-			0, 0,
-			1, 0,
-			0, 1,
-			0, 1,
-			1, 0,
-			1, 1
-		]), gl.DYNAMIC_DRAW);
+		const vao = gl.createVertexArray();
+		gl.bindVertexArray(vao);
 
-		const aUV = gl.getAttribLocation(program, 'aUV');
-		if (aUV !== -1 && aUV !== null) {
-			gl.enableVertexAttribArray(aUV);
-			gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0);
-		}
+		Crumbs.bufferGLVAO = vao;
 
-		Crumbs.buffersList.set('posBuf', posBuf);
-		Crumbs.buffersList.set('uvBuf', uvBuf);
+		const vbo = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+		gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+
+		// position
+		gl.enableVertexAttribArray(0);
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 16, 0);
+
+		// uv
+		gl.enableVertexAttribArray(1);
+		gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
+
+		gl.bindVertexArray(null);
 	}
 	if (Crumbs.webGLSupported) { Crumbs.setupBufferEffectsCanva(); }
 	window.addEventListener('resize', function() { 
@@ -1755,11 +1748,11 @@ const Crumbs_Init_On_Load = function() {
 	});
 	if (!Crumbs.bufferGL) {
 		Crumbs.webGLSupported = false;
-		console.warn('Note: WebGL is not supported by your browser, so certain advanced shader effects will not function.');
-		console.warn('Note: WebGL is not supported by your browser, so certain advanced shader effects will not function.');
-		console.warn('Note: WebGL is not supported by your browser, so certain advanced shader effects will not function.');
-		console.warn('Note: WebGL is not supported by your browser, so certain advanced shader effects will not function.');
-		console.warn('Note: WebGL is not supported by your browser, so certain advanced shader effects will not function.');
+		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
+		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
+		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
+		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
+		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
 	}
 	Crumbs.shader = function(fs, vs) {
 		//delete the shaders after linking program as it is no longer needed?
@@ -1769,24 +1762,27 @@ const Crumbs_Init_On_Load = function() {
 
 		this.setup();
 	}
-	Crumbs.shader.prototype.vs = `precision mediump float;
+	Crumbs.shader.prototype.vs = `#version 300 es
+	precision mediump float;
 
-	attribute vec2 a_pos; 
-	attribute vec2 aUV;
+	layout(location = 0) in vec2 a_pos;
+	layout(location = 1) in vec2 aUV;
 
-	varying vec2 vUV;
+	out vec2 vUV;
 
 	void main() {
-	    vUV = vec2(aUV.x, aUV.y);
-	    gl_Position = vec4(a_pos, 0.0, 1.0);
+		vUV = aUV;
+		gl_Position = vec4(a_pos, 0.0, 1.0);
 	}`;
-	Crumbs.shader.prototype.fs = `precision mediump float;
-	 
+	Crumbs.shader.prototype.fs = `#version 300 es
+	precision mediump float;
+
 	uniform sampler2D u_tex;
-	varying vec2 vUV;
+	in vec2 vUV;
+	out vec4 outColor;
 
 	void main() {
-    	gl_FragColor = texture2D(u_tex, vUV);
+		outColor = texture(u_tex, vUV);
 	}`;
 	Crumbs.shader.prototype.setup = function(canvas) {
 
@@ -1848,14 +1844,17 @@ const Crumbs_Init_On_Load = function() {
 
 		return out;
 	}
-	Crumbs.grayscale = new Crumbs.shader(`precision mediump float;
-	uniform sampler2D uTex;
-	varying vec2 vUV;
+	Crumbs.grayscale = new Crumbs.shader(`#version 300 es
+	precision mediump float;
+
+	uniform sampler2D u_tex;
+	in vec2 vUV;
+	out vec4 outColor;
 
 	void main() {
-		vec4 c = texture2D(uTex, vUV);
-  		float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-  		gl_FragColor = vec4(vec3(g), c.a);
+		vec4 c = texture(u_tex, vUV);
+		float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+		outColor = vec4(vec3(g), c.a);
 	}`);
 	Crumbs.testModule = new Crumbs.image('perfectCookie.png');
 	Crumbs.test = function() {
