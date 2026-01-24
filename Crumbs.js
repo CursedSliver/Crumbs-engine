@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 (function() {
-if (typeof Crumbs === 'undefined') { var Crumbs = {}; }
+if (typeof window.Crumbs === 'undefined') { window.Crumbs = {}; }
 else { return; }
 
 if (typeof window.crumbsEngineLoaded === 'undefined') { window.CrumbsEngineLoaded = false; }
@@ -468,7 +468,13 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.updateCanvas();
 	// @ts-ignore
-	window.addEventListener('resize',function(event) {
+	window.addEventListener('resize',function() {
+		Crumbs.updateCanvas();
+	});
+	window.addEventListener('mousemove', function() {
+		Crumbs.updateCanvas();
+	});
+	Game.registerHook('check', function() {
 		Crumbs.updateCanvas();
 	});
 	
@@ -2407,7 +2413,11 @@ const Crumbs_Init_On_Load = function() {
 
     Game.Load(function() { });
 
-	Crumbs.__disposalCanvas = new OffscreenCanvas(1, 1);
+
+	Crumbs.__disposalCanvas = document.createElement('canvas');
+	Crumbs.__disposalCanvas.width = 1;
+	Crumbs.__disposalCanvas.height = 1;
+	l('preloadImages').appendChild(Crumbs.__disposalCanvas);
 	Crumbs.__disposalCtx = Crumbs.__disposalCanvas.getContext('2d');
 	Crumbs.overwriteDraw = function() {
 		if (!Game.DrawBackground) { 

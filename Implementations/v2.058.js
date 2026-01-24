@@ -125,8 +125,7 @@
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: (xd || (Math.random()*2-1)) }), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: t * Game.fps}), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFadeout, {speed: (t * Game.fps)}),
-				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound),
-				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, {spin: Math.floor(Math.random()*Math.PI*2)})
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.pruneOnNonvisibleGravityBound)
 			],
 			x: (onMouse?Crumbs.scopedCanvas.left.mouseX:x),
 			y: (onMouse?Crumbs.scopedCanvas.left.mouseY:y),
@@ -155,8 +154,7 @@
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFall, {yd: Math.random()*-2-2}), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.horizontal, {speed: Math.random()*4-2}), 
 				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.expireAfter, {t: 1 * Game.fps}), 
-				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFadeout, {speed: (1 * Game.fps)}),
-				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.spin, {spin: Math.floor(Math.random()*Math.PI*2)})
+				new Crumbs.behaviorInstance(Crumbs.objectBehaviors.cookieFadeout, {speed: (1 * Game.fps)})
 			],
 			imgUsing: type,
 			sx: ((id * 3) % 8) * 100,
@@ -233,7 +231,8 @@
 		const me = Game.wrinklers[this.wId];
 		this.scaleX = sw / 100;
 		this.scaleY = sh / 200;
-		this.x = me.x;
+		this.x = me.x + this.scope.l.width * 0.5;
+		this.x = me.y + this.scope.l.height * 0.4;
 		this.y = me.y;
 		this.offsetX = -sw/2 + 50;
 		this.rotation = -(me.r)*Math.PI/180;
