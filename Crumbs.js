@@ -1706,9 +1706,10 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.bufferEffectsCanva = new OffscreenCanvas(Math.max(512, l('game').offsetWidth), Math.max(512, l('game').offsetHeight));
 	Crumbs.bufferGL = Crumbs.bufferEffectsCanva.getContext('webgl2');
 	Crumbs.bufferGLVAO = null;
-	Crumbs.setupBufferEffectsCanva = function(buffer, program) {
+	Crumbs.bufferGLVBO = null;
+	Crumbs.setupBufferEffectsCanva = function() {
 		/**
-		 * @type WebGLRenderingContext
+		 * @type WebGL2RenderingContext
 		 */
 		const gl = Crumbs.bufferGL;
 
@@ -1722,6 +1723,15 @@ const Crumbs_Init_On_Load = function() {
 			1, 1, 1, 1,
 		]);
 
+		/*const quad = new Float32Array([
+  -0.5, -0.5,
+   0.5, -0.5,
+  -0.5,  0.5,
+  -0.5,  0.5,
+   0.5, -0.5,
+   0.5,  0.5,
+]);*/
+
 		const vao = gl.createVertexArray();
 		gl.bindVertexArray(vao);
 
@@ -1729,7 +1739,9 @@ const Crumbs_Init_On_Load = function() {
 
 		const vbo = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-		gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, quad, gl.DYNAMIC_DRAW);
+
+		Crumbs.bufferGLVBO = vbo;
 
 		// position
 		gl.enableVertexAttribArray(0);
@@ -1738,8 +1750,6 @@ const Crumbs_Init_On_Load = function() {
 		// uv
 		gl.enableVertexAttribArray(1);
 		gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
-
-		gl.bindVertexArray(null);
 	}
 	if (Crumbs.webGLSupported) { Crumbs.setupBufferEffectsCanva(); }
 	window.addEventListener('resize', function() { 
@@ -1759,8 +1769,6 @@ const Crumbs_Init_On_Load = function() {
 		console.log(vs ?? this.vs, fs ?? this.fs, Crumbs.bufferGL);
 		const prog = Crumbs.h.createProgram(Crumbs.bufferGL, vs ?? this.vs, fs ?? this.fs);
 		this.program = prog[0];
-
-		this.setup();
 	}
 	Crumbs.shader.prototype.vs = `#version 300 es
 	precision mediump float;
@@ -1784,8 +1792,56 @@ const Crumbs_Init_On_Load = function() {
 	void main() {
 		outColor = texture(u_tex, vUV);
 	}`;
-	Crumbs.shader.prototype.setup = function(canvas) {
+	Crumbs.shader.prototype.refreshCanvaState = function(canvas) {
+		Crumbs.setupBufferEffectsCanva();
+	}
+	Crumbs.shader.prototype.setupSubData = function(w, h) {
+		const gl = Crumbs.bufferGL;
+		const x = 0;
+		const y = 0;
+		gl.bufferSubData(
+			gl.ARRAY_BUFFER,
+			0,
+			new Float32Array([
+				x, y, 0, 0,
+				x + w, y, 1, 0,
+				x, y + h, 0, 1,
 
+				x, y + h, 0, 1,
+				x + w, y, 1, 0,
+				x + w, y + h, 1, 1
+			])
+		);
+	}
+	Crumbs.shader.prototype.getTexture = function(src) {
+		/**
+		 * @type WebGL2RenderingContext
+		 */
+		const gl = Crumbs.bufferGL;
+		const tex = gl.createTexture();
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		/*try {
+			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+		} catch (e) { }*/
+
+		const isPOT = Crumbs.h.isPowerOf2(src.width) && Crumbs.h.isPowerOf2(src.height);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, isPOT ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, isPOT ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			src
+		);
+
+		return tex;
 	}
 	Crumbs.shader.prototype.parse = function(image, scale) {
 		//ONLY use for alterImage or other things that will only ever process the image once
@@ -1793,7 +1849,7 @@ const Crumbs_Init_On_Load = function() {
 		//scale not yet supported.
 		scale = scale ?? 1;
 		/**
-		 * @type WebGLRenderingContext
+		 * @type WebGL2RenderingContext
 		 */
 		const gl = Crumbs.bufferGL;
 		const src = Crumbs.getRawPic(image);
@@ -1805,7 +1861,6 @@ const Crumbs_Init_On_Load = function() {
 		const w = src.width;
 		const h = src.height;
 		if (w * h * scale * scale > 2 ** 20) { console.warn('Overly large dimensions of '+src?.alt+', may cause instability.'); }
-
 		if (w > Crumbs.bufferEffectsCanva.width) { 
 			Crumbs.bufferEffectsCanva.width = w;
 		}
@@ -1814,33 +1869,38 @@ const Crumbs_Init_On_Load = function() {
 		}
 
 		gl.useProgram(this.program);
+		//gl.bindVertexArray(Crumbs.bufferGLVAO);
 		gl.viewport(0, 0, w, h);
 
-		const tex = gl.createTexture();
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+		this.setupSubData(w, h);
+
+		const tex = this.getTexture(src);
+
+		console.log({
+  vao: gl.getParameter(gl.VERTEX_ARRAY_BINDING),
+  program: gl.getParameter(gl.CURRENT_PROGRAM),
+  arrayBuffer: gl.getParameter(gl.ARRAY_BUFFER_BINDING),
+});
+console.log(gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_ENABLED),
+gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_STRIDE)
+);
 
 		const uTex = gl.getUniformLocation(this.program, 'u_tex');
-		if (uTex !== -1 && uTex !== null) gl.uniform1i(uTex, 0);
+		if (uTex !== -1 && uTex !== null) { gl.uniform1i(uTex, 0);  }
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+		//export and cleanup
 		const out = new OffscreenCanvas(w, h);
 		const ctx = out.getContext('2d');
-		ctx.drawImage(Crumbs.bufferEffectsCanva, 0, Crumbs.bufferEffectsCanva.height - h, w, h, 0, 0, w, h);
+		//ctx.drawImage(Crumbs.bufferEffectsCanva, 0, Crumbs.bufferEffectsCanva.height - h, w, h, 0, 0, w, h);
+		ctx.drawImage(Crumbs.bufferEffectsCanva, 0, 0, w, h);
 
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		gl.deleteTexture(tex);
-		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 		Crumbs.bufferEffectsCanva.width = Math.max(l('game').offsetWidth, 512);
-		Crumbs.bufferEffectsCanva.height = Math.max(l('game').height, 512);
+		Crumbs.bufferEffectsCanva.height = Math.max(l('game').offsetHeight, 512);
 
 		return out;
 	}
@@ -1856,9 +1916,10 @@ const Crumbs_Init_On_Load = function() {
 		float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
 		outColor = vec4(vec3(g), c.a);
 	}`);
+	Crumbs.gggggggg = new Crumbs.shader();
 	Crumbs.testModule = new Crumbs.image('perfectCookie.png');
 	Crumbs.test = function() {
-		Crumbs.testModule.applyShader(Crumbs.grayscale);
+		Crumbs.testModule.applyShader(Crumbs.gggggggg);
 		Crumbs.spawn({ imgs: Crumbs.testModule, x: 100, y: 100, scaleX: 0.5, scaleY: 0.5, anchor: 'top-left' });
 	}
 

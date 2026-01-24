@@ -297,8 +297,8 @@
 		}
 		for (let i = 0; i < Game.wrinklerLimit; i++) {
 			const h = Crumbs.spawn(Crumbs.wrinklerObj, { id: 'wrinkler'+i, wId: i });
-			for (let i in h.children) {
-				h.children[i].wId = i;
+			for (let ii in h.children) {
+				h.children[ii].wId = i;
 			}
 		}
 	};
