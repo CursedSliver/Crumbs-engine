@@ -837,7 +837,7 @@
 	Crumbs.shine = function(scaleMult, target1, target2) {
 		return {
 			order: 10, 
-			imgs: 'img/flare.png',
+			imgs: 'img/shine.png',
 			scaleX: scaleMult,
 			scaleY: scaleMult,
 			behaviors: [
