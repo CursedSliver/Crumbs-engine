@@ -435,6 +435,8 @@
 			this.rotation = 0; 
 			this.imgUsing = 3;
 			this.alpha = 0.5; 
+			this.scaleX = 4;
+			this.scaleY = 4;
 			return; 
 		}
 		var goodBuff=0;
