@@ -258,6 +258,10 @@ declare global { declare namespace Crumbs {
         updateChildren(): void;
         findChild(id: any): object | null;
         getChildren(id?: any): object[];
+        /**
+         * Creates a shallow copy of the object without any functions, but component behavior and imgs arrays are refreshed, and all children are also soft duplicated
+         */
+        softDuplicate(scope: string | Crumbs.canvas): object;
         compile(): object[];
         recursiveCompile(): object[];
         /**

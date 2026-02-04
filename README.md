@@ -145,7 +145,7 @@ Crumbs Engine contains many helper methods to help you find, manipulate, and do 
 | `hasChildren()` | Returns `true` if the object has any children, otherwise `false`. |
 | `removeChild(index)` | Removes the child at the specified index by setting it to `null`. Note: Children arrays are not automatically cleaned, so manage them carefully. |
 | `addComponent(comp)` | Adds a component to the object, and calls the component's `init` method if it exists. |
-| `removeComponent(type)` | Removes the first component of the specified type from the object and returns it; returns `null` if not found. |
+| `removeComponent(type)` | Removes the first component of the specified type (string or the instance itself) from the object and returns it; returns `null` if not found. |
 | `getComponent(type)` | Returns the first component of the specified type attached to the object, or `null` if not found. |
 | `getAllComponents(type)` | Returns an array of all components of the specified type attached to the object. |
 | `addBehavior(behavior)` | Adds a behavior to the object. Accepts a `Crumbs.behavior`, `Crumbs.behaviorInstance`, or a function. |

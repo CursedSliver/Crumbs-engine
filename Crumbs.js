@@ -543,6 +543,7 @@ const Crumbs_Init_On_Load = function() {
 		this.t = Crumbs.t; //the time when it was created
 		this.scaleFactorX = 1;
 		this.scaleFactorY = 1;
+		this[Crumbs.toCompositSym] = false;
 	};
 	Crumbs.behaviorSym = Symbol('f');
 	Crumbs.initSym = Symbol('init');
@@ -895,17 +896,34 @@ const Crumbs_Init_On_Load = function() {
 			}
 		}
 		this.components.push(comp);
+		let needComposition = false;
+		for (let i in this.components) {
+			if (this.components[i].overrideDraw) { 
+				if (needComposition) { this[Crumbs.toCompositSym] = true; break; }
+				needComposition = true;
+			}
+		}
 	};
 	Crumbs.object.prototype.removeComponent = function(type) {
 		for (let i in this.components) {
-			if (this.components[i] instanceof Crumbs.component[type]) {
+			if (!(this.components[i] instanceof Crumbs.component[type] || this.components[i] == type)) { continue; }
+
+			for (let ii in this.components) {
+				if (this.components[ii].onComponentsChange) {
+					this.components[ii].onComponentsChange(this);
+				}
+			}
+			let n = 0;
+			if (this.components[i].overrideDraw) {
 				for (let ii in this.components) {
-					if (this.components[ii].onComponentsChange) {
-						this.components[ii].onComponentsChange(this);
+					if (this.components[ii].overrideDraw) { 
+						n++;
 					}
 				}
-				return this.components.splice(i, 1);
 			}
+			if (n <= 1) { this[Crumbs.toCompositSym] = false; } 
+
+			return this.components.splice(i, 1);
 		}
 		return null;
 	};
@@ -986,6 +1004,22 @@ const Crumbs_Init_On_Load = function() {
 		}
 		return toReturn;
 	};
+	Crumbs.object.prototype.softDuplicate = function(scope) {
+		let obj = {};
+		for (let i in this) {
+			if (typeof this[i] == 'function') { continue; }
+			obj[i] = this[i];
+		}
+		obj.components = [].concat(obj.components);
+		obj.behaviors = [].concat(obj.behaviors);
+		obj.imgs = [].concat(obj.imgs);
+		obj.children = [].concat(obj.children);
+		for (let i in obj.children) {
+			if (obj.children[i]) { obj.children[i] = obj.children[i].softDuplicate(scope); }
+		}
+		obj.scope = scope;
+		return obj;
+	};
 	Crumbs.reorderAllObjects = function() {
 		for (let i in Crumbs.objects) {
 			let counter = 0;
@@ -1008,7 +1042,6 @@ const Crumbs_Init_On_Load = function() {
 	};
 	Crumbs.lastUpdate = Date.now();
 	Crumbs.updateObjects = function() { //called every logic frame
-		if (window.gamePause) { return; } //p for pause support
 		for (let i in Crumbs.objects) { 
 			if (Crumbs.objectsEnabled(i)) {
 				for (let ii in Crumbs.objects[i]) {
@@ -1109,6 +1142,9 @@ const Crumbs_Init_On_Load = function() {
 
 	Crumbs.component = {};
 	Crumbs.defaultComp = {};
+	Crumbs.compositionCanvas = new OffscreenCanvas(Math.max(512, l('game').offsetWidth), Math.max(512, l('game').offsetHeight));
+	Crumbs.compositionCtx = Crumbs.compositionCanvas.getContext('2d');
+	Crumbs.toCompositSym = Symbol('toCompositeComponents');
 
 	Crumbs.component.rect = function(obj) {
 		for (let i in Crumbs.defaultComp.rect) {
@@ -1239,18 +1275,17 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.component.text.prototype.disable = function() {
 		this.enabled = false;
 	};
-	// @ts-ignore
 	Crumbs.component.text.prototype.logic = function(m) { };
-	// @ts-ignore
 	Crumbs.component.text.prototype.preDraw = function(m, ctx) {
+
+	};
+	Crumbs.component.text.prototype.postDraw = function(m, ctx) {
 		ctx.font = this.size+'px '+this.font;
 		ctx.textAlign = this.align;
 		ctx.direction = this.direction;
 		ctx.fillStyle = this.color;
 		ctx.lineWidth = this.outline;
 		ctx.strokeStyle = this.outlineColor;
-	};
-	Crumbs.component.text.prototype.postDraw = function(m, ctx) {
 		if (this.maxWidth) {
 			ctx.fillText(this.content, m.offsetX, m.offsetY, this.maxWidth);
 		} else {
@@ -1389,7 +1424,6 @@ const Crumbs_Init_On_Load = function() {
 			if (this.click && !Crumbs.pointerHold) { this.click = false; this.onRelease.call(m); }
 		}
 	};
-	// @ts-ignore
 	Crumbs.component.pointerInteractive.prototype.preDraw = function(m, ctx) { };
 	Crumbs.pointerHold = false;
 	AddEvent(document, 'mousedown', function() { Crumbs.pointerHold = true; });
@@ -1742,7 +1776,7 @@ const Crumbs_Init_On_Load = function() {
 	}
 	Crumbs.component.dynamicShader.prototype.overrideDraw = true;
 	Crumbs.bufferEffectsCanva = new OffscreenCanvas(Math.max(512, l('game').offsetWidth), Math.max(512, l('game').offsetHeight));
-	Crumbs.bufferGL = Crumbs.bufferEffectsCanva.getContext('webgl2');
+	Crumbs.bufferGL = Crumbs.bufferEffectsCanva.getContext('webgl2', { antialias: false, depth: false, stencil: false });
 	Crumbs.bufferGLVAO = null;
 	Crumbs.bufferGLVBO = null;
 	Crumbs.bufferGLUvVBO = null;
@@ -1800,10 +1834,14 @@ const Crumbs_Init_On_Load = function() {
 		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
 		console.warn('Note: WebGL2 is not supported by your browser, so certain advanced shader effects will not function.');
 	}
-	Crumbs.shader = function(fs, vs) {
+	Crumbs.shader = function(fs, vs, options) {
 		//delete the shaders after linking program as it is no longer needed?
 		const prog = Crumbs.h.createProgram(Crumbs.bufferGL, vs ?? this.vs, fs ?? this.fs);
 		this.program = prog[0];
+
+		for (let i in options) {
+			this[i] = options[i];
+		}
 	}
 	Crumbs.shader.prototype.vs = `#version 300 es
 	precision mediump float;
@@ -1832,25 +1870,6 @@ const Crumbs_Init_On_Load = function() {
 	Crumbs.shader.prototype.scratchPadMain = Crumbs.bufferEffectsCanva;
 	Crumbs.shader.prototype.refreshCanvaState = function(canvas) {
 		Crumbs.setupBufferEffectsCanva();
-	}
-	Crumbs.shader.prototype.setupSubData = function(w, h) {
-		//?
-		const gl = this.scratchPad;
-		const x = 0;
-		const y = 0;
-		gl.bufferSubData(
-			gl.ARRAY_BUFFER,
-			0,
-			new Float32Array([
-				x, y, 0, 0,
-				x + w, y, 1, 0,
-				x, y + h, 0, 1,
-
-				x, y + h, 0, 1,
-				x + w, y, 1, 0,
-				x + w, y + h, 1, 1
-			])
-		);
 	}
 	Crumbs.shader.prototype.setupParameters = function() {
 		const gl = this.scratchPad;
@@ -1896,10 +1915,7 @@ const Crumbs_Init_On_Load = function() {
 		gl.useProgram(this.program);
 		gl.viewport(0, 0, w, h);
 
-		const uTex = gl.getUniformLocation(this.program, 'u_tex');
-		if (uTex !== -1 && uTex !== null) { gl.uniform1i(uTex, 0); }
-		const uTime = gl.getUniformLocation(this.program, 'u_time');
-		if (uTime !== -1 && uTime !== null) { gl.uniform1f(uTime, Date.now() - performance.timeOrigin + 10000); }
+		this.applyUniforms(gl);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 	}
@@ -1944,6 +1960,12 @@ const Crumbs_Init_On_Load = function() {
 		this.scratchPadMain.height = Math.max(l('game').offsetHeight, 512);
 
 		return out;
+	}
+	Crumbs.shader.prototype.applyUniforms = function(gl) {
+		const uTex = gl.getUniformLocation(this.program, 'u_tex');
+		if (uTex !== -1 && uTex !== null) { gl.uniform1i(uTex, 0); }
+		const uTime = gl.getUniformLocation(this.program, 'u_time');
+		if (uTime !== -1 && uTime !== null) { gl.uniform1f(uTime, Date.now() - performance.timeOrigin + 10000); }
 	}
 	Crumbs.grayscale = new Crumbs.shader(`#version 300 es
 	precision mediump float;
